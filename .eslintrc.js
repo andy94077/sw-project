@@ -15,5 +15,6 @@ module.exports = {
   rules: {
     "react/jsx-filename-extension": 0,
     "prettier/prettier": ["error"],
+    "react/prop-types": 0,
   },
 };
