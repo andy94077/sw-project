@@ -6,9 +6,14 @@ import InfoIcon from "@material-ui/icons/Info";
 const useStyles = makeStyles({
   root: {
     position: "relative",
+    borderRadius: "20px",
+    margin: "0 7px 20px 7px",
   },
   icon: {
     color: "#eeeeee",
+  },
+  bar: {
+    borderRadius: "0 0 20px 20px",
   },
 });
 
@@ -25,9 +30,14 @@ export default function Photo(props) {
       onMouseEnter={changeBarVisibility}
       onMouseLeave={changeBarVisibility}
     >
-      <img src={src} alt={image} style={{ width: "100%", height: "auto" }} />
+      <img
+        src={src}
+        alt={image}
+        style={{ width: "100%", height: "auto", borderRadius: "inherit" }}
+      />
       {barVisibility && (
         <GridListTileBar
+          className={classes.bar}
           title={image}
           actionIcon={
             <IconButton
