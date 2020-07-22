@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2),
     marginLeft: 0,
     width: "100%",
     [theme.breakpoints.up("sm")]: {
@@ -62,7 +61,16 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("md")]: {
-      width: "20ch",
+      width: "18ch",
+      "&:focus": {
+        width: "36ch",
+      },
+    },
+    [`@media screen and (min-width: 600px) and (max-width: 960px)`]: {
+      width: "18ch",
+      "&:focus": {
+        width: "36ch",
+      },
     },
   },
   sectionDesktop: {
@@ -79,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default () => {
+export default function Bar() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -229,4 +237,4 @@ export default () => {
       {renderMenu}
     </div>
   );
-};
+}
