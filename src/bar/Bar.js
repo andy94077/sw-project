@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -10,12 +10,15 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from "@material-ui/icons/Menu";
 import SearchIcon from "@material-ui/icons/Search";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
 const useStyles = makeStyles((theme) => ({
+  Rounded: {
+    width: "32px",
+    borderRadius: "16px",
+  },
   grow: {
     flexGrow: 1,
   },
@@ -87,10 +90,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Bar() {
+export default function Bar(props) {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
+  const { avatar } = props;
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -123,8 +128,8 @@ export default function Bar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
     </Menu>
   );
 
@@ -162,7 +167,7 @@ export default function Bar() {
           aria-haspopup="true"
           color="inherit"
         >
-          <AccountCircle />
+          <img alt="Avatar" className={classes.Rounded} src={avatar} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -217,7 +222,7 @@ export default function Bar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
+              <img alt="Avatar" className={classes.Rounded} src={avatar} />
             </IconButton>
           </div>
           <div className={classes.sectionMobile}>
