@@ -14,6 +14,8 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
+import LeftDrawer from "./LeftDrawer";
+
 const useStyles = makeStyles((theme) => ({
   Rounded: {
     width: "32px",
@@ -94,6 +96,7 @@ export default function Bar(props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const { avatar } = props;
 
@@ -115,6 +118,17 @@ export default function Bar(props) {
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const toggleDrawer = (isOpen) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setOpen(isOpen);
   };
 
   const menuId = "primary-search-account-menu";
@@ -178,14 +192,21 @@ export default function Bar(props) {
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="open drawer"
-          >
-            <MenuIcon />
-          </IconButton>
+          <LeftDrawer
+            open={open}
+            toggleDrawer={toggleDrawer}
+            button={
+              <IconButton
+                edge="start"
+                className={classes.menuButton}
+                color="inherit"
+                aria-label="open drawer"
+                onClick={toggleDrawer(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+            }
+          />
           <Typography className={classes.title} variant="h6" noWrap>
             SW
           </Typography>
