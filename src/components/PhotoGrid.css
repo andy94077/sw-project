@@ -1,0 +1,35 @@
+.grid {
+  line-height: 0;
+  column-count: 6;
+  column-gap: 0px;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    column-count: 5;
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    column-count: 4;
+  }
+}
+
+@media (max-width: 800px) {
+  .grid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid {
+    column-count: 1;
+  }
+}
