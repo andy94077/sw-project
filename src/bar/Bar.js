@@ -8,16 +8,15 @@ import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
-import MenuIcon from "@material-ui/icons/Menu";
 import SearchIcon from "@material-ui/icons/Search";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
-import LeftDrawer from "./LeftDrawer";
+import RightDrawer from "./RightDrawer";
 
 const useStyles = makeStyles((theme) => ({
-  Rounded: {
+  rounded: {
     width: "32px",
     borderRadius: "16px",
   },
@@ -90,30 +89,20 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  offset: theme.mixins.toolbar,
 }));
 
 export default function Bar(props) {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
 
   const { avatar } = props;
 
-  const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
   };
 
   const handleMobileMenuOpen = (event) => {
@@ -132,21 +121,6 @@ export default function Bar(props) {
   };
 
   const menuId = "primary-search-account-menu";
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
-    </Menu>
-  );
-
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <Menu
@@ -174,14 +148,14 @@ export default function Bar(props) {
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={toggleDrawer(true)}>
         <IconButton
           aria-label="account of current user"
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
         >
-          <img alt="Avatar" className={classes.Rounded} src={avatar} />
+          <img alt="Avatar" className={classes.rounded} src={avatar} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -190,23 +164,8 @@ export default function Bar(props) {
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
-          <LeftDrawer
-            open={open}
-            toggleDrawer={toggleDrawer}
-            button={
-              <IconButton
-                edge="start"
-                className={classes.menuButton}
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer(true)}
-              >
-                <MenuIcon />
-              </IconButton>
-            }
-          />
           <Typography className={classes.title} variant="h6" noWrap>
             SW
           </Typography>
@@ -225,26 +184,32 @@ export default function Bar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="secondary">
+            <IconButton aria-label="show 2 new mails" color="inherit">
+              <Badge badgeContent={2} color="secondary">
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
+            <IconButton aria-label="show 3 new notifications" color="inherit">
+              <Badge badgeContent={3} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <img alt="Avatar" className={classes.Rounded} src={avatar} />
-            </IconButton>
+            <RightDrawer
+              open={open}
+              toggleDrawer={toggleDrawer}
+              button={
+                <IconButton
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                  onClick={toggleDrawer(true)}
+                  color="inherit"
+                >
+                  <img alt="Avatar" className={classes.rounded} src={avatar} />
+                </IconButton>
+              }
+            />
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
@@ -260,7 +225,7 @@ export default function Bar(props) {
         </Toolbar>
       </AppBar>
       {renderMobileMenu}
-      {renderMenu}
+      <div className={classes.offset} />
     </div>
   );
 }
