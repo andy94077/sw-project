@@ -1,7 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
-import Bar from "../bar/Bar";
 
 const useStyles = makeStyles({
   central: {
@@ -46,7 +45,6 @@ export default function Profile(props) {
   const { avatar, name, url, intro, follow } = props;
   return (
     <div>
-      <Bar avatar="pictures/avatar.jpeg" />
       <img
         alt="Avatar"
         className={`${classes.central} ${classes.rounded}`}
