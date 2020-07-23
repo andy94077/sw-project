@@ -15,7 +15,6 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-// eslint-disable-next-line import/no-unresolved
 import CommandBox from "./CommandBox";
 
 const useStyles = makeStyles((theme) => ({
@@ -25,9 +24,10 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
-    height: "80vh",
+    height: "75vh",
     boxShadow: "rgba(0,0,0,0.45) 0px 2px 10px",
     borderRadius: "30px",
+    marginTop: "50px",
   },
   details: {
     display: "flex",
@@ -93,7 +93,7 @@ export default function Content() {
   const [value, setValue] = useState("");
   return (
     <Grid container className={classes.gird} justify="center">
-      <Grid item xs={10}>
+      <Grid item xs={9}>
         <Card className={classes.root}>
           <CardMedia
             className={classes.cover}
