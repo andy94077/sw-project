@@ -1,12 +1,13 @@
 import React from "react";
-import { Box } from "@material-ui/core";
-import Content from "./Content/Content";
+import Bar from "./bar/Bar";
+import Content from "./content/Content";
 
 function App() {
   return (
-    <Box>
+    <>
+      <Bar />
       <Content />
-    </Box>
+    </>
   );
 }
 

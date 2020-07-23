@@ -12,8 +12,8 @@ import {
   CardMedia,
   CardContent,
   Card,
-  ExpandMoreIcon,
 } from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 // eslint-disable-next-line import/no-unresolved
 import CommandBox from "./CommandBox";
