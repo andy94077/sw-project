@@ -6,10 +6,8 @@ import Content from "./Content/Content";
 import Profile from "./Profile/Profile";
 import Bar from "./Bar/Bar";
 
-function App() {
-  const [tabIndex, setTabIndex] = useState("Homepage");
-
-  setTabIndex("Homepage");
+export default function App() {
+  const [tabIndex, setTabIndex] = useState("Profile");
 
   let currentPage;
   switch (tabIndex) {
@@ -27,9 +25,18 @@ function App() {
       currentPage = <Content />;
       break;
     case "Profile":
-      currentPage = <Profile />;
+      currentPage = (
+        <Profile
+          avatar="pictures/1.jpg"
+          name="testing"
+          url="localhost:3000"
+          intro="hi"
+          follow={[123, 456]}
+        />
+      );
       break;
     default:
+      setTabIndex("Homepage");
       currentPage = <LoginPage />;
       break;
   }
@@ -40,5 +47,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
