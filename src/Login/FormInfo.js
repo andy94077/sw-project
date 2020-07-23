@@ -35,6 +35,7 @@ export default function FormInfo() {
           inputRef={username}
           label="User Name"
           variant="outlined"
+          required="true"
           placeholder="enter your username"
           color="primary"
           className={classes.controlSpace}
@@ -45,7 +46,8 @@ export default function FormInfo() {
           inputRef={password}
           label="Password"
           variant="outlined"
-          place="enter your password"
+          required="true"
+          placeholder="enter your password"
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
