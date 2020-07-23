@@ -13,6 +13,8 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
+import { Popover } from "@material-ui/core";
+import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +27,11 @@ const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
+  },
+  // For popover
+  paper: {
+    minWidth: "400px",
+    maxWidth: "600px",
   },
   title: {
     display: "none",
@@ -93,20 +100,51 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Bar(props) {
+  // Classes & States
   const classes = useStyles();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [content, setContent] = useState(false);
+  const [text, setText] = useState([""]);
   const [open, setOpen] = useState(false);
 
   const { avatar } = props;
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const isContentOpen = Boolean(content);
 
+  const mailId = "primary-search-mail-menu";
+  const noteId = "primary-search-notification-menu";
+  const menuId = "primary-search-account-menu";
+  const mobileMenuId = "primary-search-account-menu-mobile";
+
+  // Static contents
+  const mails = [
+    { subject: "Mail 1", sender: "from Andy Chen", content: "How are you?" },
+    { subject: "Mail 2", sender: "from Jason Hung", content: "How do you do?" },
+  ];
+  const notes = [
+    { subject: "Hint 1", sender: "", content: "Hey!" },
+    { subject: "Hint 2", sender: "", content: "Hey you!" },
+    { subject: "Hint 3", sender: "", content: "Yes you!" },
+  ];
+
+  // Toggle functions
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleContentClose = () => {
+    setText([""]);
+    setContent(null);
+  };
+
+  const handleContentOpen = (texts) => (event) => {
+    setText(texts);
+    setContent(event.currentTarget);
   };
 
   const toggleDrawer = (isOpen) => (event) => {
@@ -120,8 +158,23 @@ export default function Bar(props) {
     setOpen(isOpen);
   };
 
-  const menuId = "primary-search-account-menu";
-  const mobileMenuId = "primary-search-account-menu-mobile";
+  // Toggled components
+  const renderContent = (
+    <Popover
+      anchorEl={content}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      classes={{ paper: `${classes.paper}` }}
+      id={mailId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={isContentOpen}
+      onClose={handleContentClose}
+      width="50%"
+    >
+      <Content text={text} />
+    </Popover>
+  );
+
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -133,16 +186,16 @@ export default function Bar(props) {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
+        <IconButton aria-label="popup 2 new mails" color="inherit">
+          <Badge badgeContent={2} color="secondary">
             <MailIcon />
           </Badge>
         </IconButton>
         <p>Messages</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
+        <IconButton aria-label="popup 3 new notifications" color="inherit">
+          <Badge badgeContent={3} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -162,6 +215,7 @@ export default function Bar(props) {
     </Menu>
   );
 
+  // The bar
   return (
     <div className={classes.grow}>
       <AppBar position="fixed">
@@ -184,12 +238,24 @@ export default function Bar(props) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 2 new mails" color="inherit">
+            <IconButton
+              aria-label="popup 2 new mails"
+              aria-controls={mailId}
+              aria-haspopup="true"
+              onClick={handleContentOpen(mails)}
+              color="inherit"
+            >
               <Badge badgeContent={2} color="secondary">
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 3 new notifications" color="inherit">
+            <IconButton
+              aria-label="popup 3 new notifications"
+              aria-controls={noteId}
+              aria-haspopup="true"
+              onClick={handleContentOpen(notes)}
+              color="inherit"
+            >
               <Badge badgeContent={3} color="secondary">
                 <NotificationsIcon />
               </Badge>
@@ -213,7 +279,7 @@ export default function Bar(props) {
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
-              aria-label="show more"
+              aria-label="popup more"
               aria-controls={mobileMenuId}
               aria-haspopup="true"
               onClick={handleMobileMenuOpen}
@@ -224,6 +290,7 @@ export default function Bar(props) {
           </div>
         </Toolbar>
       </AppBar>
+      {renderContent}
       {renderMobileMenu}
       <div className={classes.offset} />
     </div>

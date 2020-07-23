@@ -1,81 +1,79 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
-import Bar from "./bar/Bar";
+import Bar from "../bar/Bar";
 
 const useStyles = makeStyles({
-  Central: {
+  central: {
     display: "block",
     margin: "auto",
   },
-  Center: {
+  center: {
     textAlign: "center",
   },
-  Rounded: {
+  rounded: {
     marginTop: "20px",
     width: "120px",
     borderRadius: "60px",
   },
-  Bold: {
+  bold: {
     color: "#111",
     fontWeight: "700",
   },
-  Name: {
+  name: {
     fontSize: "36px",
   },
-  Text: {
+  text: {
     lineHeight: "25px",
     fontSize: "16px",
   },
-  URL: {
+  url: {
     textDecoration: "none",
     "&:hover": {
       textDecoration: "underline",
       cursor: "pointer",
     },
   },
-  Tmp: {
+  tmp: {
     marginTop: "100px",
     fontSize: "21px",
     color: "#a3a19a",
   },
 });
 
-function Profile(props) {
+export default function Profile(props) {
   const classes = useStyles();
   const { avatar, name, url, intro, follow } = props;
   return (
     <div>
-      <Bar avatar="picture/avatar.jpeg" />
+      <Bar avatar="pictures/avatar.jpeg" />
       <img
         alt="Avatar"
-        className={`${classes.Central} ${classes.Rounded}`}
+        className={`${classes.central} ${classes.rounded}`}
         src={avatar}
       />
-      <h2 className={`${classes.Center} ${classes.Name}`}>{name}</h2>
-      <div className={`${classes.Center} ${classes.Text}`}>
-        <a className={`${classes.Bold} ${classes.URL}`} href={url}>
+      <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
+      <div className={`${classes.center} ${classes.text}`}>
+        <a className={`${classes.bold} ${classes.url}`} href={url}>
           {url}
         </a>
         &nbsp;·&nbsp;
         <span>{intro}</span>
         <br />
-        <span className={classes.Bold}>
+        <span className={classes.bold}>
           {follow[0]} followers · {follow[1]} following
         </span>
       </div>
       <Button
-        className={`${classes.Central} ${classes.Rounded} ${classes.Text}`}
+        className={`${classes.central} ${classes.rounded} ${classes.text}`}
         variant="contained"
         color="secondary"
       >
         Follow
       </Button>
-      <div className={`${classes.Center} ${classes.Tmp}`}>
+      <div className={`${classes.center} ${classes.tmp}`}>
         No image on this profile.
       </div>
     </div>
   );
 }
-
-export default Profile;
