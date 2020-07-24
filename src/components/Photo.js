@@ -20,8 +20,11 @@ const useStyles = makeStyles({
 export default function Photo(props) {
   const classes = useStyles();
   const [barVisibility, setBarVisibility] = useState(false);
-  const { image, src } = props;
+  const { image, src, onClick } = props;
 
+  const onKeyUp = (e) => {
+    if (e.key === "Enter") onClick();
+  };
   const changeBarVisibility = () => setBarVisibility(!barVisibility);
 
   return (
@@ -29,6 +32,10 @@ export default function Photo(props) {
       className={classes.root}
       onMouseEnter={changeBarVisibility}
       onMouseLeave={changeBarVisibility}
+      onClick={onClick}
+      onKeyUp={onKeyUp}
+      role="button"
+      tabIndex="0"
     >
       <img
         src={src}
