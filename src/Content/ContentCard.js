@@ -128,7 +128,14 @@ export default function ContentCard(props) {
         </Fab>
         <Collapse in={expand}>
           <div className={classes.command}>
-            <CommandBox author="author" command="Cute cat." />
+            <CommandBox
+              author="author"
+              command="Cute cat."
+              authorOnClick={handleSetState({
+                tabIndex: "Profile",
+                profileUse: "Author",
+              })}
+            />
           </div>
           <form
             className={classes.command}
