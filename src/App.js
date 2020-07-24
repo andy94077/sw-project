@@ -25,7 +25,11 @@ export default function App() {
       );
       break;
     case "Content":
-      currentPage = <Content />;
+      currentPage = (
+        <Content
+          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
+        />
+      );
       break;
     case "Profile":
       currentPage = (
