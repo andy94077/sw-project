@@ -33,7 +33,7 @@ export default function Content(props) {
     <div className={classes.root}>
       {text.map((value) => {
         return (
-          <Accordion>
+          <Accordion key={value.id}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"

@@ -105,7 +105,7 @@ export default function Bar(props) {
   const classes = useStyles();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [content, setContent] = useState(false);
-  const [text, setText] = useState([""]);
+  const [text, setText] = useState([{ id: 1 }]);
   const [open, setOpen] = useState(false);
 
   const { avatar, handleClick } = props;
@@ -120,13 +120,23 @@ export default function Bar(props) {
 
   // Static contents
   const mails = [
-    { subject: "Mail 1", sender: "from Andy Chen", content: "How are you?" },
-    { subject: "Mail 2", sender: "from Jason Hung", content: "How do you do?" },
+    {
+      id: 1,
+      subject: "Mail 1",
+      sender: "from Andy Chen",
+      content: "How are you?",
+    },
+    {
+      id: 2,
+      subject: "Mail 2",
+      sender: "from Jason Hung",
+      content: "How do you do?",
+    },
   ];
   const notes = [
-    { subject: "Hint 1", sender: "", content: "Hey!" },
-    { subject: "Hint 2", sender: "", content: "Hey you!" },
-    { subject: "Hint 3", sender: "", content: "Yes you!" },
+    { id: 1, subject: "Hint 1", sender: "", content: "Hey!" },
+    { id: 2, subject: "Hint 2", sender: "", content: "Hey you!" },
+    { id: 3, subject: "Hint 3", sender: "", content: "Yes you!" },
   ];
 
   // Toggle functions
@@ -139,7 +149,6 @@ export default function Bar(props) {
   };
 
   const handleContentClose = () => {
-    setText([""]);
     setContent(null);
   };
 
