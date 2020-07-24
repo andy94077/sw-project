@@ -94,7 +94,7 @@ export default function FormInfo() {
           inputRef={username}
           label="User Name"
           variant="outlined"
-          required="true"
+          required
           error={state.isError}
           helperText={state.errorMes}
           placeholder="enter your username"
@@ -108,7 +108,7 @@ export default function FormInfo() {
           inputRef={password}
           label="Password"
           variant="outlined"
-          required="true"
+          required
           error={state.isError}
           helperText={state.errorMes}
           placeholder="enter your password"
