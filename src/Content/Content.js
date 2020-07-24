@@ -20,7 +20,9 @@ export default function Content(props) {
       <Grid item xs={9}>
         <ContentCard />
       </Grid>
-      <PhotoGrid imageList={imageList} xs={11} />
+      <Grid item xs={10}>
+        <PhotoGrid imageList={imageList} />
+      </Grid>
     </Grid>
   );
 }
