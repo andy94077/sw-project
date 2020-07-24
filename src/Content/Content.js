@@ -13,12 +13,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function Content(props) {
-  const { imageList } = props;
+  const { imageList, jump } = props;
   const classes = useStyles();
   return (
     <Grid container className={classes.gird} justify="center">
       <Grid item xs={9}>
-        <ContentCard />
+        <ContentCard jump={jump} />
       </Grid>
       <Grid item xs={10}>
         <PhotoGrid imageList={imageList} />
