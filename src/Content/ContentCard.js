@@ -100,7 +100,7 @@ export default function ContentCard(props) {
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <CardActions onClick={() => jump("Profile")}>
+            <CardActions onClick={jump("Profile")}>
               <Typography component="h5" variant="h5">
                 Author
               </Typography>
