@@ -8,12 +8,17 @@ import Profile from "./Profile/Profile";
 import Bar from "./Bar/Bar";
 
 export default function App() {
-  const [tabIndex, setTabIndex] = useState("LoginPage");
+  const [state, setState] = useState({
+    tabIndex: "LoginPage",
+    contentSrc: null,
+    profileUser: "test",
+  });
 
-  const handleClick = (page) => () => setTabIndex(page);
+  const handleClick = (page) => () => setState({ tabIndex: page });
+  const handleSetState = (_state) => () => setState(_state);
 
   let currentPage;
-  switch (tabIndex) {
+  switch (state) {
     case "LoginPage":
       currentPage = <LoginPage />;
       break;
@@ -21,6 +26,7 @@ export default function App() {
       currentPage = (
         <HomePage
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
+          setState={handleSetState}
         />
       );
       break;
@@ -35,7 +41,7 @@ export default function App() {
       currentPage = (
         <Profile
           avatar="pictures/avatar.jpeg"
-          name="testing"
+          name={state.profileUser}
           url="localhost:3000"
           intro="hi"
           follow={[123, 456]}
@@ -43,13 +49,13 @@ export default function App() {
       );
       break;
     default:
-      setTabIndex("Homepage");
+      setState("Homepage");
       currentPage = <LoginPage />;
       break;
   }
   return (
     <div>
-      {tabIndex !== "LoginPage" && <Bar avatar="pictures/avatar.jpeg" />}
+      {state !== "LoginPage" && <Bar avatar="pictures/avatar.jpeg" />}
       <Button
         variant="contained"
         color="primary"
