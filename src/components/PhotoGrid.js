@@ -13,7 +13,7 @@ export default function PhotoGrid(props) {
       src={`images/${image}`}
       onClick={handleSetState({
         tabIndex: "Content",
-        ContentSrc: `images/${image}`,
+        contentSrc: `images/${image}`,
       })}
     />
   ));

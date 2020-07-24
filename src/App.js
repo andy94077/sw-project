@@ -34,6 +34,7 @@ export default function App() {
       currentPage = (
         <Content
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
+          state={state}
           handleSetState={handleSetState}
         />
       );
