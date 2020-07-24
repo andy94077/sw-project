@@ -47,7 +47,7 @@ export default function App() {
           url="localhost:3000"
           intro="hi"
           follow={[123, 456]}
-          handleClick={handleClick}
+          handleSetState={handleSetState}
         />
       );
       break;
@@ -74,20 +74,6 @@ export default function App() {
         onClick={handleClick("Homepage")}
       >
         Homepage
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClick("Content")}
-      >
-        Content
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClick("Profile")}
-      >
-        Profile
       </Button>
       {currentPage}
     </div>
