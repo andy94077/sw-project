@@ -86,21 +86,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { jump } = props;
+  const { state, setState } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
+
+  function handleOnClick(author) {
+    setState({ tabIndex: "Profile", profileUse: author });
+  }
+
   return (
     <Card className={classes.root}>
       <CardMedia
         className={classes.cover}
-        image="pictures/test.png"
+        image={state.contentSrc}
         title="Live from space album cover"
       />
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <CardActions onClick={jump("Profile")}>
+            <CardActions onClick={handleOnClick("Author")}>
               <Typography component="h5" variant="h5">
                 Author
               </Typography>
