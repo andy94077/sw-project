@@ -13,7 +13,7 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 
-import { Popover } from "@material-ui/core";
+import { Popover, Button } from "@material-ui/core";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "600px",
   },
   title: {
+    color: "white",
     display: "none",
     [theme.breakpoints.up("sm")]: {
       display: "block",
@@ -107,7 +108,7 @@ export default function Bar(props) {
   const [text, setText] = useState([""]);
   const [open, setOpen] = useState(false);
 
-  const { avatar } = props;
+  const { avatar, handleClick } = props;
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(content);
@@ -220,9 +221,11 @@ export default function Bar(props) {
     <div className={classes.grow}>
       <AppBar position="fixed">
         <Toolbar>
-          <Typography className={classes.title} variant="h6" noWrap>
-            SW
-          </Typography>
+          <Button onClick={handleClick("Homepage")}>
+            <Typography className={classes.title} variant="h6" noWrap>
+              SW
+            </Typography>
+          </Button>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -275,6 +278,7 @@ export default function Bar(props) {
                   <img alt="Avatar" className={classes.rounded} src={avatar} />
                 </IconButton>
               }
+              handleClick={handleClick}
             />
           </div>
           <div className={classes.sectionMobile}>

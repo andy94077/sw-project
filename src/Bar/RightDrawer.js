@@ -21,12 +21,13 @@ const useStyles = makeStyles({
 export default function RightDrawer(props) {
   const classes = useStyles();
 
-  const { open, toggleDrawer, button } = props;
+  const { open, toggleDrawer, button, handleClick } = props;
   const menuItem = ["My account", "Settings", "Log out"];
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
+  const menuTabs = ["Profile", false, "LoginPage"];
 
   const menu = menuItem.map((text, index) => (
-    <ListItem button key={text}>
+    <ListItem button key={text} onClick={handleClick(menuTabs[index])}>
       <ListItemIcon>{menuIcon[index]}</ListItemIcon>
       <ListItemText primary={text} />
     </ListItem>

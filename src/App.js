@@ -35,6 +35,7 @@ export default function App() {
           url="localhost:3000"
           intro="hi"
           follow={[123, 456]}
+          handleClick={handleClick}
         />
       );
       break;
@@ -45,7 +46,9 @@ export default function App() {
   }
   return (
     <div>
-      {tabIndex !== "LoginPage" && <Bar avatar="pictures/avatar.jpeg" />}
+      {tabIndex !== "LoginPage" && (
+        <Bar avatar="pictures/avatar.jpeg" handleClick={handleClick} />
+      )}
       <Button
         variant="contained"
         color="primary"
