@@ -4,7 +4,7 @@ import LoginForm from "./LoginForm";
 
 const useStyles = makeStyles(() => ({
   Background: {
-    backgroundImage: "url(picture/desktop.png)",
+    backgroundImage: "url(pictures/desktop.png)",
     backgroundPosition: "center",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",

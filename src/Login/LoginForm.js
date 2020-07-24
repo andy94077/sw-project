@@ -30,9 +30,9 @@ export default function LoginForm() {
         <div className={classes.logoFrame} />
         <div style={{ height: "10px" }} />
         <div style={{ margin: "0px auto 0px" }}>
-          <h style={{ fontSize: "30px", fontWeight: "bold" }}>
+          <h1 style={{ fontSize: "30px", fontWeight: "bold", margin: "0" }}>
             Happy Tree Friend
-          </h>
+          </h1>
         </div>
         <div style={{ margin: "30px auto 0px" }}>
           <FormInfo />
