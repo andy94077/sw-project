@@ -35,7 +35,7 @@ export default function App() {
         <Content
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
           state={state}
-          setState={setState}
+          handleSetState={handleSetState}
         />
       );
       break;

@@ -86,14 +86,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { state, setState } = props;
+  const { state, handleSetState } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
-
-  function handleOnClick(author) {
-    setState({ tabIndex: "Profile", profileUse: author });
-  }
 
   return (
     <Card className={classes.root}>
@@ -105,7 +101,12 @@ export default function ContentCard(props) {
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <CardActions onClick={handleOnClick("Author")}>
+            <CardActions
+              onClick={handleSetState({
+                tabIndex: "Profile",
+                profileUse: "Author",
+              })}
+            >
               <Typography component="h5" variant="h5">
                 Author
               </Typography>
