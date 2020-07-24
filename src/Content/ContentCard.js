@@ -11,6 +11,8 @@ import {
   CardMedia,
   CardContent,
   Card,
+  CardActionArea,
+  CardActions,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -83,7 +85,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ContentCard() {
+export default function ContentCard(props) {
+  const { jump } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
@@ -96,9 +99,13 @@ export default function ContentCard() {
       />
       <div className={classes.details}>
         <CardContent className={classes.content}>
-          <Typography component="h5" variant="h5">
-            Author
-          </Typography>
+          <CardActionArea>
+            <CardActions onClick={() => jump("Profile")}>
+              <Typography component="h5" variant="h5">
+                Author
+              </Typography>
+            </CardActions>
+          </CardActionArea>
           <Typography variant="subtitle1" color="textSecondary">
             This is a cat
           </Typography>
