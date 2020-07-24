@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Profile(props) {
   const classes = useStyles();
-  const { avatar, name, url, intro, follow } = props;
+  const { avatar, name, url, intro, follow, handleSetState } = props;
   return (
     <div>
       <img
@@ -77,6 +77,7 @@ export default function Profile(props) {
       <div className={classes.central}>
         <PhotoGrid
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
+          handleSetState={handleSetState}
         />
       </div>
     </div>
