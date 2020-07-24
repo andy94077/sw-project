@@ -1,11 +1,16 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
+import PhotoGrid from "../components/PhotoGrid";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   central: {
     display: "block",
     margin: "auto",
+    width: "70%",
+    [theme.breakpoints.down("sm")]: {
+      width: "95%",
+    },
   },
   center: {
     textAlign: "center",
@@ -38,7 +43,7 @@ const useStyles = makeStyles({
     fontSize: "21px",
     color: "#a3a19a",
   },
-});
+}));
 
 export default function Profile(props) {
   const classes = useStyles();
@@ -69,8 +74,10 @@ export default function Profile(props) {
       >
         Follow
       </Button>
-      <div className={`${classes.center} ${classes.tmp}`}>
-        No image on this profile.
+      <div className={classes.central}>
+        <PhotoGrid
+          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
+        />
       </div>
     </div>
   );
