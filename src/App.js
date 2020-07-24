@@ -18,7 +18,7 @@ export default function App() {
   const handleSetState = (_state) => () => setState(_state);
 
   let currentPage;
-  switch (state) {
+  switch (state.tabIndex) {
     case "LoginPage":
       currentPage = <LoginPage />;
       break;
@@ -26,7 +26,7 @@ export default function App() {
       currentPage = (
         <HomePage
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}.jpg`)}
-          setState={handleSetState}
+          handleSetState={handleSetState}
         />
       );
       break;
@@ -47,17 +47,20 @@ export default function App() {
           url="localhost:3000"
           intro="hi"
           follow={[123, 456]}
+          handleClick={handleClick}
         />
       );
       break;
     default:
-      setState("Homepage");
+      setState({ tabIndex: "Homepage" });
       currentPage = <LoginPage />;
       break;
   }
   return (
     <div>
-      {state !== "LoginPage" && <Bar avatar="pictures/avatar.jpeg" />}
+      {state.tabIndex !== "LoginPage" && (
+        <Bar avatar="pictures/avatar.jpeg" handleClick={handleClick} />
+      )}
       <Button
         variant="contained"
         color="primary"
