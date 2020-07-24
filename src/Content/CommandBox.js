@@ -26,11 +26,19 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CommandBox(props) {
-  const { author, command } = props;
+  const { author, command, authorOnClick } = props;
   const classes = useStyles();
   return (
     <Paper className={classes.root}>
-      <div className={classes.author}>{author}</div>
+      <div
+        className={classes.author}
+        onClick={authorOnClick}
+        role="button"
+        onKeyPress={() => {}}
+        tabIndex={0}
+      >
+        {author}
+      </div>
       <div className={classes.content}>{command}</div>
     </Paper>
   );
