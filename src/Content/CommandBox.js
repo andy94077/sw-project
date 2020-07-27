@@ -31,7 +31,9 @@ export default function CommandBox(props) {
   const classes = useStyles();
   return (
     <Paper className={classes.root}>
-      <Link to="/profile/author">{author}</Link>
+      <Link to="/profile/author" className={classes.author}>
+        {author}
+      </Link>
       <div className={classes.content}>{command}</div>
     </Paper>
   );

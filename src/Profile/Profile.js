@@ -2,6 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import PhotoGrid from "../components/PhotoGrid";
+import Bar from "../Bar/Bar";
 
 const useStyles = makeStyles((theme) => ({
   central: {
@@ -53,7 +54,8 @@ export default function Profile({ match }) {
   const url = "localhost:3000";
   const intro = "hi";
   return (
-    <div>
+    <>
+      <Bar />
       <img
         alt="Avatar"
         className={`${classes.central} ${classes.rounded}`}
@@ -83,6 +85,6 @@ export default function Profile({ match }) {
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
         />
       </div>
-    </div>
+    </>
   );
 }

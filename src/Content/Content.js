@@ -5,6 +5,7 @@ import { Grid } from "@material-ui/core";
 
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
+import Bar from "../Bar/Bar";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -16,15 +17,18 @@ export default function Content({ match }) {
   const { pictureId } = match.params;
   const classes = useStyles();
   return (
-    <Grid container className={classes.gird} justify="center">
-      <Grid item xs={9}>
-        <ContentCard src={`/images/${pictureId}.jpg`} />
+    <>
+      <Bar />
+      <Grid container className={classes.gird} justify="center">
+        <Grid item xs={9}>
+          <ContentCard src={`/images/${pictureId}.jpg`} />
+        </Grid>
+        <Grid item xs={10}>
+          <PhotoGrid
+            imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
+          />
+        </Grid>
       </Grid>
-      <Grid item xs={10}>
-        <PhotoGrid
-          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
-        />
-      </Grid>
-    </Grid>
+    </>
   );
 }

@@ -12,8 +12,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
+import { Link } from "react-router-dom";
 
-import { Popover, Button } from "@material-ui/core";
+import { Popover } from "@material-ui/core";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
@@ -100,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.toolbar,
 }));
 
-export default function Bar(props) {
+export default function Bar() {
   // Classes & States
   const classes = useStyles();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
@@ -108,7 +109,7 @@ export default function Bar(props) {
   const [text, setText] = useState([{ id: 1 }]);
   const [open, setOpen] = useState(false);
 
-  const { avatar, handleClick } = props;
+  const avatar = "/pictures/avatar.jpeg";
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(content);
@@ -230,11 +231,11 @@ export default function Bar(props) {
     <div className={classes.grow}>
       <AppBar position="fixed">
         <Toolbar>
-          <Button onClick={handleClick("Homepage")}>
+          <Link to="/home">
             <Typography className={classes.title} variant="h6" noWrap>
               SW
             </Typography>
-          </Button>
+          </Link>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -287,7 +288,6 @@ export default function Bar(props) {
                   <img alt="Avatar" className={classes.rounded} src={avatar} />
                 </IconButton>
               }
-              handleClick={handleClick}
             />
           </div>
           <div className={classes.sectionMobile}>
