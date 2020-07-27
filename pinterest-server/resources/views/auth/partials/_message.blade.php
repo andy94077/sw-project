@@ -1,0 +1,71 @@
+@if ($message = Session::get('success'))
+<div class="alert success">
+    <span class="closebtn">&times;</span>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('error'))
+<div class="alert error">
+    <span class="closebtn">&times;</span>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('warning'))
+<div class="alert warning">
+    <span class="closebtn">&times;</span>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('info'))
+<div class="alert">
+    <span class="closebtn">&times;</span>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('status'))
+{{ Session::flash('status_pop', '1') }}
+@endif
+
+@if ($errors->any())
+<div class="alert any">
+    <span class="closebtn">&times;</span>
+    @foreach ($errors->messages() as $messages)
+        @foreach ($messages as $message)
+            <strong>{{ $message }}</strong>
+        @endforeach
+    @endforeach
+</div>
+@endif
+
+<style>
+.alert {
+    opacity: 1;
+    transition: opacity 0.6s; /* 600ms to fade out */
+}
+</style>
+
+<script>
+// Get all elements with class="closebtn"
+var close = document.getElementsByClassName("closebtn");
+var i;
+
+// Loop through all close buttons
+for (i = 0; i < close.length; i++) {
+    // When someone clicks on a close button
+    close[i].onclick = function(){
+
+    // Get the parent of <span class="closebtn"> (<div class="alert">)
+    var div = this.parentElement;
+
+    // Set the opacity of div to 0 (transparent)
+    div.style.opacity = "0";
+
+    // Hide the div after 600ms (the same amount of milliseconds it takes to fade out)
+    setTimeout(function(){ div.style.display = "none"; }, 600);
+    }
+}
+</script>

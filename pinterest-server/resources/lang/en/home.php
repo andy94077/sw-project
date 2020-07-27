@@ -1,0 +1,30 @@
+<?php
+//english
+return [
+    'funpodium' => 'Funpodium',
+    'company' => 'Company',
+    'career' => 'Career',
+    'blog' => 'Blog',
+    'fun' => 'Fun',
+    'innovation' => 'Innovation',
+    'agile' => 'Agility',
+    'home' => 'Home',
+    'mission' => 'Our Mission',
+    'about' => 'About',
+    'serve' => 'Products',
+    'join_us' => 'Join Us',
+    'contact' => 'Contact Us',
+    'our_product' => 'OUR PRODUCTS',
+    'product_launched' => 'Launched',
+    'product_developing' => 'Developing',
+    'browse' => 'Browse',
+    'what_we_offer' => 'WHAT WE OFFER',
+    'about_us' => 'ABOUT US',
+    'contact_us' => 'CONTACT US',
+    'form_name' => 'Name',
+    'form_email' => 'Email',
+    'form_select' => 'Select a subject',
+    'form_msg' => 'Your message',
+    'submit' => 'Submit',
+    'learn_more' => 'Learn More'
+];

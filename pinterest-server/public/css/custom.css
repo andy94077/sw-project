@@ -1,0 +1,94 @@
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+}
+.header {
+    height: 68px;
+    background-color: #101f5f;
+    position: relative;
+}
+.header .logo {
+    position: absolute;
+    top: 50%;
+    left: 78px;
+    transform: translateY(-50%);
+}
+.w-300 {
+    width: 300px;
+}
+.form-position {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.form-title {
+    margin-bottom: 32px;
+    color: #0a1726;
+    font-size: 32px;
+    font-weight: 900;
+    text-align: center;
+}
+.description-txt {
+    color: #717171;
+    margin-bottom: 24px;
+    text-align: center;
+    font-size: 15px;
+}
+.input-group {
+    margin-bottom: 12px;
+}
+input:focus {
+    outline: none;
+}
+.mb-24 {
+    margin-bottom: 24px;
+}
+.input-control {
+    width: 100%;
+    height: 38px;
+    padding: 6px 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+}
+.help-txt {
+    margin-top: 2px;
+    font-size: 14px;
+    color: #9b9b9b;
+    text-decoration: none;
+}
+.checkbox-txt {
+    color: #717171;
+    font-size: 14px;
+}
+.float-wrap {
+    margin-bottom: 36px;
+    overflow: hidden;
+}
+.float-l {
+    float: left;
+}
+.float-r {
+    float: right;
+}
+.btn-group {
+    text-align: center;
+}
+.btn {
+    display: inline-block;
+    padding: 7px 14px;
+    margin-bottom: 0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 8px;
+    outline: none;
+}
+.btn-blue {
+    background-color: #0d60a7;
+    border: 1px solid #0d60a7;
+}
+
