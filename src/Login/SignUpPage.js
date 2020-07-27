@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [modalShow, setModalShow] = useState(false);
   const classes = useStyles();
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
                 <div style={{ width: "10%" }} />
                 <div className={classes.formTEXT}>
                   <div className={classes.itemFormat}>
-                    <LoginForm
+                    <SignUp
                       show={modalShow}
                       setModalShow={() => setModalShow(true)}
                     />
@@ -74,7 +74,7 @@ export default function LoginPage() {
               </div>
             </div>
           ) : (
-            <SignUp show={modalShow} onHide={() => setModalShow(false)} />
+            <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
           )}
         </div>
       </div>

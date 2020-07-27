@@ -1,36 +1,17 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Modal from "react-bootstrap/Modal";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
 import FormInfo from "./FormInfo";
-import "./SignUp.css";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
     backgroundColor: `rgb(255, 255, 255)`,
     borderRadius: "25px",
-    // position: "fixed",
     textAlign: "center",
-    // position: "fixed",
-    // left: "45%",
-    // top: "50%",
-    // transform: `translate(-50%, -50%)`,
     width: "420px",
-    // margin: "auto 0px auto 4%",
+    margin: "auto 0px auto 4%",
     minHeight: "600px",
     boxShadow: `rgba(0, 0, 0, 0.45) 0px 2px 10px`,
-  },
-  jumpFrame: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: "25px",
-    textAlign: "center",
-    margin: "auto",
-    height: "600px",
-    overflow: "hidden",
-    width: "420px",
   },
   logoFrame: {
     backgroundColor: `rgb(255,0,0)`,
@@ -42,7 +23,7 @@ const useStyles = makeStyles(() => ({
   },
   signUpFrame: {
     height: "48px",
-    width: "100%",
+    width: "403.4px",
     color: "#111",
     borderRadius: "0 0 25px 25px",
   },
@@ -57,40 +38,29 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function SignUp(props) {
-  const { onHide, show } = props;
+  const { setModalShow } = props;
   const classes = useStyles();
   return (
-    <Modal
-      show={show}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-      // animation={false}
-      dialogClassName={classes.jumpFrame}
-    >
-      <div>
-        {/* <div className={classes.formFrame}> */}
-        <div style={{ padding: "20px 10px 24px", height: "552px" }}>
-          <div className={classes.logoFrame} />
-          <div style={{ height: "10px" }} />
-          <div style={{ margin: "0px auto 0px" }}>
-            <h style={{ fontSize: "30px", fontWeight: "bold" }}>
-              Happy Tree Friend
-            </h>
-          </div>
-          <div style={{ margin: "30px auto 0px" }}>
-            <FormInfo />
-          </div>
+    <div className={classes.formFrame}>
+      <div style={{ padding: "20px 10px 24px", height: "552px" }}>
+        <div className={classes.logoFrame} />
+        <div style={{ height: "10px" }} />
+        <div style={{ margin: "0px auto 0px" }}>
+          <h1 style={{ fontSize: "30px", fontWeight: "bold", margin: "0" }}>
+            Happy Tree Friend
+          </h1>
         </div>
-        <Button
-          variant="contained"
-          className={classes.signUpFrame}
-          onClick={onHide}
-        >
-          <div className={classes.signUpText}>Create a new account</div>
-        </Button>
+        <div style={{ margin: "30px auto 0px" }}>
+          <FormInfo />
+        </div>
       </div>
-      {/* </div> */}
-    </Modal>
+      <Button
+        variant="contained"
+        className={classes.signUpFrame}
+        onClick={setModalShow}
+      >
+        <div className={classes.signUpText}>Already have an account</div>
+      </Button>
+    </div>
   );
 }
