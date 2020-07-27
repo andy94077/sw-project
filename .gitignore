@@ -23,3 +23,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+pinterest-server/node_modules
+pinterest-server/public/hot
+pinterest-server/public/uploads
+pinterest-server/storage/*.key
+pinterest-server/vendor
+pinterest-server/.env
+pinterest-server/.env.backup
+pinterest-server/.phpunit.result.cache
+pinterest-server/Homestead.json
+pinterest-server/Homestead.yaml
+pinterest-server/npm-debug.log
+pinterest-server/yarn-error.log
