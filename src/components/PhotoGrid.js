@@ -1,21 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import Photo from "./Photo";
 import "./PhotoGrid.css";
 
 export default function PhotoGrid(props) {
-  const { imageList, handleSetState } = props;
+  const { imageList } = props;
 
   const photos = imageList.map((image) => (
-    <Photo
-      key={image}
-      image={image}
-      src={`images/${image}`}
-      onClick={handleSetState({
-        tabIndex: "Content",
-        contentSrc: `images/${image}`,
-      })}
-    />
+    <Link to={`/picture/${image}`}>
+      <Photo key={image} image={image} src={`/images/${image}.jpg`} />
+    </Link>
   ));
 
   return <div className="grid">{photos}</div>;
