@@ -8,8 +8,8 @@ export default function PhotoGrid(props) {
   const { imageList } = props;
 
   const photos = imageList.map((image) => (
-    <Link to={`/picture/${image}`}>
-      <Photo key={image} image={image} src={`/images/${image}.jpg`} />
+    <Link to={`/picture/${image}`} key={image}>
+      <Photo image={image} src={`/images/${image}.jpg`} />
     </Link>
   ));
 

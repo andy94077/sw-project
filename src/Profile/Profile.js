@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import PhotoGrid from "../components/PhotoGrid";
 import Bar from "../Bar/Bar";
+import Upload from "./Upload";
 
 const useStyles = makeStyles((theme) => ({
   central: {
@@ -39,6 +40,9 @@ const useStyles = makeStyles((theme) => ({
       cursor: "pointer",
     },
   },
+  input: {
+    display: "none",
+  },
   tmp: {
     marginTop: "100px",
     fontSize: "21px",
@@ -53,8 +57,25 @@ export default function Profile({ match }) {
   const avatar = "/pictures/avatar.jpeg";
   const url = "localhost:3000";
   const intro = "hi";
+
+  const [image, setImage] = useState("");
+  const [modalShow, setModalShow] = useState(false);
+
+  const handleUploadImage = (event) => {
+    if (image === event.target.value) {
+      return;
+    }
+    setImage(event.target.value);
+    setModalShow(true);
+  };
+
+  const handleUploadCancel = () => {
+    setImage("");
+    setModalShow(false);
+  };
+
   return (
-    <>
+    <div>
       <Bar />
       <img
         alt="Avatar"
@@ -73,6 +94,28 @@ export default function Profile({ match }) {
           {follow[0]} followers · {follow[1]} following
         </span>
       </div>
+      {/* Upload button */}
+      <div className={classes.center}>
+        <label htmlFor="contained-button-file">
+          <input
+            accept="image/*"
+            className={classes.input}
+            id="contained-button-file"
+            type="file"
+            onChange={handleUploadImage}
+            value={image}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            component="span"
+            className={`${classes.center} ${classes.rounded} ${classes.text}`}
+          >
+            Upload
+          </Button>
+        </label>
+        <Upload show={modalShow} onHide={handleUploadCancel} src={image} />
+      </div>
       <Button
         className={`${classes.central} ${classes.rounded} ${classes.text}`}
         variant="contained"
@@ -85,6 +128,6 @@ export default function Profile({ match }) {
           imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
         />
       </div>
-    </>
+    </div>
   );
 }

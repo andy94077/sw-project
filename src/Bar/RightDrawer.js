@@ -27,8 +27,8 @@ export default function RightDrawer(props) {
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
   const menuLink = ["/profile/test", "/setting", "/"];
   const menu = menuItem.map((text, index) => (
-    <Link to={menuLink[index]}>
-      <ListItem button key={text}>
+    <Link to={menuLink[index]} key={text}>
+      <ListItem button>
         <ListItemIcon>{menuIcon[index]}</ListItemIcon>
         <ListItemText primary={text} />
       </ListItem>
