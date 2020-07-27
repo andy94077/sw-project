@@ -8,6 +8,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SettingsIcon from "@material-ui/icons/Settings";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   list: {
@@ -21,16 +22,17 @@ const useStyles = makeStyles({
 export default function RightDrawer(props) {
   const classes = useStyles();
 
-  const { open, toggleDrawer, button, handleClick } = props;
+  const { open, toggleDrawer, button } = props;
   const menuItem = ["My account", "Settings", "Log out"];
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
-  const menuTabs = ["Profile", false, "LoginPage"];
-
+  const menuLink = ["/profile/test", "/setting", "/"];
   const menu = menuItem.map((text, index) => (
-    <ListItem button key={text} onClick={handleClick(menuTabs[index])}>
-      <ListItemIcon>{menuIcon[index]}</ListItemIcon>
-      <ListItemText primary={text} />
-    </ListItem>
+    <Link to={menuLink[index]}>
+      <ListItem button key={text}>
+        <ListItemIcon>{menuIcon[index]}</ListItemIcon>
+        <ListItemText primary={text} />
+      </ListItem>
+    </Link>
   ));
 
   const list = () => (
