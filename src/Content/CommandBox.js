@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles, Paper } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -26,19 +27,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CommandBox(props) {
-  const { author, command, authorOnClick } = props;
+  const { author, command } = props;
   const classes = useStyles();
   return (
     <Paper className={classes.root}>
-      <div
-        className={classes.author}
-        onClick={authorOnClick}
-        role="button"
-        onKeyPress={() => {}}
-        tabIndex={0}
-      >
-        {author}
-      </div>
+      <Link to="/profile/author">{author}</Link>
       <div className={classes.content}>{command}</div>
     </Paper>
   );

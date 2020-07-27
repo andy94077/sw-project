@@ -12,20 +12,18 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Content(props) {
-  const { imageList, jump, state, handleSetState } = props;
+export default function Content({ match }) {
+  const { pictureId } = match.params;
   const classes = useStyles();
   return (
     <Grid container className={classes.gird} justify="center">
       <Grid item xs={9}>
-        <ContentCard
-          jump={jump}
-          state={state}
-          handleSetState={handleSetState}
-        />
+        <ContentCard src={`/images/${pictureId}.jpg`} />
       </Grid>
       <Grid item xs={10}>
-        <PhotoGrid imageList={imageList} handleSetState={handleSetState} />
+        <PhotoGrid
+          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
+        />
       </Grid>
     </Grid>
   );

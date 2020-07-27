@@ -12,10 +12,10 @@ import {
   CardContent,
   Card,
   CardActionArea,
-  CardActions,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
+import { Link } from "react-router-dom";
 import CommandBox from "./CommandBox";
 
 const useStyles = makeStyles((theme) => ({
@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { state, handleSetState } = props;
+  const { src } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
@@ -95,22 +95,17 @@ export default function ContentCard(props) {
     <Card className={classes.root}>
       <CardMedia
         className={classes.cover}
-        image={state.contentSrc}
+        image={src}
         title="Live from space album cover"
       />
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <CardActions
-              onClick={handleSetState({
-                tabIndex: "Profile",
-                profileUse: "Author",
-              })}
-            >
+            <Link to="/profile/test">
               <Typography component="h5" variant="h5">
                 Author
               </Typography>
-            </CardActions>
+            </Link>
           </CardActionArea>
           <Typography variant="subtitle1" color="textSecondary">
             This is a cat
@@ -128,14 +123,7 @@ export default function ContentCard(props) {
         </Fab>
         <Collapse in={expand}>
           <div className={classes.command}>
-            <CommandBox
-              author="author"
-              command="Cute cat."
-              authorOnClick={handleSetState({
-                tabIndex: "Profile",
-                profileUse: "Author",
-              })}
-            />
+            <CommandBox author="author" command="Cute cat." />
           </div>
           <form
             className={classes.command}
