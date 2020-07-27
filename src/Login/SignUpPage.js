@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import LoginForm from "./LoginForm";
-import SignUp from "./SignUp";
+import SignUpForm from "./SignUpForm";
 
 const useStyles = makeStyles(() => ({
   Background: {
@@ -65,7 +65,7 @@ export default function SignUpPage() {
                 <div style={{ width: "10%" }} />
                 <div className={classes.formTEXT}>
                   <div className={classes.itemFormat}>
-                    <SignUp
+                    <SignUpForm
                       show={modalShow}
                       setModalShow={() => setModalShow(true)}
                     />

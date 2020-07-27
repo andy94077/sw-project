@@ -37,7 +37,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function SignUp(props) {
+export default function SignUpForm(props) {
   const { setModalShow } = props;
   const classes = useStyles();
   return (

@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
 import FormInfo from "./FormInfo";
-import "./SignUp.css";
+import "./LoginForm.css";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
