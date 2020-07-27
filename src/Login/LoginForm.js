@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import FormInfo from "./FormInfo";
 
 const useStyles = makeStyles(() => ({
@@ -20,13 +21,28 @@ const useStyles = makeStyles(() => ({
     borderRadius: "30px",
     margin: "0px auto 0px",
   },
+  signUpFrame: {
+    height: "48px",
+    width: "403.4px",
+    color: "#111",
+    borderRadius: "0 0 25px 25px",
+  },
+  controlCenter: {
+    height: "100%",
+  },
+  signUpText: {
+    fontSize: "16px",
+    fontWeight: "700",
+    color: "#111",
+  },
 }));
 
-export default function LoginForm() {
+export default function LoginForm(props) {
+  const { setModalShow } = props;
   const classes = useStyles();
   return (
     <div className={classes.formFrame}>
-      <div style={{ padding: "20px 10px 24px" }}>
+      <div style={{ padding: "20px 10px 24px", height: "552px" }}>
         <div className={classes.logoFrame} />
         <div style={{ height: "10px" }} />
         <div style={{ margin: "0px auto 0px" }}>
@@ -38,6 +54,13 @@ export default function LoginForm() {
           <FormInfo />
         </div>
       </div>
+      <Button
+        variant="contained"
+        className={classes.signUpFrame}
+        onClick={setModalShow}
+      >
+        <div className={classes.signUpText}>Already have an account</div>
+      </Button>
     </div>
   );
 }
