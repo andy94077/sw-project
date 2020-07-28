@@ -30,4 +30,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('user', 'UserController');
+
+    // for upload images
+    Route::post('/profile/upload', 'PostController@uploadImage')->name('profile.uploadImage');
 });

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import PhotoGrid from "../components/PhotoGrid";
@@ -59,14 +60,27 @@ export default function Profile({ match }) {
   const intro = "hi";
 
   const [image, setImage] = useState("");
+  const [imageURL, setImageURL] = useState("");
   const [modalShow, setModalShow] = useState(false);
 
   const handleUploadImage = (event) => {
     if (image === event.target.value) {
       return;
     }
-    setImage(event.target.value);
-    setModalShow(true);
+
+    const formData = new FormData();
+    formData.append("imageupload", event.target.files[0]);
+
+    axios
+      .request({
+        method: "POST",
+        url: "http://pinterest-server.test/api/v1/profile/upload",
+        data: formData,
+      })
+      .then((res) => {
+        setImageURL(`http://pinterest-server.test${res.data.url}`);
+        setModalShow(true);
+      });
   };
 
   const handleUploadCancel = () => {
@@ -109,12 +123,12 @@ export default function Profile({ match }) {
             variant="contained"
             color="primary"
             component="span"
-            className={`${classes.center} ${classes.rounded} ${classes.text}`}
+            className={`${classes.rounded} ${classes.text}`}
           >
             Upload
           </Button>
         </label>
-        <Upload show={modalShow} onHide={handleUploadCancel} src={image} />
+        <Upload show={modalShow} onHide={handleUploadCancel} src={imageURL} />
       </div>
       <Button
         className={`${classes.central} ${classes.rounded} ${classes.text}`}
