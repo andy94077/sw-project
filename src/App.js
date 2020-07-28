@@ -12,6 +12,7 @@ export default function App() {
       <Switch>
         <Route exact path="/" component={LoginPage} />
         <Route exact path="/home" component={HomePage} />
+        <Route exact path="/home/:tag" component={HomePage} />
         <Route exact path="/picture/:pictureId" component={Content} />
         <Route exact path="/profile/:name" component={Profile} />
         <Route exact path="setting" component={() => <>setting</>} />
