@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -25,10 +26,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function FormInfo() {
+export default function LoginFormInfo() {
   const classes = useStyles();
   const username = useRef();
   const password = useRef();
+  const history = useHistory();
 
   const [state, setState] = useState({
     username: "",
@@ -59,13 +61,12 @@ export default function FormInfo() {
     formdata.append("name", username.current.value);
     formdata.append("email", username.current.value);
     formdata.append("password", password.current.value);
-    alert("Sent !");
+    // must remove before demo
+    formdata.append("avatar_url", "/img/avatar.jpeg");
+    //
+    alert("Login_Sent !");
     axios
-      .post(
-        "http://pinterest-server.test/api/v1/user/register",
-        formdata,
-        config
-      )
+      .post("http://pinterest-server.test/api/v1/user/logIn", formdata, config)
       .then((response) => {
         if (response) {
           alert(response.data);
@@ -73,6 +74,7 @@ export default function FormInfo() {
             isError: false,
             nowLoading: false,
           });
+          history.push("/home");
         } else {
           alert(response.data);
           setState({
