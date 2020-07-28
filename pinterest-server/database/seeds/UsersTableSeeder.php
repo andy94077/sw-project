@@ -20,9 +20,22 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('admin'),
             'roles' => '1',
             'created_at' => date("Y-m-d H:i:s"),
-            'user_id' => '1',
+            //'user_id' => '1',
             // 'api_token' => Str::random(80),
         ]);
+
+        for ($i = 2; $i <= 12; $i++) {
+            DB::table('users')->insert(
+                [
+                    'name' => "user{$i}",
+                    'email' => "cms{$i}@funpodium.net",
+                    'password' => Hash::make("user{$i}"),
+                    'roles' => '1',
+                    'created_at' => date("Y-m-d H:i:s"),
+                    //'user_id' => $i,
+                ]
+            );
+        }
 
         if (env('APP_ENV') == 'stage') {
             DB::table('users')->insert([
