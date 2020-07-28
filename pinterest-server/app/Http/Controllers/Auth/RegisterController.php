@@ -50,11 +50,10 @@ class RegisterController extends Controller
     public static function validator(Request $data)
     { 
         //echo $data->toArray()["email"];
-        var_dump($data->all());
         return Validator::make($data->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => [ 'string', 'min:8', 'required'],
+            'password' => [ 'required', 'string', 'min:8'],
         ]);
     }
 

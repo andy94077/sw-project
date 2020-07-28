@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Auth;
 // use App\Models\PostDraft;
 // use App\Models\Label;
 use App\Http\Controllers\Auth\RegisterController;
@@ -25,13 +26,34 @@ class UserController extends BaseController
             //do something ...
             //var_dump($isValid -> failed());
             //return response()->json(['Message' => "Sign up fails !"], 200);
-            return "Sign up fails !";
+            return "Sign up fails!";
         }
         else{
             // return "Sign up success !";
             $user = RegisterController::create($request);
             //return response()->json(['Message' => "Sign up seccess !"], 200);
-            return "Sign up success !";
+            return "Sign up success!";
+        }
+    }
+
+    public function logIn(Request $request)
+    {
+        //return "Connected!";
+        if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+            return "Login success!";
+        }
+        else {
+            return "Login fails!";
+        }
+    }
+
+    public function logOut()
+    {
+        if(Auth::logout()){
+            return "Logout success !";
+        }
+        else{
+            return "Please try again!";
         }
     }
 }
