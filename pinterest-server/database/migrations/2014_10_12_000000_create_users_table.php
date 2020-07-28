@@ -20,8 +20,8 @@ class CreateUsersTable extends Migration
             // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->tinyInteger('roles');
-            $table->unsignedBigInteger('user_id')->default("1")->comment('this column for latest modifed user');
-            $table->foreign('user_id')->references('id')->on('users');
+            //$table->unsignedBigInteger('user_id')->default("1")->comment('this column for latest modifed user');
+            //$table->foreign('user_id')->references('id')->on('users');
             $table->rememberToken();
             $table->timestamps();
         });
