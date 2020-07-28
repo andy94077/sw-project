@@ -16,12 +16,11 @@ class PostTableSeeder extends Seeder
         for ($i = 1; $i <= 12; $i++) {
             DB::table('posts')->insert(
                 [
-                    'user_id' => $i,
-                    //'post_id'=>$i,
-                    'url'=>"images/{$i}.jpg",
-                    'content'=>"This is no.{$i} post",
-                    //'status'=>1,
-                    'tag'=>'cat',
+                    'url' => 'http://pinterest-server.test/picture/' . $i,
+                    'user_id' => 1,
+                    'username' => 'admin',
+                    'content' => 'hello world',
+                    'tag' => 'cat',
                     'publish_time' => date('Y-m-d H:i:s'),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')

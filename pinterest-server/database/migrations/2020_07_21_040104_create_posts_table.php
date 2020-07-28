@@ -15,18 +15,17 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('url');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            //$table->unsignedBigInteger('post_id');
-            //$table->foreign('post_id')->references('id')->on('posts');
-            $table->string('url');
-            $table->text('content')->nullable();
-            //$table->string('status', 1)->comment("0 = draft, 1 = publish, 2 = archived");
+            $table->string('username');
+            $table->string('content')->nullable();
             $table->string('tag')->nullable();
             $table->dateTime('publish_time')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
+
     }
 
     /**
