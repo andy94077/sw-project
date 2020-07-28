@@ -16,7 +16,7 @@ class PostTableSeeder extends Seeder
         for ($i = 1; $i <= 12; $i++) {
             DB::table('posts')->insert(
                 [
-                    'url' => 'http://pinterest-server.test/picture/' . $i,
+                    'url' => '/images/' . $i . '.jpg',
                     'user_id' => 1,
                     'username' => 'admin',
                     'content' => 'hello world',
