@@ -27,7 +27,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::apiResource('post', 'PostController');
 
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
+    Route::post('/user/register','UserController@register')->name('user.register');
 
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
-    Route::apiResource('user', 'UserController');
 });

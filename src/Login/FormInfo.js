@@ -55,21 +55,26 @@ export default function FormInfo() {
         "Access-Control-Allow-Origin": "*",
       },
     };
-    const boolTest = false;
     const formdata = new FormData();
-    formdata.append("username", username.current.value);
+    formdata.append("name", username.current.value);
+    formdata.append("email", username.current.value);
     formdata.append("password", password.current.value);
+    alert("Sent !");
     axios
-      .post("http://localhost:3000", formdata, config)
+      .post(
+        "http://pinterest-server.test/api/v1/user/register",
+        formdata,
+        config
+      )
       .then((response) => {
-        if (response === null) return;
-        if (boolTest !== true) {
-          alert("Message already sent!");
+        if (response) {
+          alert(response.data);
           setState({
             isError: false,
             nowLoading: false,
           });
         } else {
+          alert(response.data);
           setState({
             isError: true,
             nowLoading: false,
