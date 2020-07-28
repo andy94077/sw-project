@@ -74,11 +74,11 @@ export default function Profile({ match }) {
     axios
       .request({
         method: "POST",
-        url: "http://pinterest-server.test/api/v1/profile/upload",
+        url: "http://pinterest-server.test/api/v1/profile/uploadImage",
         data: formData,
       })
       .then((res) => {
-        setImageURL(`http://pinterest-server.test${res.data.url}`);
+        setImageURL(res.data.url);
         setModalShow(true);
       });
   };
@@ -86,6 +86,15 @@ export default function Profile({ match }) {
   const handleUploadCancel = () => {
     setImage("");
     setModalShow(false);
+
+    const formData = new FormData();
+    formData.append("canceledURL", imageURL);
+
+    axios.request({
+      method: "POST",
+      url: "http://pinterest-server.test/api/v1/profile/deleteImage",
+      data: formData,
+    });
   };
 
   return (
@@ -128,7 +137,11 @@ export default function Profile({ match }) {
             Upload
           </Button>
         </label>
-        <Upload show={modalShow} onHide={handleUploadCancel} src={imageURL} />
+        <Upload
+          show={modalShow}
+          onHide={handleUploadCancel}
+          src={`http://pinterest-server.test${imageURL}`}
+        />
       </div>
       <Button
         className={`${classes.central} ${classes.rounded} ${classes.text}`}

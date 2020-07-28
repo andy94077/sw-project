@@ -12,6 +12,18 @@ use App\Models\User;
 use App\Models\Image;
 use stdClass;
 
+// for delete images
+function removeDirectory($path) {
+
+	$files = glob($path . '/*');
+	foreach ($files as $file) {
+		is_dir($file) ? removeDirectory($file) : unlink($file);
+	}
+	rmdir($path);
+
+	return;
+}
+
 class PostController extends BaseController
 {
     public function index()
@@ -361,6 +373,12 @@ class PostController extends BaseController
         $image->image_alt = "image";
         $image->save();
         return response()->json(['url' => $image->url['original'], 'id' => $image->id], 200);
+    }
+    
+    public function deleteImage(Request $request)
+    {
+        $imageURL = dirname(substr($request["canceledURL"], 1), 2);
+        removeDirectory($imageURL);
     }
 
     public function destroy(Request $request, $post)
