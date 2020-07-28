@@ -17,8 +17,8 @@ class PostTableSeeder extends Seeder
             DB::table('posts')->insert(
                 [
                     'url' => 'http://pinterest-server.test/picture/' . $i,
-                    'user_id' => 1,
-                    'username' => 'admin',
+                    'user_id' => $i,
+                    'username' => 'user' . $i,
                     'content' => 'hello world',
                     'tag' => 'cat',
                     'publish_time' => date('Y-m-d H:i:s'),
