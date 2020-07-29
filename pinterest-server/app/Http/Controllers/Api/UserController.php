@@ -58,7 +58,6 @@ class UserController extends BaseController
 
     public function authentication(Request $request)
     {
-        var_dump($request['accessToken']);
         $userToken = $request['accessToken'];
         if($userToken === null){
             return response()->json(['isValid' => false], 200);
@@ -71,6 +70,22 @@ class UserController extends BaseController
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
+                'isValid' => true
+            ], 200);
+        }
+    }
+    
+    public function userExist(Request $request)
+    {
+        $userInfo = DB::table('users')->where('name', $request['name'])->first();
+        if($userInfo === null){
+            return response()->json(['isValid' => false], 200);
+        }
+        else{
+            return response()->json([
+                'username' => $userInfo->name,
+                'user_id' => $userInfo->id,
+                'avatar_url' => $userInfo->avatar_url,
                 'isValid' => true
             ], 200);
         }
