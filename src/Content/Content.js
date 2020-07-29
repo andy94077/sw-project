@@ -7,6 +7,7 @@ import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Bar from "../Bar/Bar";
+import Loading from "../components/Loading";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -22,11 +23,11 @@ export default function Content({ match }) {
     src: "",
     content: "",
   });
-  console.log(pictureId);
+  const [pageState, setPageState] = useState(0);
   useEffect(() => {
+    setPageState(0);
     Axios.get(`http://pinterest-server.test/api/v1/post/${pictureId}`).then(
       ({ data }) => {
-        console.log(data);
         setInfo({
           authorName: data[0].user_name,
           src: data[0].url,
@@ -34,8 +35,15 @@ export default function Content({ match }) {
         });
       }
     );
+    setPageState(2);
   }, [pictureId]);
 
+  if (pageState === 0) {
+    return <Loading />;
+  }
+  if (pageState === 1) {
+    return <Loading />;
+  }
   return (
     <>
       <Bar />
