@@ -107,7 +107,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ContentCard(props) {
   const { src, id, author, content } = props;
   const classes = useStyles();
-  const [expand, setExpand] = useState(false);
+  const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
   const [comments, setComments] = useState([]);
 
