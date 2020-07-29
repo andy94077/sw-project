@@ -1,22 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-import {
-  Collapse,
-  TextareaAutosize,
-  Button,
-  Icon,
-  Fab,
-  Typography,
-  CardMedia,
-  CardContent,
-  Card,
-  CardActionArea,
-} from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-
-import { Link } from "react-router-dom";
-import CommandBox from "./CommandBox";
+import { Button, CardMedia, Card } from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import TextField from "@material-ui/core/TextField";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,8 +17,8 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: "wrap",
     height: "75vh",
     boxShadow: "rgba(0,0,0,0.45) 0px 2px 10px",
-    borderRadius: "30px",
-    marginTop: "50px",
+    borderRadius: "30px 30px 0 0",
+    overflow: "auto",
   },
   details: {
     display: "flex",
@@ -57,39 +50,79 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
     },
   },
-  expand: {
-    transform: "rotate(0deg)",
-    transition: theme.transitions.create("transform", {
-      duration: theme.transitions.duration.shortest,
-    }),
-    marginLeft: "5%",
+  select: {
+    margin: "20px",
+    width: "40%",
   },
-  expandOpen: {
-    transform: "rotate(180deg)",
-    marginLeft: "5%",
-  },
-  command: {
-    marginLeft: "5%",
-    width: "90%",
+  textarea: {
+    marginRight: "20px",
+    marginBottom: "20px",
     display: "flex",
+    flexDirection: "column",
+    height: "400px",
+    overflow: "auto",
   },
-  input: {
-    resize: "none",
-    width: "75%",
-    borderRadius: "20px",
-    margin: "5px",
-    fontSize: "x-large",
+  textfield: {
+    marginTop: "20px",
+    marginLeft: "20px",
   },
-  button: {
-    maxHeight: "40px",
+  central: {
+    position: "absolute",
+    bottom: "5px",
+    right: "5px",
+  },
+  rounded: {
+    marginTop: "20px",
+    width: "calc(100% - 10px)",
+    borderRadius: "60px",
+  },
+  text: {
+    lineHeight: "25px",
+    fontSize: "16px",
+  },
+  none: {
+    color: "gray",
   },
 }));
 
 export default function ContentCard(props) {
-  const { src } = props;
+  const { userId, username, src } = props;
   const classes = useStyles();
-  const [expand, setExpand] = useState(false);
-  const [value, setValue] = useState("");
+  const desc = useRef();
+  const history = useHistory();
+
+  const [tag, setTag] = useState("");
+  const [error, setError] = useState(false);
+
+  const handleSelectTag = (event) => {
+    setError(false);
+    setTag(event.target.value);
+  };
+
+  const handleUploadDesc = () => {
+    if (tag === "") {
+      setError(true);
+      return;
+    }
+
+    const jsonData = {
+      url: src,
+      user_id: userId,
+      username,
+      content: desc.current.value,
+      tag,
+    };
+
+    axios
+      .request({
+        method: "POST",
+        url: "http://pinterest-server.test/api/v1/profile/uploadDesc",
+        data: jsonData,
+      })
+      .then((res) => {
+        history.push(`/picture/${res.data.id}`);
+      });
+  };
 
   return (
     <Card className={classes.root}>
@@ -99,60 +132,51 @@ export default function ContentCard(props) {
         title="Live from space album cover"
       />
       <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <CardActionArea>
-            <Link to="/profile/test">
-              <Typography component="h5" variant="h5">
-                Author
-              </Typography>
-            </Link>
-          </CardActionArea>
-          <Typography variant="subtitle1" color="textSecondary">
-            This is a cat
-          </Typography>
-        </CardContent>
-        <Fab
-          onClick={() => {
-            setExpand(!expand);
-          }}
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expand,
-          })}
+        <FormControl
+          variant="outlined"
+          className={classes.select}
+          error={error}
         >
-          <ExpandMoreIcon />
-        </Fab>
-        <Collapse in={expand}>
-          <div className={classes.command}>
-            <CommandBox author="author" command="Cute cat." />
-          </div>
-          <form
-            className={classes.command}
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (value) alert(value);
-              setValue("");
-            }}
+          <InputLabel id="demo-simple-select-outlined-label">Tag *</InputLabel>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={tag}
+            onChange={handleSelectTag}
+            label="Tag *"
           >
-            <TextareaAutosize
-              id="standard-basic"
-              className={classes.input}
-              rowsMin={1}
-              rowsMax={10}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              endIcon={<Icon>send</Icon>}
-              size="small"
-              type="submit"
-            >
-              Send
-            </Button>
-          </form>
-        </Collapse>
+            <MenuItem value="">
+              <em className={classes.none}>None</em>
+            </MenuItem>
+            <MenuItem value="cat">cat</MenuItem>
+            <MenuItem value="dog">dog</MenuItem>
+          </Select>
+          {error ? <FormHelperText>A tag is necessary</FormHelperText> : null}
+        </FormControl>
+        <TextField
+          id="outlined-start-adornment"
+          className={classes.textfield}
+          label="Image description"
+          multiline
+          rowsMax="17"
+          variant="outlined"
+          InputProps={{
+            className: classes.textarea,
+            startAdornment: (
+              <InputAdornment>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  className={`${classes.central} ${classes.rounded} ${classes.text}`}
+                  onClick={handleUploadDesc}
+                >
+                  Submit
+                </Button>
+              </InputAdornment>
+            ),
+          }}
+          inputRef={desc}
+        />
       </div>
     </Card>
   );

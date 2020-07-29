@@ -32,19 +32,20 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function Upload(props) {
-  const { onHide, show, src } = props;
+  const { show, onHide, userId, username, src } = props;
   const classes = useStyles();
   return (
     <Modal
       show={show}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
+      backdrop="static"
       centered
       // animation={false}
       dialogClassName={classes.jumpFrame}
     >
       <div>
-        <ContentCard src={src} />
+        <ContentCard userId={userId} username={username} src={src} />
         <Button
           variant="contained"
           className={classes.signUpFrame}
@@ -53,7 +54,6 @@ export default function Upload(props) {
           <div className={classes.signUpText}>Cancel</div>
         </Button>
       </div>
-      {/* </div> */}
     </Modal>
   );
 }
