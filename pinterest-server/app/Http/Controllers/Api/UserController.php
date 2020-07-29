@@ -58,7 +58,6 @@ class UserController extends BaseController
 
     public function authentication(Request $request)
     {
-        var_dump($request['accessToken']);
         $userToken = $request['accessToken'];
         if($userToken === null){
             return response()->json(['isValid' => false], 200);

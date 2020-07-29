@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { Redirect } from "react-router-dom";
 
 import { Grid } from "@material-ui/core";
 
@@ -8,6 +9,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Bar from "../Bar/Bar";
 import Loading from "../components/Loading";
+import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -22,44 +24,67 @@ export default function Content({ match }) {
     authorName: "",
     src: "",
     content: "",
+    userId: "",
   });
-  const [pageState, setPageState] = useState(0);
+  const [pageState, setPageState] = useState("Loading");
+  const accessToken = getCookie();
   useEffect(() => {
-    setPageState(0);
-    Axios.get(`http://pinterest-server.test/api/v1/post/${pictureId}`).then(
-      ({ data }) => {
-        setInfo({
-          authorName: data[0].user_name,
-          src: data[0].url,
-          content: data[0].content,
-        });
-      }
-    );
-    setPageState(2);
+    const { CancelToken } = Axios;
+    const source = CancelToken.source();
+    setPageState("Loading");
+    console.log(pageState);
+    Axios.post("http://pinterest-server.test/api/v1/user/authentication", {
+      accessToken,
+    })
+      .then(({ data }) => {
+        const { isValid } = data;
+        if (!isValid) {
+          setPageState("invalid");
+        } else {
+          setInfo({ userId: data.user_id });
+          Axios.get("http://pinterest-server.test/api/v1/post/id", {
+            params: { id: pictureId },
+          }).then((res) => {
+            setInfo({
+              authorName: res.data[0].user_name,
+              src: res.data[0].url,
+              content: res.data[0].content,
+            });
+            setPageState("Done");
+          });
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    return source.cancel();
   }, [pictureId]);
-
-  if (pageState === 0) {
+  if (pageState === "Loading") {
     return <Loading />;
   }
-  if (pageState === 1) {
-    return <Loading />;
+  if (pageState === "invalid") {
+    return <Redirect to="/" />;
   }
-  return (
-    <>
-      <Bar />
-      <Grid container className={classes.gird} justify="center">
-        <Grid item xs={9}>
-          <ContentCard
-            id={pictureId}
-            src={info.src}
-            author={info.authorName}
-            content={info.content}
-          />
+  if (pageState === "Done") {
+    return (
+      <>
+        <Bar />
+        <Grid container className={classes.gird} justify="center">
+          <Grid item xs={9}>
+            <ContentCard
+              id={pictureId}
+              src={info.src}
+              author={info.authorName}
+              content={info.content}
+              userId={info.userId}
+            />
+          </Grid>
+          <Grid item xs={10}>
+            <PhotoGrid />
+          </Grid>
         </Grid>
-        <Grid item xs={10}>
-          <PhotoGrid />
-        </Grid>
-      </Grid>
-    </>
-  );
+      </>
+    );
+  }
+  return <>Wrong</>;
 }
