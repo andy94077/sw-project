@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { Redirect } from "react-router-dom";
 
 import { Grid } from "@material-ui/core";
 
@@ -8,6 +9,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Bar from "../Bar/Bar";
 import Loading from "../components/Loading";
+import getCookie from "../cookieHelper";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -24,25 +26,49 @@ export default function Content({ match }) {
     content: "",
   });
   const [pageState, setPageState] = useState(0);
+  const accessToken = getCookie();
+
   useEffect(() => {
     setPageState(0);
-    Axios.get(`http://pinterest-server.test/api/v1/post/${pictureId}`).then(
-      ({ data }) => {
-        setInfo({
-          authorName: data[0].user_name,
-          src: data[0].url,
-          content: data[0].content,
-        });
-      }
-    );
-    setPageState(2);
+    Axios.request({
+      method: "POST",
+      url: "http://pinterest-server.test/api/v1/user/authentication",
+      date: {
+        accessToken: { accessToken },
+      },
+    })
+      .then(({ data }) => {
+        const { isValid } = data;
+        console.log(isValid);
+        if (!isValid) {
+          setPageState(1);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }, [pictureId]);
+
+  useEffect(() => {
+    if (pageState === 0) {
+      Axios.get(`http://pinterest-server.test/api/v1/post/${pictureId}`).then(
+        ({ data }) => {
+          setInfo({
+            authorName: data[0].user_name,
+            src: data[0].url,
+            content: data[0].content,
+          });
+        }
+      );
+      setPageState(2);
+    }
+  }, [pageState]);
 
   if (pageState === 0) {
     return <Loading />;
   }
   if (pageState === 1) {
-    return <Loading />;
+    return <Redirect to="/" />;
   }
   return (
     <>
