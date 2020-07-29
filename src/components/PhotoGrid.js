@@ -25,7 +25,6 @@ export default function PhotoGrid(props) {
 
   let photos;
   if (isReady) {
-    console.log(imageList);
     photos = imageList.map((image) => (
       <Link to={`/picture/${image.split("/").slice(-3, -2)[0]}`} key={image}>
         <Photo image={image.split("/").slice(-1)[0]} src={image} />

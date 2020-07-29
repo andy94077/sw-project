@@ -86,8 +86,18 @@ const useStyles = makeStyles((theme) => ({
   },
   comments: {
     overflow: "auto",
-    maxHeight: "70%",
-    marginLeft: "10%",
+    [theme.breakpoints.down("xs")]: {
+      maxHeight: "20%",
+      marginLeft: "10%",
+    },
+    [theme.breakpoints.only("sm")]: {
+      maxHeight: "20%",
+      marginLeft: "10%",
+    },
+    [theme.breakpoints.up("md")]: {
+      maxHeight: "70%",
+      marginLeft: "10%",
+    },
   },
 }));
 
