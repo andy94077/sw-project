@@ -150,7 +150,7 @@ export default function ContentCard(props) {
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <Link to="/profile/test">
+            <Link to={`/profile/${author}`}>
               <Typography component="h5" variant="h5">
                 {author}
               </Typography>
