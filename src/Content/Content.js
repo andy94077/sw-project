@@ -9,7 +9,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Bar from "../Bar/Bar";
 import Loading from "../components/Loading";
-import getCookie from "../cookieHelper";
+import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -27,7 +27,6 @@ export default function Content({ match }) {
   });
   const [pageState, setPageState] = useState(0);
   const accessToken = getCookie();
-
   useEffect(() => {
     setPageState(0);
     Axios.request({
@@ -51,16 +50,16 @@ export default function Content({ match }) {
 
   useEffect(() => {
     if (pageState === 0) {
-      Axios.get(`http://pinterest-server.test/api/v1/post/${pictureId}`).then(
-        ({ data }) => {
-          setInfo({
-            authorName: data[0].user_name,
-            src: data[0].url,
-            content: data[0].content,
-          });
-        }
-      );
-      setPageState(2);
+      Axios.get("http://pinterest-server.test/api/v1/post/id", {
+        params: { id: pictureId },
+      }).then(({ data }) => {
+        setInfo({
+          authorName: data[0].user_name,
+          src: data[0].url,
+          content: data[0].content,
+        });
+        setPageState(2);
+      });
     }
   }, [pageState]);
 
@@ -70,22 +69,24 @@ export default function Content({ match }) {
   if (pageState === 1) {
     return <Redirect to="/" />;
   }
-  return (
-    <>
-      <Bar />
-      <Grid container className={classes.gird} justify="center">
-        <Grid item xs={9}>
-          <ContentCard
-            id={pictureId}
-            src={info.src}
-            author={info.authorName}
-            content={info.content}
-          />
+  if (pageState === 2) {
+    return (
+      <>
+        <Bar />
+        <Grid container className={classes.gird} justify="center">
+          <Grid item xs={9}>
+            <ContentCard
+              id={pictureId}
+              src={info.src}
+              author={info.authorName}
+              content={info.content}
+            />
+          </Grid>
+          <Grid item xs={10}>
+            <PhotoGrid />
+          </Grid>
         </Grid>
-        <Grid item xs={10}>
-          <PhotoGrid />
-        </Grid>
-      </Grid>
-    </>
-  );
+      </>
+    );
+  }
 }

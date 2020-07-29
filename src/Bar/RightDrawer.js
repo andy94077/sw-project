@@ -9,7 +9,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { Link } from "react-router-dom";
-import { getCookie, deleteCookie } from "../cookieHelper";
+import { deleteCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles({
   list: {
