@@ -4,7 +4,9 @@ import { Container, CssBaseline } from "@material-ui/core";
 import PhotoGrid from "../components/PhotoGrid";
 import Bar from "../Bar/Bar";
 
-export default function Homepage() {
+export default function Homepage({ match }) {
+  const { tag } = match.params;
+  console.log(tag);
   return (
     <>
       <Bar />

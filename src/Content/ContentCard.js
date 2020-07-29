@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
+import Axios from "axios";
 import {
   Collapse,
   TextareaAutosize,
@@ -86,10 +87,44 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src } = props;
+  const { src, id } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
+  const [comments, setComments] = useState([]);
+
+  function refreshComment() {
+    Axios.get(`http://pinterest-server.test/api/v1/comment/${id}`)
+      .then(({ data }) => {
+        console.log(data);
+        setComments(data.reverse());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    if (value !== "") {
+      Axios.request({
+        method: "post",
+        url: "http://pinterest-server.test/api/v1/comment/upload",
+        data: {
+          content: value,
+          user_id: 1,
+          post_id: id,
+        },
+      }).then(() => {
+        refreshComment();
+      });
+      setValue("");
+    }
+  };
+
+  useEffect(() => {
+    refreshComment();
+  }, []);
 
   return (
     <Card className={classes.root}>
@@ -122,17 +157,12 @@ export default function ContentCard(props) {
           <ExpandMoreIcon />
         </Fab>
         <Collapse in={expand}>
-          <div className={classes.command}>
-            <CommandBox author="author" command="Cute cat." />
-          </div>
-          <form
-            className={classes.command}
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (value) alert(value);
-              setValue("");
-            }}
-          >
+          {comments.map((i) => (
+            <div className={classes.command}>
+              <CommandBox author={i.user_name} command={i.content} />
+            </div>
+          ))}
+          <form className={classes.command} onSubmit={handleOnSubmit}>
             <TextareaAutosize
               id="standard-basic"
               className={classes.input}
