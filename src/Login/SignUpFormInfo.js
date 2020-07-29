@@ -62,7 +62,6 @@ export default function SignUpFormInfo() {
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
-    alert("Sent !");
     axios
       .post(
         "http://pinterest-server.test/api/v1/user/register",
@@ -70,14 +69,14 @@ export default function SignUpFormInfo() {
         config
       )
       .then((response) => {
-        if (response) {
-          alert(response.data);
+        if (response.data.isSignUp) {
+          alert(response.data.Message);
           setState({
             isError: false,
             nowLoading: false,
           });
         } else {
-          alert(response.data);
+          alert(response.data.Message);
           setState({
             isError: true,
             nowLoading: false,

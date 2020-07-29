@@ -59,7 +59,7 @@ export default function SignUpForm(props) {
         className={classes.signUpFrame}
         onClick={setModalShow}
       >
-        <div className={classes.signUpText}>Already have an account</div>
+        <div className={classes.signUpText}>Already have an account ?</div>
       </Button>
     </div>
   );

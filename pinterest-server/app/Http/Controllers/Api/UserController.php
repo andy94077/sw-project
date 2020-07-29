@@ -25,14 +25,12 @@ class UserController extends BaseController
         if($isValid -> fails()){
             //do something ...
             //var_dump($isValid -> failed());
-            //return response()->json(['Message' => "Sign up fails !"], 200);
-            return "Sign up fails!";
+            return response()->json(['Message' => "Sign up fails!",'isSignUp' => false], 200);
         }
         else{
             // return "Sign up success !";
             $user = RegisterController::create($request);
-            //return response()->json(['Message' => "Sign up seccess !"], 200);
-            return "Sign up success!";
+            return response()->json(['Message' => "Sign up seccess!",'isSignUp' => true], 200);
         }
     }
 
@@ -40,20 +38,28 @@ class UserController extends BaseController
     {
         //return "Connected!";
         if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-            return "Login success!";
+            //var_dump(Auth::user()->name);
+            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true], 200);
         }
         else {
-            return "Login fails!";
+            return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
         }
     }
 
     public function logOut()
     {
         if(Auth::logout()){
-            return "Logout success !";
+            return response()->json(['Message' => "Logout success!",'isLogout' => true], 200);
         }
         else{
-            return "Please try again!";
+            return response()->json(['Message' => "Please try again!",'isLogout' => false], 200);
         }
+    }
+
+    public function authentication(Request $request)
+    {
+        $userToken = $request['accessToken'];
+        $userInfo = DB::table('users')->where('token', $userToken)->first();
+        echo $userInfo;
     }
 }

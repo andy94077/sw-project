@@ -5,6 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
+import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,19 +65,19 @@ export default function LoginFormInfo() {
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
-    alert("Login_Sent !");
     axios
       .post("http://pinterest-server.test/api/v1/user/logIn", formdata, config)
       .then((response) => {
-        if (response) {
-          alert(response.data);
+        if (response.data.isLogin) {
+          alert(response.data.Message);
           setState({
             isError: false,
             nowLoading: false,
           });
+          setCookie("userToken", response.data.token, 1);
           history.push("/home");
         } else {
-          alert(response.data);
+          alert(response.data.Message);
           setState({
             isError: true,
             nowLoading: false,
