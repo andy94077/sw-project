@@ -4,8 +4,12 @@ import { Container, CssBaseline } from "@material-ui/core";
 import PhotoGrid from "../components/PhotoGrid";
 import Bar from "../Bar/Bar";
 
-export default function Homepage({ match }) {
-  const { tag } = match.params;
+export default function Homepage(props) {
+  const {
+    match: {
+      params: { tag },
+    },
+  } = props;
 
   return (
     <div>
