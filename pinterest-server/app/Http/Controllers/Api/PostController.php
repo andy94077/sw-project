@@ -391,7 +391,8 @@ class PostController extends BaseController
             "content" => $request['content'],
             "tag" => $request['tag'],
         ]);
-        return response()->json(['url' => $request['url']], 200);
+        $imageId = basename(dirname($request['url'], 2));
+        return response()->json(['id' => $imageId], 200);
     }
 
     public function destroy(Request $request, $post)

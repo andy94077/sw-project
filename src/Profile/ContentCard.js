@@ -1,8 +1,13 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, CardMedia, Card } from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import { useHistory } from "react-router-dom";
 
@@ -45,6 +50,10 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
     },
   },
+  select: {
+    margin: "20px",
+    width: "40%",
+  },
   textarea: {
     marginRight: "20px",
     marginBottom: "20px",
@@ -71,6 +80,9 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "25px",
     fontSize: "16px",
   },
+  none: {
+    color: "gray",
+  },
 }));
 
 export default function ContentCard(props) {
@@ -79,13 +91,26 @@ export default function ContentCard(props) {
   const desc = useRef();
   const history = useHistory();
 
+  const [tag, setTag] = useState("");
+  const [error, setError] = useState(false);
+
+  const handleSelectTag = (event) => {
+    setError(false);
+    setTag(event.target.value);
+  };
+
   const handleUploadDesc = () => {
+    if (tag === "") {
+      setError(true);
+      return;
+    }
+
     const jsonData = {
       url: src,
       user_id: userId,
       username,
       content: desc.current.value,
-      tag: "cat",
+      tag,
     };
 
     axios
@@ -95,8 +120,7 @@ export default function ContentCard(props) {
         data: jsonData,
       })
       .then((res) => {
-        console.log(res.data.url);
-        history.push("/picture/1");
+        history.push(`/picture/${res.data.id}`);
       });
   };
 
@@ -108,6 +132,27 @@ export default function ContentCard(props) {
         title="Live from space album cover"
       />
       <div className={classes.details}>
+        <FormControl
+          variant="outlined"
+          className={classes.select}
+          error={error}
+        >
+          <InputLabel id="demo-simple-select-outlined-label">Tag *</InputLabel>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={tag}
+            onChange={handleSelectTag}
+            label="Tag *"
+          >
+            <MenuItem value="">
+              <em className={classes.none}>None</em>
+            </MenuItem>
+            <MenuItem value="cat">cat</MenuItem>
+            <MenuItem value="dog">dog</MenuItem>
+          </Select>
+          {error ? <FormHelperText>A tag is necessary</FormHelperText> : null}
+        </FormControl>
         <TextField
           id="outlined-start-adornment"
           className={classes.textfield}
