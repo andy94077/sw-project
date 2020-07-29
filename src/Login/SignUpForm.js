@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import FormInfo from "./FormInfo";
+import SignUpFormInfo from "./SignUpFormInfo";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
@@ -51,7 +51,7 @@ export default function SignUpForm(props) {
           </h1>
         </div>
         <div style={{ margin: "30px auto 0px" }}>
-          <FormInfo />
+          <SignUpFormInfo />
         </div>
       </div>
       <Button
@@ -59,7 +59,7 @@ export default function SignUpForm(props) {
         className={classes.signUpFrame}
         onClick={setModalShow}
       >
-        <div className={classes.signUpText}>Already have an account</div>
+        <div className={classes.signUpText}>Already have an account ?</div>
       </Button>
     </div>
   );

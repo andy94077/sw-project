@@ -7,9 +7,9 @@ import Photo from "./Photo";
 import "./PhotoGrid.css";
 
 export default function PhotoGrid(props) {
-  const { tag, number = 12 } = props;
+  const { tag, number = 120 } = props;
   const [isReady, setIsReady] = useState(false);
-  const [imageList, setImageList] = useState();
+  const [imageListWithid, setImageListWithId] = useState();
 
   useEffect(() => {
     axios
@@ -17,7 +17,7 @@ export default function PhotoGrid(props) {
         params: { tag, number },
       })
       .then((res) => {
-        setImageList(res.data.imageListWithId.map((value) => value.url));
+        setImageListWithId(res.data.imageListWithId);
         setIsReady(true);
       })
       .catch(() => alert("error"));
@@ -25,9 +25,9 @@ export default function PhotoGrid(props) {
 
   let photos;
   if (isReady) {
-    photos = imageList.map((image) => (
-      <Link to={`/picture/${image.split("/").slice(-3, -2)[0]}`} key={image}>
-        <Photo image={image.split("/").slice(-1)[0]} src={image} />
+    photos = imageListWithid.map(({ id, url }) => (
+      <Link to={`/picture/${id}`} key={id}>
+        <Photo image={url.split("/").slice(-1)[0]} src={url} />
       </Link>
     ));
   }

@@ -246,9 +246,9 @@ class PostController extends BaseController
     public function getPictureFromTag(Request $request)
     {
         if ($request->has('tag'))
-            $posts = Post::where("tag", $request['tag'])->select("url", "user_id")->limit($request['number'])->get();
+            $posts = Post::where("tag", $request['tag'])->select("id", "url")->limit($request['number'])->get();
         else
-            $posts = Post::select("url", "user_id")->limit($request['number'])->get();
+            $posts = Post::select("id", "url")->limit($request['number'])->get();
 
         // var_dump($posts);
         return response()->json(["imageListWithId" => $posts]);
@@ -401,15 +401,14 @@ class PostController extends BaseController
 
     public function uploadDesc(Request $request)
     {
-        Post::create([
-            "url" => $request['url'],
-            "user_id" => $request['user_id'],
-            "username" => $request['username'],
-            "content" => $request['content'],
-            "tag" => $request['tag'],
-        ]);
-        $imageId = basename(dirname($request['url'], 2));
-        return response()->json(['id' => $imageId], 200);
+        $post = new Post();
+        $post->url = $request['url'];
+        $post->user_id = $request['user_id'];
+        $post->username = $request['username'];
+        $post->content = $request['content'];
+        $post->tag = $request['tag'];
+        $post->save();
+        return response()->json(['id' => $post->id], 200);
     }
 
     public function destroy(Request $request, $post)
