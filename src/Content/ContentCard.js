@@ -193,6 +193,7 @@ export default function ContentCard(props) {
             <Button
               variant="contained"
               color="primary"
+              type="submit"
               className={classes.button}
             >
               <SendIcon />
