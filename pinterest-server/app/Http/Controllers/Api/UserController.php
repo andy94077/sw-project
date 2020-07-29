@@ -75,8 +75,8 @@ class UserController extends BaseController
         }
         else{
             return response()->json([
-                'username' => $userInfo->name,
-                'user_id' => $userInfo->id,
+                'name' => $userInfo->name,
+                'id' => $userInfo->id,
                 'avatar_url' => $userInfo->avatar_url,
                 'isValid' => true
             ], 200);

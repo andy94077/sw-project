@@ -61,18 +61,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Profile({ match }) {
-  /*
+export default function Profile(props) {
   const {
     username,
     userId,
-    match: { params: name },
+    match: {
+      params: { name },
+    },
   } = props;
-  */
 
-  const userId = 1;
-  const username = "user1";
-  const { name } = match.params;
+  // const userId = 1;
+  // const username = "user1";
+  // const { name } = match.params;
 
   const classes = useStyles();
   const follow = [123, 456];
@@ -85,6 +85,7 @@ export default function Profile({ match }) {
   const [modalShow, setModalShow] = useState(false);
   const [isReady, setIsReady] = useState("Loading");
   const [isMyself, setIsMyself] = useState(false);
+  const [id, setId] = useState(null);
 
   useEffect(() => {
     setIsReady("Loading");
@@ -107,6 +108,7 @@ export default function Profile({ match }) {
         if (username === name) {
           setIsMyself(true);
         }
+        setId(res.data.id);
         setIsReady("OK");
       });
   }, [name]);
@@ -211,7 +213,7 @@ export default function Profile({ match }) {
         {isMyself ? uploadButton : followButton}
 
         <div className={classes.central}>
-          <PhotoGrid userId={userId} />
+          <PhotoGrid userId={id} />
         </div>
       </div>
     );
