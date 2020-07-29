@@ -84,10 +84,15 @@ const useStyles = makeStyles((theme) => ({
   button: {
     maxHeight: "40px",
   },
+  comments: {
+    overflow: "auto",
+    maxHeight: "70%",
+    marginLeft: "10%",
+  },
 }));
 
 export default function ContentCard(props) {
-  const { src, id } = props;
+  const { src, id, author, content } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(false);
   const [value, setValue] = useState("");
@@ -96,7 +101,6 @@ export default function ContentCard(props) {
   function refreshComment() {
     Axios.get(`http://pinterest-server.test/api/v1/comment/${id}`)
       .then(({ data }) => {
-        console.log(data);
         setComments(data.reverse());
       })
       .catch((err) => {
@@ -124,7 +128,7 @@ export default function ContentCard(props) {
 
   useEffect(() => {
     refreshComment();
-  }, []);
+  }, [id]);
 
   return (
     <Card className={classes.root}>
@@ -138,12 +142,12 @@ export default function ContentCard(props) {
           <CardActionArea>
             <Link to="/profile/test">
               <Typography component="h5" variant="h5">
-                Author
+                {author}
               </Typography>
             </Link>
           </CardActionArea>
           <Typography variant="subtitle1" color="textSecondary">
-            This is a cat
+            {content}
           </Typography>
         </CardContent>
         <Fab
@@ -157,11 +161,13 @@ export default function ContentCard(props) {
           <ExpandMoreIcon />
         </Fab>
         <Collapse in={expand}>
-          {comments.map((i) => (
-            <div className={classes.command}>
-              <CommentBox author={i.user_name} command={i.content} />
-            </div>
-          ))}
+          <div className={classes.comments}>
+            {comments.map((i) => (
+              <div className={classes.command}>
+                <CommentBox author={i.user_name} command={i.content} />
+              </div>
+            ))}
+          </div>
           <form className={classes.command} onSubmit={handleOnSubmit}>
             <TextareaAutosize
               id="standard-basic"
