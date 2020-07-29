@@ -6,16 +6,14 @@ import Bar from "../Bar/Bar";
 
 export default function Homepage({ match }) {
   const { tag } = match.params;
-  console.log(tag);
+
   return (
-    <>
+    <div>
       <Bar />
       <Container maxWidth="lg">
         <CssBaseline />
-        <PhotoGrid
-          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
-        />
+        <PhotoGrid tag={tag} />
       </Container>
-    </>
+    </div>
   );
 }

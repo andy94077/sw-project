@@ -13,15 +13,16 @@ use App\Models\Image;
 use stdClass;
 
 // for delete images
-function removeDirectory($path) {
+function removeDirectory($path)
+{
 
-	$files = glob($path . '/*');
-	foreach ($files as $file) {
-		is_dir($file) ? removeDirectory($file) : unlink($file);
-	}
-	rmdir($path);
+    $files = glob($path . '/*');
+    foreach ($files as $file) {
+        is_dir($file) ? removeDirectory($file) : unlink($file);
+    }
+    rmdir($path);
 
-	return;
+    return;
 }
 
 class PostController extends BaseController
@@ -59,10 +60,10 @@ class PostController extends BaseController
     public function showByStatus($status)
     {
         if ($status == 99) {
-            $posts = Post::leftJoin('users', 'users.id', '=', 'posts.user_id')->select('posts.id', 'posts.status', 'posts.title', 'posts.updated_at', 'users.name as user_name')->orderBy("posts.updated_at", "DESC")->get();
+            $posts = Post::leftJoin('users', 'users.id', '=', 'posts.user_id')->select('posts.*', 'users.name as user_name')->orderBy("posts.updated_at", "DESC")->get();
             //->join('posts_draft', 'posts_draft.post_id', '=', 'posts.id')->select('posts.id', 'posts.status', 'posts_draft.title', 'posts_draft.updated_at', 'posts.updated_at as post_updated_at', 'users.name as user_name')->orderBy("posts_draft.updated_at", "DESC")->get();
         } else {
-            $posts = Post::where("status", $status)->leftJoin('users', 'users.id', '=', 'posts.user_id')->select('posts.id', 'posts.status', 'posts.title', 'posts.updated_at', 'users.name as user_name')->orderBy("posts.updated_at", "DESC")->get();
+            $posts = Post::where("status", $status)->leftJoin('users', 'users.id', '=', 'posts.user_id')->select('posts.*', 'users.name as user_name')->orderBy("posts.updated_at", "DESC")->get();
         }
 
         foreach ($posts as $post) {
@@ -242,6 +243,17 @@ class PostController extends BaseController
         }
     }
 
+    public function getPictureFromTag(Request $request)
+    {
+        if ($request->has('tag'))
+            $posts = Post::where("tag", $request['tag'])->select("url", "user_id")->limit($request['number'])->get();
+        else
+            $posts = Post::select("url", "user_id")->limit($request['number'])->get();
+
+        // var_dump($posts);
+        return response()->json(["imageListWithId" => $posts]);
+    }
+
     public function restore(Request $request)
     {
         $posts = Post::onlyTrashed()->whereIn("id", (array) $request['id'])->get();
@@ -374,7 +386,7 @@ class PostController extends BaseController
         $image->save();
         return response()->json(['url' => $image->url['original'], 'id' => $image->id], 200);
     }
-    
+
     public function deleteImage(Request $request)
     {
         $imageURL = dirname(substr($request["canceledURL"], 1), 2);

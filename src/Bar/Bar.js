@@ -12,7 +12,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { Popover } from "@material-ui/core";
 import Content from "./Content";
@@ -104,6 +104,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Bar() {
   // Classes & States
   const classes = useStyles();
+  const history = useHistory();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [content, setContent] = useState(false);
   const [text, setText] = useState([{ id: 1 }]);
@@ -156,6 +157,10 @@ export default function Bar() {
   const handleContentOpen = (texts) => (event) => {
     setText(texts);
     setContent(event.currentTarget);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") history.push(`/home/${e.target.value}`);
   };
 
   const toggleDrawer = (isOpen) => (event) => {
@@ -247,6 +252,7 @@ export default function Bar() {
                 input: classes.inputInput,
               }}
               inputProps={{ "aria-label": "search" }}
+              onKeyUp={handleSearch}
             />
           </div>
           <div className={classes.grow} />
