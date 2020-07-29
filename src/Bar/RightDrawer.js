@@ -29,7 +29,7 @@ export default function RightDrawer(props) {
   };
   const menuItem = ["My account", "Settings", "Log out"];
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
-  const menuLink = ["/profile/test", "/setting", "/"];
+  const menuLink = ["/profile/user1", "/setting", "/"];
   const menu = menuItem.map((text, index) => (
     <Link
       to={menuLink[index]}
