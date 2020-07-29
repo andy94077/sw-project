@@ -254,7 +254,17 @@ class PostController extends BaseController
         return response()->json(["imageListWithId" => $posts]);
     }
 
-    public function getPictureFromId(Request $request){
+    public function getPictureFromUserId(Request $request)
+    {
+        if ($request->has('number'))
+            $posts = Post::where('user_id', $request['user_id'])->select("id", "url")->limit($request['number'])->get();
+        else
+            $posts = Post::where('user_id', $request['user_id'])->select("id", "url")->get();
+        return response()->json(["imageListWithId" => $posts]);
+    }
+
+    public function getPictureFromId(Request $request)
+    {
         $posts = Post::leftJoin('users', 'users.id', '=', 'posts.user_id')->where('posts.id', $request['id'])->select('posts.*', "users.name as user_name")->get();
         return response()->json($posts, 200);
     }

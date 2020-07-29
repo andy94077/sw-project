@@ -32,7 +32,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     // Route::get('/post/labels', 'PostController@getPostLabel')->name('post.getPostLabel');
     Route::patch('/post/publish/{id}', 'PostController@publish')->name('post.publish');
-    Route::get('/get/picture', 'PostController@getPictureFromTag')->name('post.getPicture');
+    Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
+    Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('post', 'PostController');
 
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');

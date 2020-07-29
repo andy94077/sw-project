@@ -7,21 +7,26 @@ import Photo from "./Photo";
 import "./PhotoGrid.css";
 
 export default function PhotoGrid(props) {
-  const { tag, number = 120 } = props;
+  const { tag, userId, number = 120 } = props;
   const [isReady, setIsReady] = useState(false);
   const [imageListWithid, setImageListWithId] = useState();
 
   useEffect(() => {
+    setIsReady(false);
+    const url =
+      userId !== undefined && userId !== null
+        ? "http://pinterest-server.test/api/v1/post/user"
+        : "http://pinterest-server.test/api/v1/post/picture";
     axios
-      .get("http://pinterest-server.test/api/v1/get/picture", {
-        params: { tag, number },
+      .get(url, {
+        params: { user_id: userId, number, tag },
       })
       .then((res) => {
         setImageListWithId(res.data.imageListWithId);
         setIsReady(true);
       })
-      .catch(() => alert("error"));
-  }, [tag, number]);
+      .catch((res) => console.log(res));
+  }, [tag, number, userId]);
 
   let photos;
   if (isReady) {
