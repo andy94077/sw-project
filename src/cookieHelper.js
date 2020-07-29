@@ -9,6 +9,6 @@ export function getCookie(name = "accessToken") {
   return v ? v[2] : null;
 }
 
-export function deleteCookie(name) {
+export function deleteCookie(name = "accessToken") {
   setCookie(name, "", -1);
 }
