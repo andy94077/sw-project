@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function CommandBox(props) {
+export default function CommentBox(props) {
   const { author, command } = props;
   const classes = useStyles();
   return (

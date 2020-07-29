@@ -17,7 +17,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import { Link } from "react-router-dom";
-import CommandBox from "./CommandBox";
+import CommentBox from "./CommentBox";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     transform: "rotate(180deg)",
     marginLeft: "5%",
   },
-  command: {
+  comment: {
     marginLeft: "5%",
     width: "90%",
     display: "flex",
@@ -159,7 +159,7 @@ export default function ContentCard(props) {
         <Collapse in={expand}>
           {comments.map((i) => (
             <div className={classes.command}>
-              <CommandBox author={i.user_name} command={i.content} />
+              <CommentBox author={i.user_name} command={i.content} />
             </div>
           ))}
           <form className={classes.command} onSubmit={handleOnSubmit}>
