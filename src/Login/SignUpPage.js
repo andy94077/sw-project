@@ -11,6 +11,7 @@ const useStyles = makeStyles(() => ({
     backgroundRepeat: "no-repeat",
     backgroundAttachment: "fixed",
     height: "100vh",
+    overflow: "hidden",
   },
   homePage: {
     position: "relative",

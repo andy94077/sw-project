@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -27,9 +27,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUpFormInfo() {
   const classes = useStyles();
-  const username = useRef();
-  const email = useRef();
-  const password = useRef();
+  const [info, setInfo] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  console.log(info);
 
   const [state, setState] = useState({
     username: "",
@@ -37,6 +40,27 @@ export default function SignUpFormInfo() {
     nowLoading: false,
     errorMes: "",
   });
+
+  const handleChangeUsername = (e) => {
+    setInfo({
+      ...info,
+      username: e.target.value,
+    });
+  };
+
+  const handleChangeEmail = (e) => {
+    setInfo({
+      ...info,
+      email: e.target.value,
+    });
+  };
+
+  const handleChangePassword = (e) => {
+    setInfo({
+      ...info,
+      password: e.target.value,
+    });
+  };
 
   const handleSubmit = () => {
     // Check if it is a valid input
@@ -54,9 +78,9 @@ export default function SignUpFormInfo() {
       },
     };
     const formdata = new FormData();
-    formdata.append("name", username.current.value);
-    formdata.append("email", email.current.value);
-    formdata.append("password", password.current.value);
+    formdata.append("name", info.username);
+    formdata.append("email", info.email);
+    formdata.append("password", info.password);
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
@@ -78,7 +102,7 @@ export default function SignUpFormInfo() {
           setState({
             isError: true,
             nowLoading: false,
-            errorMes: "username or password is not found",
+            errorMes: "username or email or password is not found",
           });
         }
       })
@@ -90,6 +114,11 @@ export default function SignUpFormInfo() {
           errorMes: "connection fail",
         });
       });
+    setInfo({
+      username: "",
+      email: "",
+      password: "",
+    });
   };
 
   const handleSearch = (e) => {
@@ -100,9 +129,9 @@ export default function SignUpFormInfo() {
 
   return (
     <div className={classes.centerMargin}>
-      <form className={classes.root} noValidate autoComplete="off">
+      <form className={classes.root} noVlidate autoComplete="off">
         <TextField
-          inputRef={username}
+          value={info.username}
           label="User Name"
           variant="outlined"
           required
@@ -112,10 +141,11 @@ export default function SignUpFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleChangeUsername}
         />
 
         <TextField
-          inputRef={email}
+          value={info.email}
           label="Email"
           variant="outlined"
           required
@@ -125,11 +155,12 @@ export default function SignUpFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleChangeEmail}
         />
 
         <TextField
           type="password"
-          inputRef={password}
+          value={info.password}
           label="Password"
           variant="outlined"
           required
@@ -139,6 +170,7 @@ export default function SignUpFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleChangePassword}
           onKeyUp={handleSearch}
         />
 
