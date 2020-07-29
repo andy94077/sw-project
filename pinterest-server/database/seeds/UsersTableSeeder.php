@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder
                     'name' => "user{$i}",
                     'email' => "cms{$i}@funpodium.net",
                     'password' => Hash::make("user{$i}"),
-                    'roles' => '1',
+                    'avatar_url' => "/img/avatar.jpeg",
                     'created_at' => date("Y-m-d H:i:s"),
                     //'user_id' => $i,
                 ]

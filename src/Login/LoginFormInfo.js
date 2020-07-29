@@ -1,9 +1,11 @@
 import React, { useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
+import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,10 +27,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function FormInfo() {
+export default function LoginFormInfo() {
   const classes = useStyles();
   const username = useRef();
   const password = useRef();
+  const history = useHistory();
 
   const [state, setState] = useState({
     username: "",
@@ -55,21 +58,26 @@ export default function FormInfo() {
         "Access-Control-Allow-Origin": "*",
       },
     };
-    const boolTest = false;
     const formdata = new FormData();
-    formdata.append("username", username.current.value);
+    formdata.append("name", username.current.value);
+    formdata.append("email", username.current.value);
     formdata.append("password", password.current.value);
+    // must remove before demo
+    formdata.append("avatar_url", "/img/avatar.jpeg");
+    //
     axios
-      .post("http://localhost:3000", formdata, config)
+      .post("http://pinterest-server.test/api/v1/user/logIn", formdata, config)
       .then((response) => {
-        if (response === null) return;
-        if (boolTest !== true) {
-          alert("Message already sent!");
+        if (response.data.isLogin) {
+          alert(response.data.Message);
           setState({
             isError: false,
             nowLoading: false,
           });
+          setCookie("userToken", response.data.token, 1);
+          history.push("/home");
         } else {
+          alert(response.data.Message);
           setState({
             isError: true,
             nowLoading: false,

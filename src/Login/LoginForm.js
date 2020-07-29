@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Modal from "react-bootstrap/Modal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
-import FormInfo from "./FormInfo";
+import LoginFormInfo from "./LoginFormInfo";
 import "./LoginForm.css";
 
 const useStyles = makeStyles(() => ({
@@ -59,7 +59,7 @@ export default function LoginForm(props) {
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
-      // animation={false}
+      backdrop="static"
       dialogClassName={classes.jumpFrame}
     >
       <div>
@@ -72,7 +72,7 @@ export default function LoginForm(props) {
             </h>
           </div>
           <div style={{ margin: "30px auto 0px" }}>
-            <FormInfo />
+            <LoginFormInfo />
           </div>
         </div>
         <Button

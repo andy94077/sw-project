@@ -17,11 +17,8 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->string('name')->comment('username for login purpose');
             $table->string('email')->unique();
-            // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->tinyInteger('roles');
-            //$table->unsignedBigInteger('user_id')->default("1")->comment('this column for latest modifed user');
-            //$table->foreign('user_id')->references('id')->on('users');
+            $table->string('avatar_url');
             $table->rememberToken();
             $table->timestamps();
         });
