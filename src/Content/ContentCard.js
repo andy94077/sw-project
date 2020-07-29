@@ -6,7 +6,6 @@ import {
   Collapse,
   TextareaAutosize,
   Button,
-  Icon,
   Fab,
   Typography,
   CardMedia,
@@ -15,6 +14,7 @@ import {
   CardActionArea,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import SendIcon from "@material-ui/icons/Send";
 
 import { Link } from "react-router-dom";
 import CommentBox from "./CommentBox";
@@ -73,21 +73,34 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "5%",
     width: "90%",
     display: "flex",
+    margin: "5px",
   },
   input: {
     resize: "none",
-    width: "75%",
+    width: "90%",
     borderRadius: "20px",
-    margin: "5px",
-    fontSize: "x-large",
+    fontSize: "20px",
+    alignItems: "center",
   },
   button: {
-    maxHeight: "40px",
+    maxHeight: "35px",
+    maxWidth: "30px",
   },
   comments: {
     overflow: "auto",
-    maxHeight: "70%",
-    marginLeft: "10%",
+    weight: "100%",
+    [theme.breakpoints.down("xs")]: {
+      maxHeight: "20%",
+      marginLeft: "10%",
+    },
+    [theme.breakpoints.only("sm")]: {
+      maxHeight: "20%",
+      marginLeft: "10%",
+    },
+    [theme.breakpoints.up("md")]: {
+      maxHeight: "70%",
+      marginLeft: "10%",
+    },
   },
 }));
 
@@ -140,7 +153,7 @@ export default function ContentCard(props) {
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <CardActionArea>
-            <Link to="/profile/test">
+            <Link to={`/profile/${author}`}>
               <Typography component="h5" variant="h5">
                 {author}
               </Typography>
@@ -168,7 +181,7 @@ export default function ContentCard(props) {
               </div>
             ))}
           </div>
-          <form className={classes.command} onSubmit={handleOnSubmit}>
+          <form className={classes.comment} onSubmit={handleOnSubmit}>
             <TextareaAutosize
               id="standard-basic"
               className={classes.input}
@@ -180,12 +193,10 @@ export default function ContentCard(props) {
             <Button
               variant="contained"
               color="primary"
-              className={classes.button}
-              endIcon={<Icon>send</Icon>}
-              size="small"
               type="submit"
+              className={classes.button}
             >
-              Send
+              <SendIcon />
             </Button>
           </form>
         </Collapse>
