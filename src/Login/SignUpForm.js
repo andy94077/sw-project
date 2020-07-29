@@ -46,8 +46,19 @@ export default function SignUpForm(props) {
         <div className={classes.logoFrame} />
         <div style={{ height: "10px" }} />
         <div style={{ margin: "0px auto 0px" }}>
-          <h1 style={{ fontSize: "30px", fontWeight: "bold", margin: "0" }}>
-            Happy Tree Friend
+          <h1 style={{ fontSize: "40px", fontWeight: "bold", margin: "0" }}>
+            Sign Up
+          </h1>
+          <div style={{ height: "15px" }} />
+          <h1
+            style={{
+              color: "gray",
+              fontSize: "18px",
+              fontWeight: "bold",
+              margin: "0",
+            }}
+          >
+            It is time to start your adventure
           </h1>
         </div>
         <div style={{ margin: "30px auto 0px" }}>

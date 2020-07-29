@@ -7,8 +7,6 @@ use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Auth;
-// use App\Models\PostDraft;
-// use App\Models\Label;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
@@ -21,14 +19,10 @@ class UserController extends BaseController
     public function register(Request $request)
     {
         $isValid = RegisterController::validator($request);
-        // var_dump($isValid->messages());
         if($isValid -> fails()){
-            //do something ...
-            //var_dump($isValid -> failed());
             return response()->json(['Message' => "Sign up fails!",'isSignUp' => false], 200);
         }
         else{
-            // return "Sign up success !";
             $user = RegisterController::create($request);
             return response()->json(['Message' => "Sign up seccess!",'isSignUp' => true], 200);
         }
@@ -36,9 +30,7 @@ class UserController extends BaseController
 
     public function logIn(Request $request)
     {
-        //return "Connected!";
         if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-            //var_dump(Auth::user()->name);
             return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true], 200);
         }
         else {

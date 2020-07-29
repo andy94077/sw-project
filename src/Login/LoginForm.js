@@ -67,9 +67,18 @@ export default function LoginForm(props) {
           <div className={classes.logoFrame} />
           <div style={{ height: "10px" }} />
           <div style={{ margin: "0px auto 0px" }}>
-            <h style={{ fontSize: "30px", fontWeight: "bold" }}>
-              Happy Tree Friend
-            </h>
+            <h1 style={{ fontSize: "50px", fontWeight: "bold" }}>Welcome</h1>
+            <h1
+              style={{
+                letterSpacing: "2px",
+                color: "gray",
+                fontSize: "15px",
+                fontWeight: "bold",
+                margin: "0",
+              }}
+            >
+              Login to enjoy your new day
+            </h1>
           </div>
           <div style={{ margin: "30px auto 0px" }}>
             <LoginFormInfo />

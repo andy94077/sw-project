@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUpFormInfo() {
   const classes = useStyles();
   const username = useRef();
+  const email = useRef();
   const password = useRef();
 
   const [state, setState] = useState({
@@ -38,9 +39,6 @@ export default function SignUpFormInfo() {
   });
 
   const handleSubmit = () => {
-    setState({
-      username: username.current.value,
-    });
     // Check if it is a valid input
     //
     setState({
@@ -57,7 +55,7 @@ export default function SignUpFormInfo() {
     };
     const formdata = new FormData();
     formdata.append("name", username.current.value);
-    formdata.append("email", username.current.value);
+    formdata.append("email", email.current.value);
     formdata.append("password", password.current.value);
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
@@ -94,6 +92,12 @@ export default function SignUpFormInfo() {
       });
   };
 
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   return (
     <div className={classes.centerMargin}>
       <form className={classes.root} noValidate autoComplete="off">
@@ -111,6 +115,19 @@ export default function SignUpFormInfo() {
         />
 
         <TextField
+          inputRef={email}
+          label="Email"
+          variant="outlined"
+          required
+          error={state.isError}
+          helperText={state.errorMes}
+          placeholder="enter your email"
+          color="primary"
+          className={classes.controlSpace}
+          InputProps={{ style: { borderRadius: "50px" } }}
+        />
+
+        <TextField
           type="password"
           inputRef={password}
           label="Password"
@@ -122,6 +139,7 @@ export default function SignUpFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onKeyUp={handleSearch}
         />
 
         {state.nowLoading ? (

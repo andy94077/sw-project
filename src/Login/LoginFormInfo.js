@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LoginFormInfo() {
   const classes = useStyles();
-  const username = useRef();
+  const email = useRef();
   const password = useRef();
   const history = useHistory();
 
@@ -41,9 +41,6 @@ export default function LoginFormInfo() {
   });
 
   const handleSubmit = () => {
-    setState({
-      username: username.current.value,
-    });
     // Check if it is a valid input
     //
     setState({
@@ -59,8 +56,7 @@ export default function LoginFormInfo() {
       },
     };
     const formdata = new FormData();
-    formdata.append("name", username.current.value);
-    formdata.append("email", username.current.value);
+    formdata.append("email", email.current.value);
     formdata.append("password", password.current.value);
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
@@ -81,7 +77,7 @@ export default function LoginFormInfo() {
           setState({
             isError: true,
             nowLoading: false,
-            errorMes: "username or password is not found",
+            errorMes: "email or password is not found",
           });
         }
       })
@@ -95,17 +91,23 @@ export default function LoginFormInfo() {
       });
   };
 
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   return (
     <div className={classes.centerMargin}>
       <form className={classes.root} noValidate autoComplete="off">
         <TextField
-          inputRef={username}
-          label="User Name"
+          inputRef={email}
+          label="Email"
           variant="outlined"
           required
           error={state.isError}
           helperText={state.errorMes}
-          placeholder="enter your username"
+          placeholder="enter your email"
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
@@ -123,6 +125,7 @@ export default function LoginFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onKeyUp={handleSearch}
         />
 
         {state.nowLoading ? (
