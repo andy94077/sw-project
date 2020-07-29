@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +12,8 @@ class Comment extends Model
     protected $fillable = ['user_id', 'post_id'];
     public $translatable = ['content'];
 
-    public function boot(){
+    protected static function boot()
+    {
         parent::boot();
     }
 }
