@@ -4,7 +4,7 @@ export function setCookie(name, value, days) {
   document.cookie = `${name}=${value};path=/;expires=${d.toGMTString()}`;
 }
 
-export function getCookie(name) {
+export function getCookie(name = "accessToken") {
   const v = document.cookie.match(`(^|;) ?${name}=([^;]*)(;|$)`);
   return v ? v[2] : null;
 }

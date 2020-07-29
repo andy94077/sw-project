@@ -59,7 +59,16 @@ class UserController extends BaseController
     public function authentication(Request $request)
     {
         $userToken = $request['accessToken'];
-        $userInfo = DB::table('users')->where('token', $userToken)->first();
-        echo $userInfo;
+        $userInfo = DB::table('users')->where('remember_token', $userToken)->first();
+        if($userInfo === null){
+            return response()->json(['isValid' => false], 200);
+        }
+        else{
+            return response()->json([
+                'username' => $userInfo->name,
+                'user_id' => $userInfo->id,
+                'isValid' => true
+            ], 200);
+        }
     }
 }

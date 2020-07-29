@@ -74,7 +74,7 @@ export default function LoginFormInfo() {
             isError: false,
             nowLoading: false,
           });
-          setCookie("userToken", response.data.token, 1);
+          setCookie("accessToken", response.data.token, 1);
           history.push("/home");
         } else {
           alert(response.data.Message);
