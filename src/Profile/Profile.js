@@ -177,9 +177,10 @@ export default function Profile({ match }) {
 
   const followButton = (
     <Button
-      className={`${classes.central} ${classes.rounded} ${classes.text}`}
+      className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text}`}
       variant="contained"
       color="secondary"
+      component="span"
     >
       Follow
     </Button>
