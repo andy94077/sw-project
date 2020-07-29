@@ -21,7 +21,7 @@ export default function Content({ match }) {
       <Bar />
       <Grid container className={classes.gird} justify="center">
         <Grid item xs={9}>
-          <ContentCard src={`/images/${pictureId}.jpg`} />
+          <ContentCard id={pictureId} src={`/images/${pictureId}.jpg`} />
         </Grid>
         <Grid item xs={10}>
           <PhotoGrid

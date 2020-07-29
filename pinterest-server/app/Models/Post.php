@@ -14,8 +14,7 @@ class Post extends Model
     public $timestamps = true;
     protected $table = 'posts';
     protected $primaryKey = 'id';
-    protected $fillable = ['url', 'username', 'tag', 'publish_time'];
-    public $translatable = ['content'];
+    protected $fillable = ['url', 'user_id', 'username', 'content', 'tag', 'publish_time'];
     public $image;
 
     protected static function boot()
