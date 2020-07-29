@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Profile({ match }) {
+  const userId = 1;
   const { name } = match.params;
   const classes = useStyles();
   const follow = [123, 456];
@@ -140,6 +141,8 @@ export default function Profile({ match }) {
         <Upload
           show={modalShow}
           onHide={handleUploadCancel}
+          userId={userId}
+          username={name}
           src={`http://pinterest-server.test${imageURL}`}
         />
       </div>

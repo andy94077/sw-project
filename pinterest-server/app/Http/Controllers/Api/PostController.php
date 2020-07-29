@@ -389,8 +389,22 @@ class PostController extends BaseController
 
     public function deleteImage(Request $request)
     {
-        $imageURL = dirname(substr($request["canceledURL"], 1), 2);
+        $imageURL = dirname(substr($request['canceledURL'], 1), 2);
         removeDirectory($imageURL);
+        return response()->json(['url' => $imageURL], 200);
+    }
+
+    public function uploadDesc(Request $request)
+    {
+        Post::create([
+            "url" => $request['url'],
+            "user_id" => $request['user_id'],
+            "username" => $request['username'],
+            "content" => $request['content'],
+            "tag" => $request['tag'],
+        ]);
+        $imageId = basename(dirname($request['url'], 2));
+        return response()->json(['id' => $imageId], 200);
     }
 
     public function destroy(Request $request, $post)

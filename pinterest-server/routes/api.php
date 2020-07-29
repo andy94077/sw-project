@@ -42,4 +42,5 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     // for upload images
     Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage');
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
+    Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc');
 });
