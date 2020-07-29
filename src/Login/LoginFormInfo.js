@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -29,9 +29,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LoginFormInfo() {
   const classes = useStyles();
-  const email = useRef();
-  const password = useRef();
   const history = useHistory();
+  const [info, setInfo] = useState({
+    email: "",
+    password: "",
+  });
 
   const [state, setState] = useState({
     username: "",
@@ -39,6 +41,20 @@ export default function LoginFormInfo() {
     nowLoading: false,
     errorMes: "",
   });
+
+  const handleChangeEmail = (e) => {
+    setInfo({
+      ...info,
+      email: e.target.value,
+    });
+  };
+
+  const handleChangePassword = (e) => {
+    setInfo({
+      ...info,
+      password: e.target.value,
+    });
+  };
 
   const handleSubmit = () => {
     // Check if it is a valid input
@@ -56,8 +72,8 @@ export default function LoginFormInfo() {
       },
     };
     const formdata = new FormData();
-    formdata.append("email", email.current.value);
-    formdata.append("password", password.current.value);
+    formdata.append("email", info.email);
+    formdata.append("password", info.password);
     // must remove before demo
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
@@ -101,7 +117,7 @@ export default function LoginFormInfo() {
     <div className={classes.centerMargin}>
       <form className={classes.root} noValidate autoComplete="off">
         <TextField
-          inputRef={email}
+          value={info.email}
           label="Email"
           variant="outlined"
           required
@@ -111,11 +127,12 @@ export default function LoginFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleChangeEmail}
         />
 
         <TextField
           type="password"
-          inputRef={password}
+          value={info.password}
           label="Password"
           variant="outlined"
           required
@@ -125,6 +142,7 @@ export default function LoginFormInfo() {
           color="primary"
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleChangePassword}
           onKeyUp={handleSearch}
         />
 

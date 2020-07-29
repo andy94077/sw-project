@@ -9,7 +9,6 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Bar from "../Bar/Bar";
 import Loading from "../components/Loading";
-import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -17,42 +16,35 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Content({ match }) {
-  const { pictureId } = match.params;
+export default function Content(props) {
+  const {
+    userId,
+    match: {
+      params: { pictureId },
+    },
+  } = props;
   const classes = useStyles();
   const [info, setInfo] = useState({
     authorName: "",
     src: "",
     content: "",
-    userId: "",
   });
   const [pageState, setPageState] = useState("Loading");
-  const accessToken = getCookie();
   useEffect(() => {
     const { CancelToken } = Axios;
     const source = CancelToken.source();
     setPageState("Loading");
-    console.log(pageState);
-    Axios.post("http://pinterest-server.test/api/v1/user/authentication", {
-      accessToken,
+
+    Axios.get("http://pinterest-server.test/api/v1/post/id", {
+      params: { id: pictureId },
     })
-      .then(({ data }) => {
-        const { isValid } = data;
-        if (!isValid) {
-          setPageState("invalid");
-        } else {
-          setInfo({ userId: data.user_id });
-          Axios.get("http://pinterest-server.test/api/v1/post/id", {
-            params: { id: pictureId },
-          }).then((res) => {
-            setInfo({
-              authorName: res.data[0].user_name,
-              src: res.data[0].url,
-              content: res.data[0].content,
-            });
-            setPageState("Done");
-          });
-        }
+      .then((res) => {
+        setInfo({
+          authorName: res.data[0].user_name,
+          src: res.data[0].url,
+          content: res.data[0].content,
+        });
+        setPageState("Done");
       })
       .catch((e) => {
         console.log(e);
@@ -76,7 +68,7 @@ export default function Content({ match }) {
               src={info.src}
               author={info.authorName}
               content={info.content}
-              userId={info.userId}
+              userId={userId}
             />
           </Grid>
           <Grid item xs={10}>

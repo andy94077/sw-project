@@ -51,7 +51,7 @@ class RegisterController extends Controller
     { 
         //echo $data->toArray()["email"];
         return Validator::make($data->all(), [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => [ 'required', 'string', 'min:8'],
         ]);
