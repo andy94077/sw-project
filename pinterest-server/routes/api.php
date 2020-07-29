@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('Api')->prefix('v1')->group(function () {
+    Route::get('/comments', 'CommentController@index');
+    Route::get('/comment/{post}', 'CommentController@showByPost');
+    Route::post('/comment/upload', 'CommentController@upload');
+    Route::apiResource('comment', 'CommentController');
+
+
+    Route::get('/posts', 'PostController@index');
     Route::get('/poststatus/{status}', 'PostController@showByStatus')->name('post.showByStatus');
     Route::patch('/post/status', 'PostController@updateStatus')->name('post.updateStatus');
     Route::get('/post/deleted', 'PostController@deleted')->name('post.deleted');
