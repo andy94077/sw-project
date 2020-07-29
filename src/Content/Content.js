@@ -24,52 +24,48 @@ export default function Content({ match }) {
     authorName: "",
     src: "",
     content: "",
+    userId: "",
   });
-  const [pageState, setPageState] = useState(0);
+  const [pageState, setPageState] = useState("Loading");
   const accessToken = getCookie();
   useEffect(() => {
-    setPageState(0);
-    Axios.request({
-      method: "POST",
-      url: "http://pinterest-server.test/api/v1/user/authentication",
-      date: {
-        accessToken: { accessToken },
-      },
+    const { CancelToken } = Axios;
+    const source = CancelToken.source();
+    setPageState("Loading");
+    console.log(pageState);
+    Axios.post("http://pinterest-server.test/api/v1/user/authentication", {
+      accessToken,
     })
       .then(({ data }) => {
         const { isValid } = data;
-        console.log(isValid);
         if (!isValid) {
-          setPageState(1);
+          setPageState("invalid");
+        } else {
+          setInfo({ userId: data.user_id });
+          Axios.get("http://pinterest-server.test/api/v1/post/id", {
+            params: { id: pictureId },
+          }).then((res) => {
+            setInfo({
+              authorName: res.data[0].user_name,
+              src: res.data[0].url,
+              content: res.data[0].content,
+            });
+            setPageState("Done");
+          });
         }
       })
       .catch((e) => {
         console.log(e);
       });
+    return source.cancel();
   }, [pictureId]);
-
-  useEffect(() => {
-    if (pageState === 0) {
-      Axios.get("http://pinterest-server.test/api/v1/post/id", {
-        params: { id: pictureId },
-      }).then(({ data }) => {
-        setInfo({
-          authorName: data[0].user_name,
-          src: data[0].url,
-          content: data[0].content,
-        });
-        setPageState(2);
-      });
-    }
-  }, [pageState]);
-
-  if (pageState === 0) {
+  if (pageState === "Loading") {
     return <Loading />;
   }
-  if (pageState === 1) {
+  if (pageState === "invalid") {
     return <Redirect to="/" />;
   }
-  if (pageState === 2) {
+  if (pageState === "Done") {
     return (
       <>
         <Bar />
@@ -80,6 +76,7 @@ export default function Content({ match }) {
               src={info.src}
               author={info.authorName}
               content={info.content}
+              userId={info.userId}
             />
           </Grid>
           <Grid item xs={10}>
@@ -89,4 +86,5 @@ export default function Content({ match }) {
       </>
     );
   }
+  return <>Wrong</>;
 }

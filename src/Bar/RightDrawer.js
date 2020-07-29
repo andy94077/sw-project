@@ -9,7 +9,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { Link } from "react-router-dom";
-import { deleteCookie, getCookie } from "../cookieHelper";
+import { deleteCookie } from "../cookieHelper";
 
 const useStyles = makeStyles({
   list: {
@@ -25,8 +25,7 @@ export default function RightDrawer(props) {
 
   const { open, toggleDrawer, button } = props;
   const logOut = () => {
-    const token = getCookie();
-    deleteCookie(token);
+    deleteCookie();
   };
   const menuItem = ["My account", "Settings", "Log out"];
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];

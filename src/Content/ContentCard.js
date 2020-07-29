@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src, id, author, content } = props;
+  const { src, id, author, content, userId } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
@@ -129,7 +129,7 @@ export default function ContentCard(props) {
         url: "http://pinterest-server.test/api/v1/comment/upload",
         data: {
           content: value,
-          user_id: 1,
+          user_id: userId,
           post_id: id,
         },
       }).then(() => {
@@ -176,7 +176,7 @@ export default function ContentCard(props) {
         <Collapse in={expand}>
           <div className={classes.comments}>
             {comments.map((i) => (
-              <div className={classes.command}>
+              <div className={classes.command} key={i.id}>
                 <CommentBox author={i.user_name} command={i.content} />
               </div>
             ))}
