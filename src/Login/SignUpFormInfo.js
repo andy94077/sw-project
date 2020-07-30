@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -39,6 +39,14 @@ export default function SignUpFormInfo() {
     errorMes: ["", "", ""],
   });
 
+  useEffect(() => {
+    setInfo({
+      username: state.isError[0] ? "" : info.username,
+      email: state.isError[1] ? "" : info.email,
+      password: state.isError[2] ? "" : info.password,
+    });
+  }, [state]);
+
   const handleChangeUsername = (e) => {
     setInfo({
       ...info,
@@ -63,11 +71,6 @@ export default function SignUpFormInfo() {
   const handleSubmit = () => {
     // Check if it is a valid input
     //
-    setState({
-      isError: state.isError,
-      nowLoading: true,
-      errorMes: state.errorMes,
-    });
 
     const config = {
       headers: {
@@ -98,6 +101,7 @@ export default function SignUpFormInfo() {
           });
         } else {
           alert(response.data.Message);
+          console.log(response.data.isContentInvalid);
           setState({
             isError: [
               response.data.isContentInvalid.name,
@@ -127,11 +131,6 @@ export default function SignUpFormInfo() {
           errorMes: ["", "", "connection fail"],
         });
       });
-    setInfo({
-      username: "",
-      email: "",
-      password: "",
-    });
   };
 
   const handleSearch = (e) => {
