@@ -3,15 +3,17 @@ import { makeStyles } from "@material-ui/core/styles";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   Background: {
     background: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(pictures/desktop.png)`,
     backgroundPosition: "center",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundAttachment: "fixed",
-    height: "100vh",
-    overflow: "hidden",
+    height: "100%",
+    [`@media (min-height: 650px)`]: {
+      height: "100vh",
+    },
   },
   homePage: {
     position: "relative",
@@ -29,10 +31,14 @@ const useStyles = makeStyles(() => ({
   titleTEXT: {
     width: "365px",
     minWidth: "365px",
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
 
   formTEXT: {
     height: "90%",
+    maxWidth: "90%",
   },
 
   pageSetting: {
@@ -42,6 +48,13 @@ const useStyles = makeStyles(() => ({
     width: "100%",
     height: "675px",
     overflow: "hidden",
+  },
+
+  spaceControl: {
+    width: "10%",
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
 }));
 
@@ -63,7 +76,7 @@ export default function SignUpPage() {
                     </p>
                   </div>
                 </div>
-                <div style={{ width: "10%" }} />
+                <div className={classes.spaceControl} />
                 <div className={classes.formTEXT}>
                   <div className={classes.itemFormat}>
                     <SignUpForm

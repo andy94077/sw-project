@@ -18,10 +18,16 @@ const useStyles = makeStyles((theme) => ({
   controlSpace: {
     marginTop: "10px",
     width: "300px",
+    [`@media (max-width: 400px)`]: {
+      width: "80%",
+    },
   },
   controlButton: {
     marginTop: "30px",
     width: "200px",
+    [`@media (max-width: 400px)`]: {
+      width: "170px",
+    },
   },
 }));
 
@@ -71,6 +77,11 @@ export default function SignUpFormInfo() {
   const handleSubmit = () => {
     // Check if it is a valid input
     //
+    setState({
+      isError: [false, false, false],
+      nowLoading: true,
+      errorMes: ["", "", ""],
+    });
 
     const config = {
       headers: {
@@ -101,7 +112,6 @@ export default function SignUpFormInfo() {
           });
         } else {
           alert(response.data.Message);
-          console.log(response.data.isContentInvalid);
           setState({
             isError: [
               response.data.isContentInvalid.name,
