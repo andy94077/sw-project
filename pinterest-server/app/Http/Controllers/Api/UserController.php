@@ -19,8 +19,11 @@ class UserController extends BaseController
     public function register(Request $request)
     {
         $isValid = RegisterController::validator($request);
+        $errorMes = $isValid->messages();
+        $errorMesContent = $isValid->messages()->messages();
+        $isContentInvalid = array('name' => $errorMes->has('name'), 'email' => $errorMes->has('email'), 'password' => $errorMes->has('password'));
         if($isValid -> fails()){
-            return response()->json(['Message' => "Sign up fails!",'isSignUp' => false], 200);
+            return response()->json(['Message' => "Sign up fails!",'isSignUp' => false, "isContentInvalid" => $isContentInvalid, "errorMesContent" => $errorMesContent], 200);
         }
         else{
             $user = RegisterController::create($request);

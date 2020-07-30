@@ -50,11 +50,25 @@ class RegisterController extends Controller
     public static function validator(Request $data)
     { 
         //echo $data->toArray()["email"];
-        return Validator::make($data->all(), [
-            'name' => ['required', 'string', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => [ 'required', 'string', 'min:8'],
-        ]);
+        return Validator::make($data->all(),
+            [
+                'name' => ['required', 'string', 'max:64', 'unique:users'],
+                'email' => ['required', 'string', 'email', 'max:64', 'unique:users'],
+                'password' => [ 'required', 'string', 'min:8', 'max:255', 'alpha_num'],
+            ],
+            [  
+                'name.required' => 'Username can\'t be empty',
+                'name.unique' => 'This username is already registered',
+                'name.max' => 'Username must be less than 64 character',
+                'email.required' => 'Email can\'t be empty',
+                'email.unique' => 'This email is already registered',
+                'email.max' => 'Email must be less than 64 character',
+                'password.required' => 'Password  can\'t be empty',
+                'password.alpha_num' => 'Password must only contain number or alpha',
+                'password.unique' => 'This password is already registered',
+                'password.min' => 'Password must be at least 8 character',
+                'password.max' => 'Password must be less than 255 character',
+            ]);
     }
 
     /**

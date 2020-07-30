@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     width: "300px",
   },
   controlButton: {
-    marginTop: "50px",
+    marginTop: "30px",
     width: "200px",
   },
 }));
@@ -34,11 +34,18 @@ export default function SignUpFormInfo() {
   });
 
   const [state, setState] = useState({
-    username: "",
-    isError: false,
+    isError: [false, false, false],
     nowLoading: false,
-    errorMes: "",
+    errorMes: ["", "", ""],
   });
+
+  useEffect(() => {
+    setInfo({
+      username: state.isError[0] ? "" : info.username,
+      email: state.isError[1] ? "" : info.email,
+      password: state.isError[2] ? "" : info.password,
+    });
+  }, [state]);
 
   const handleChangeUsername = (e) => {
     setInfo({
@@ -64,11 +71,6 @@ export default function SignUpFormInfo() {
   const handleSubmit = () => {
     // Check if it is a valid input
     //
-    setState({
-      isError: state.isError,
-      nowLoading: true,
-      errorMes: state.errorMes,
-    });
 
     const config = {
       headers: {
@@ -93,31 +95,42 @@ export default function SignUpFormInfo() {
         if (response.data.isSignUp) {
           alert(response.data.Message);
           setState({
-            isError: false,
+            isError: [false, false, false],
             nowLoading: false,
+            errorMes: ["", "", ""],
           });
         } else {
           alert(response.data.Message);
+          console.log(response.data.isContentInvalid);
           setState({
-            isError: true,
+            isError: [
+              response.data.isContentInvalid.name,
+              response.data.isContentInvalid.email,
+              response.data.isContentInvalid.password,
+            ],
             nowLoading: false,
-            errorMes: "username or email or password is not found",
+            errorMes: [
+              response.data.isContentInvalid.name === true
+                ? response.data.errorMesContent.name
+                : "",
+              response.data.isContentInvalid.email === true
+                ? response.data.errorMesContent.email
+                : "",
+              response.data.isContentInvalid.password === true
+                ? response.data.errorMesContent.password
+                : "",
+            ],
           });
         }
       })
       .catch((error) => {
         if (error === null) return;
         setState({
-          isError: true,
+          isError: [true, true, true],
           nowLoading: false,
-          errorMes: "connection fail",
+          errorMes: ["", "", "connection fail"],
         });
       });
-    setInfo({
-      username: "",
-      email: "",
-      password: "",
-    });
   };
 
   const handleSearch = (e) => {
@@ -134,8 +147,8 @@ export default function SignUpFormInfo() {
           label="User Name"
           variant="outlined"
           required
-          error={state.isError}
-          helperText={state.errorMes}
+          error={state.isError[0]}
+          helperText={state.errorMes[0]}
           placeholder="enter your username"
           color="primary"
           className={classes.controlSpace}
@@ -148,8 +161,8 @@ export default function SignUpFormInfo() {
           label="Email"
           variant="outlined"
           required
-          error={state.isError}
-          helperText={state.errorMes}
+          error={state.isError[1]}
+          helperText={state.errorMes[1]}
           placeholder="enter your email"
           color="primary"
           className={classes.controlSpace}
@@ -163,8 +176,8 @@ export default function SignUpFormInfo() {
           label="Password"
           variant="outlined"
           required
-          error={state.isError}
-          helperText={state.errorMes}
+          error={state.isError[2]}
+          helperText={state.errorMes[2]}
           placeholder="enter your password"
           color="primary"
           className={classes.controlSpace}
