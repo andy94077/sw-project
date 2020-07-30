@@ -32,7 +32,6 @@ export default function SignUpFormInfo() {
     email: "",
     password: "",
   });
-  console.log(info);
 
   const [state, setState] = useState({
     username: "",

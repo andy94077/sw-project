@@ -66,4 +66,20 @@ class UserController extends BaseController
             ], 200);
         }
     }
+    
+    public function userExist(Request $request)
+    {
+        $userInfo = DB::table('users')->where('name', $request['name'])->first();
+        if($userInfo === null){
+            return response()->json(['isValid' => false], 200);
+        }
+        else{
+            return response()->json([
+                'name' => $userInfo->name,
+                'id' => $userInfo->id,
+                'avatar_url' => $userInfo->avatar_url,
+                'isValid' => true
+            ], 200);
+        }
+    }
 }

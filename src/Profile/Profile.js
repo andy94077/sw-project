@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
+import { Link } from "react-router-dom";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
 import PhotoGrid from "../components/PhotoGrid";
 import Bar from "../Bar/Bar";
 import Upload from "./Upload";
@@ -49,11 +53,27 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "21px",
     color: "#a3a19a",
   },
+  paper: {
+    padding: "10px",
+    paddingTop: "50px",
+    paddingBottom: "50px",
+    marginTop: "100px",
+  },
 }));
 
-export default function Profile({ match }) {
-  const userId = 1;
-  const { name } = match.params;
+export default function Profile(props) {
+  const {
+    username,
+    userId,
+    match: {
+      params: { name },
+    },
+  } = props;
+
+  // const userId = 1;
+  // const username = "user1";
+  // const { name } = match.params;
+
   const classes = useStyles();
   const follow = [123, 456];
   const avatar = "/pictures/avatar.jpeg";
@@ -63,6 +83,35 @@ export default function Profile({ match }) {
   const [image, setImage] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [modalShow, setModalShow] = useState(false);
+  const [isReady, setIsReady] = useState("Loading");
+  const [isMyself, setIsMyself] = useState(false);
+  const [id, setId] = useState(null);
+
+  useEffect(() => {
+    setIsReady("Loading");
+    const jsonData = { name };
+
+    axios
+      .request({
+        method: "POST",
+        url: "http://pinterest-server.test/api/v1/user/userExist",
+        data: jsonData,
+      })
+      .then((res) => {
+        const userExist = res.data.isValid;
+        // Not existed user
+        if (userExist === false) {
+          setIsReady("NoUser");
+          return;
+        }
+        // My profile
+        if (username === name) {
+          setIsMyself(true);
+        }
+        setId(res.data.id);
+        setIsReady("OK");
+      });
+  }, [name]);
 
   const handleUploadImage = (event) => {
     if (image === event.target.value) {
@@ -98,66 +147,100 @@ export default function Profile({ match }) {
     });
   };
 
-  return (
-    <div>
-      <Bar />
-      <img
-        alt="Avatar"
-        className={`${classes.central} ${classes.rounded}`}
-        src={avatar}
+  const uploadButton = (
+    <div className={classes.center}>
+      <label htmlFor="contained-button-file">
+        <input
+          accept="image/*"
+          className={classes.input}
+          id="contained-button-file"
+          type="file"
+          onChange={handleUploadImage}
+          value={image}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          component="span"
+          className={`${classes.rounded} ${classes.text}`}
+        >
+          Upload
+        </Button>
+      </label>
+      <Upload
+        show={modalShow}
+        onHide={handleUploadCancel}
+        userId={userId}
+        username={name}
+        src={`http://pinterest-server.test${imageURL}`}
       />
-      <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
-      <div className={`${classes.center} ${classes.text}`}>
-        <a className={`${classes.bold} ${classes.url}`} href={url}>
-          {url}
-        </a>
-        &nbsp;·&nbsp;
-        <span>{intro}</span>
-        <br />
-        <span className={classes.bold}>
-          {follow[0]} followers · {follow[1]} following
-        </span>
+    </div>
+  );
+
+  const followButton = (
+    <Button
+      className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text}`}
+      variant="contained"
+      color="secondary"
+      component="span"
+    >
+      Follow
+    </Button>
+  );
+
+  if (isReady === "OK") {
+    return (
+      <div>
+        <Bar />
+        <img
+          alt="Avatar"
+          className={`${classes.central} ${classes.rounded}`}
+          src={avatar}
+        />
+        <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
+        <div className={`${classes.center} ${classes.text}`}>
+          <a className={`${classes.bold} ${classes.url}`} href={url}>
+            {url}
+          </a>
+          &nbsp;·&nbsp;
+          <span>{intro}</span>
+          <br />
+          <span className={classes.bold}>
+            {follow[0]} followers · {follow[1]} following
+          </span>
+        </div>
+
+        {isMyself ? uploadButton : followButton}
+
+        <div className={classes.central}>
+          <PhotoGrid userId={id} />
+        </div>
       </div>
-      {/* Upload button */}
-      <div className={classes.center}>
-        <label htmlFor="contained-button-file">
-          <input
-            accept="image/*"
-            className={classes.input}
-            id="contained-button-file"
-            type="file"
-            onChange={handleUploadImage}
-            value={image}
-          />
+    );
+  }
+  if (isReady === "NoUser") {
+    return (
+      <Paper
+        variant="outlined"
+        className={`${classes.central} ${classes.paper}`}
+      >
+        <Typography variant="h4" gutterBottom className={classes.center}>
+          Error: user does not exist
+        </Typography>
+        <Link to="/home">
           <Button
             variant="contained"
-            color="primary"
-            component="span"
-            className={`${classes.rounded} ${classes.text}`}
+            className={`${classes.central} ${classes.text}`}
           >
-            Upload
+            Back to homepage
           </Button>
-        </label>
-        <Upload
-          show={modalShow}
-          onHide={handleUploadCancel}
-          userId={userId}
-          username={name}
-          src={`http://pinterest-server.test${imageURL}`}
-        />
-      </div>
-      <Button
-        className={`${classes.central} ${classes.rounded} ${classes.text}`}
-        variant="contained"
-        color="secondary"
-      >
-        Follow
-      </Button>
-      <div className={classes.central}>
-        <PhotoGrid
-          imageList={Array.from({ length: 12 }, (_, i) => `${i + 1}`)}
-        />
-      </div>
+        </Link>
+      </Paper>
+    );
+  }
+  return (
+    <div>
+      <CircularProgress />
     </div>
   );
 }
