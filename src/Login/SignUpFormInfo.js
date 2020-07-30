@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
+import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUpFormInfo() {
   const classes = useStyles();
+  const history = useHistory();
   const [info, setInfo] = useState({
     username: "",
     email: "",
@@ -44,14 +47,6 @@ export default function SignUpFormInfo() {
     nowLoading: false,
     errorMes: ["", "", ""],
   });
-
-  useEffect(() => {
-    setInfo({
-      username: state.isError[0] ? "" : info.username,
-      email: state.isError[1] ? "" : info.email,
-      password: state.isError[2] ? "" : info.password,
-    });
-  }, [state]);
 
   const handleChangeUsername = (e) => {
     setInfo({
@@ -104,14 +99,16 @@ export default function SignUpFormInfo() {
       )
       .then((response) => {
         if (response.data.isSignUp) {
-          alert(response.data.Message);
           setState({
             isError: [false, false, false],
             nowLoading: false,
             errorMes: ["", "", ""],
           });
+          if (response.data.isLogin) {
+            setCookie("accessToken", response.data.token, 1);
+            history.push("/home");
+          }
         } else {
-          alert(response.data.Message);
           setState({
             isError: [
               response.data.isContentInvalid.name,
