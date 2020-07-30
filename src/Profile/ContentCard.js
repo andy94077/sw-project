@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("sm")]: {
       flex: "100%",
       minHeight: "0px",
-      height: "calc(100% - 100px)",
+      height: "calc(100% - 200px)",
     },
   },
   select: {
