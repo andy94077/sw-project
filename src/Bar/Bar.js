@@ -101,7 +101,9 @@ const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.toolbar,
 }));
 
-export default function Bar() {
+export default function Bar(props) {
+  const { username } = props;
+
   // Classes & States
   const classes = useStyles();
   const history = useHistory();
@@ -294,6 +296,7 @@ export default function Bar() {
                   <img alt="Avatar" className={classes.rounded} src={avatar} />
                 </IconButton>
               }
+              username={username}
             />
           </div>
           <div className={classes.sectionMobile}>

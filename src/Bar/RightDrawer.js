@@ -23,13 +23,13 @@ const useStyles = makeStyles({
 export default function RightDrawer(props) {
   const classes = useStyles();
 
-  const { open, toggleDrawer, button } = props;
+  const { open, toggleDrawer, button, username } = props;
   const logOut = () => {
     deleteCookie();
   };
   const menuItem = ["My account", "Settings", "Log out"];
   const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
-  const menuLink = ["/profile/user1", "/setting", "/"];
+  const menuLink = [`/profile/${username}`, "/setting", "/"];
   const menu = menuItem.map((text, index) => (
     <Link
       to={menuLink[index]}
