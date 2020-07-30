@@ -103,6 +103,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Bar(props) {
   const { username } = props;
+  const path = window.location.pathname.split("/");
 
   // Classes & States
   const classes = useStyles();
@@ -111,6 +112,9 @@ export default function Bar(props) {
   const [content, setContent] = useState(false);
   const [text, setText] = useState([{ id: 1 }]);
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState(
+    path[1] === "home" ? path[2] : ""
+  );
 
   const avatar = "/pictures/avatar.jpeg";
 
@@ -163,6 +167,10 @@ export default function Bar(props) {
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
+  };
+
+  const handleSetSearchValue = (event) => {
+    setSearchValue(event.target.value);
   };
 
   const toggleDrawer = (isOpen) => (event) => {
@@ -255,6 +263,8 @@ export default function Bar(props) {
               }}
               inputProps={{ "aria-label": "search" }}
               onKeyUp={handleSearch}
+              onChange={handleSetSearchValue}
+              value={searchValue}
             />
           </div>
           <div className={classes.grow} />
