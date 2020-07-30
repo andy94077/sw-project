@@ -9,7 +9,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: "25px",
     textAlign: "center",
     width: "420px",
-    margin: "auto 0px auto 4%",
+    margin: "auto 0px auto 0%",
     minHeight: "600px",
     boxShadow: `rgba(0, 0, 0, 0.45) 0px 2px 10px`,
   },
@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
   },
   signUpFrame: {
     height: "48px",
-    width: "403.4px",
+    width: "100%",
     color: "#111",
     borderRadius: "0 0 25px 25px",
   },

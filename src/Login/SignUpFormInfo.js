@@ -71,6 +71,11 @@ export default function SignUpFormInfo() {
   const handleSubmit = () => {
     // Check if it is a valid input
     //
+    setState({
+      isError: [false, false, false],
+      nowLoading: true,
+      errorMes: ["", "", ""],
+    });
 
     const config = {
       headers: {
@@ -101,7 +106,6 @@ export default function SignUpFormInfo() {
           });
         } else {
           alert(response.data.Message);
-          console.log(response.data.isContentInvalid);
           setState({
             isError: [
               response.data.isContentInvalid.name,
