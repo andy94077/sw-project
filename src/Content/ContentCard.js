@@ -112,7 +112,9 @@ export default function ContentCard(props) {
   const [comments, setComments] = useState([]);
 
   function refreshComment() {
-    Axios.get(`http://pinterest-server.test/api/v1/comment/${id}`)
+    Axios.get(`http://pinterest-server.test/api/v1/comment/post`, {
+      params: { post: id },
+    })
       .then(({ data }) => {
         setComments(data.reverse());
       })
