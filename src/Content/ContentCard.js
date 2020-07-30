@@ -32,11 +32,11 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     [theme.breakpoints.down("xs")]: {
-      height: "57%",
+      height: "65%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
-      height: "53%",
+      height: "60%",
       flex: "100%",
     },
     [theme.breakpoints.up("md")]: {
@@ -46,11 +46,11 @@ const useStyles = makeStyles((theme) => ({
   },
   cover: {
     [theme.breakpoints.down("xs")]: {
-      height: "43%",
+      height: "35%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
-      height: "47%",
+      height: "40%",
       flex: "100%",
     },
     [theme.breakpoints.up("md")]: {
@@ -73,8 +73,8 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "10%",
     display: "flex",
     margin: "5px",
-    flex: "10%",
     width: "80%",
+    height: "40px",
   },
   input: {
     resize: "none",
@@ -91,7 +91,6 @@ const useStyles = makeStyles((theme) => ({
   comments: {
     overflow: "auto",
     weight: "100%",
-    height: "87%",
     flexGrow: "1",
     marginLeft: "10%",
     // [theme.breakpoints.down("xs")]: {
@@ -108,9 +107,10 @@ const useStyles = makeStyles((theme) => ({
     // },
   },
   content: {
-    overflow: "auto",
-    maxHeight: "40%",
-    minHeight: "20%",
+    maxHeight: "50%",
+    minHeight: "30%",
+    display: "flex",
+    flexDirection: "column",
   },
   collapse: {
     display: "flex",
@@ -121,6 +121,17 @@ const useStyles = makeStyles((theme) => ({
   },
   wrapper: {
     height: "100%",
+  },
+  wrapperInner: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  author: {
+    height: "40px",
+  },
+  text: {
+    overflow: "auto",
+    flexGrow: "1",
   },
 }));
 
@@ -176,12 +187,22 @@ export default function ContentCard(props) {
         <CardContent className={classes.content}>
           <CardActionArea>
             <Link to={`/profile/${author}`}>
-              <Typography component="h5" variant="h5">
+              <Typography
+                component="h5"
+                variant="h5"
+                className={classes.author}
+              >
                 {author}
               </Typography>
             </Link>
           </CardActionArea>
-          <Typography variant="subtitle1" color="textSecondary">
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            display="block"
+            component="div"
+            className={classes.text}
+          >
             {content}
           </Typography>
         </CardContent>
@@ -197,7 +218,11 @@ export default function ContentCard(props) {
         </Fab>
         <Collapse
           in={expand}
-          classes={{ container: classes.collapse, wrapper: classes.wrapper }}
+          classes={{
+            container: classes.collapse,
+            wrapper: classes.wrapper,
+            wrapperInner: classes.wrapperInner,
+          }}
         >
           <div className={classes.comments}>
             {comments.map((i) => (
@@ -211,7 +236,7 @@ export default function ContentCard(props) {
               id="standard-basic"
               className={classes.input}
               rowsMin={1}
-              rowsMax={10}
+              rowsMax={3}
               value={value}
               onChange={(e) => setValue(e.target.value)}
             />
