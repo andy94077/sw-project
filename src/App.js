@@ -30,13 +30,16 @@ export default function App() {
           accessToken,
         })
         .then((res) => {
-          setIsReady(true);
-          if (res.data.isValid === true)
+          if (res.data.isValid === true) {
             setUser({ username: res.data.username, userId: res.data.user_id });
-          else history.push("/");
+            setIsReady(true);
+          } else {
+            setIsReady(true);
+            history.push("/");
+          }
         });
     }
-  }, [location]);
+  }, [location, history]);
 
   if (isReady) {
     return (

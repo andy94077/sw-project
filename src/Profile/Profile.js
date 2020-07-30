@@ -111,7 +111,7 @@ export default function Profile(props) {
         setId(res.data.id);
         setIsReady("OK");
       });
-  }, [name]);
+  }, [username, name]);
 
   const handleUploadImage = (event) => {
     if (image === event.target.value) {
