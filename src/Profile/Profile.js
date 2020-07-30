@@ -114,6 +114,7 @@ export default function Profile(props) {
     if (image === event.target.value) {
       return;
     }
+    setModalShow(true);
 
     const formData = new FormData();
     formData.append("imageupload", event.target.files[0]);
@@ -126,12 +127,12 @@ export default function Profile(props) {
       })
       .then((res) => {
         setImageURL(res.data.url);
-        setModalShow(true);
       });
   };
 
   const handleUploadCancel = () => {
     setImage("");
+    setImageURL("");
     setModalShow(false);
 
     const formData = new FormData();
@@ -169,7 +170,7 @@ export default function Profile(props) {
         onHide={handleUploadCancel}
         userId={userId}
         username={name}
-        src={`http://pinterest-server.test${imageURL}`}
+        src={imageURL}
       />
     </div>
   );

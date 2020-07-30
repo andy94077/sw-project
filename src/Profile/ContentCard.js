@@ -10,6 +10,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import { useHistory } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -126,11 +127,17 @@ export default function ContentCard(props) {
 
   return (
     <Card className={classes.root}>
-      <CardMedia
-        className={classes.cover}
-        image={src}
-        title="Live from space album cover"
-      />
+      {src === "" ? (
+        <div className={classes.cover}>
+          <CardMedia component={Loading} />
+        </div>
+      ) : (
+        <CardMedia
+          className={classes.cover}
+          image={`http://pinterest-server.test${src}`}
+          title="Live from space album cover"
+        />
+      )}
       <div className={classes.details}>
         <FormControl
           variant="outlined"
