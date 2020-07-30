@@ -4,12 +4,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Button, CardMedia, Card } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import { useHistory } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,31 +23,19 @@ const useStyles = makeStyles((theme) => ({
   details: {
     display: "flex",
     flexDirection: "column",
-    [theme.breakpoints.down("xs")]: {
-      height: "57%",
+    flex: "50%",
+    [theme.breakpoints.down("sm")]: {
       flex: "100%",
-    },
-    [theme.breakpoints.only("sm")]: {
-      height: "53%",
-      flex: "100%",
-    },
-    [theme.breakpoints.up("md")]: {
-      flex: "50%",
-      heught: "100%",
     },
   },
   cover: {
-    [theme.breakpoints.down("xs")]: {
-      height: "43%",
+    minHeight: "540px",
+    height: "100%",
+    flex: "50%",
+    [theme.breakpoints.down("sm")]: {
       flex: "100%",
-    },
-    [theme.breakpoints.only("sm")]: {
-      height: "47%",
-      flex: "100%",
-    },
-    [theme.breakpoints.up("md")]: {
-      flex: "50%",
-      height: "100%",
+      minHeight: "0px",
+      height: "calc(100% - 100px)",
     },
   },
   select: {
@@ -59,21 +47,23 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "20px",
     display: "flex",
     flexDirection: "column",
-    height: "400px",
+    minHeight: "400px",
+    height: "100%",
     overflow: "auto",
   },
   textfield: {
     marginTop: "20px",
     marginLeft: "20px",
+    height: "100%",
   },
   central: {
     position: "absolute",
-    bottom: "5px",
-    right: "5px",
+    bottom: "25px",
+    right: "20px",
   },
   rounded: {
     marginTop: "20px",
-    width: "calc(100% - 10px)",
+    width: "calc(40% - 10px)",
     borderRadius: "60px",
   },
   text: {
@@ -126,11 +116,17 @@ export default function ContentCard(props) {
 
   return (
     <Card className={classes.root}>
-      <CardMedia
-        className={classes.cover}
-        image={src}
-        title="Live from space album cover"
-      />
+      {src === "" ? (
+        <div className={classes.cover}>
+          <CardMedia component={Loading} />
+        </div>
+      ) : (
+        <CardMedia
+          className={classes.cover}
+          image={`http://pinterest-server.test${src}`}
+          title="Live from space album cover"
+        />
+      )}
       <div className={classes.details}>
         <FormControl
           variant="outlined"
@@ -153,27 +149,25 @@ export default function ContentCard(props) {
           </Select>
           {error ? <FormHelperText>A tag is necessary</FormHelperText> : null}
         </FormControl>
+        <FormControl>
+          <Button
+            variant="contained"
+            color="secondary"
+            className={`${classes.central} ${classes.rounded} ${classes.text}`}
+            onClick={handleUploadDesc}
+          >
+            Submit
+          </Button>
+        </FormControl>
         <TextField
           id="outlined-start-adornment"
           className={classes.textfield}
           label="Image description"
           multiline
-          rowsMax="17"
+          rowsMax="19"
           variant="outlined"
           InputProps={{
             className: classes.textarea,
-            startAdornment: (
-              <InputAdornment>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  className={`${classes.central} ${classes.rounded} ${classes.text}`}
-                  onClick={handleUploadDesc}
-                >
-                  Submit
-                </Button>
-              </InputAdornment>
-            ),
           }}
           inputRef={desc}
         />
