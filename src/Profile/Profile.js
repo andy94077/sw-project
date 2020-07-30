@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
-import { Link } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
+import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
 
@@ -217,24 +215,7 @@ export default function Profile(props) {
     );
   }
   if (isReady === "NoUser") {
-    return (
-      <Paper
-        variant="outlined"
-        className={`${classes.central} ${classes.paper}`}
-      >
-        <Typography variant="h4" gutterBottom className={classes.center}>
-          Error: user does not exist
-        </Typography>
-        <Link to="/home">
-          <Button
-            variant="contained"
-            className={`${classes.central} ${classes.text}`}
-          >
-            Back to homepage
-          </Button>
-        </Link>
-      </Paper>
-    );
+    return <ErrorGrid mes="user" />;
   }
   return (
     <div>

@@ -7,7 +7,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import SettingsIcon from "@material-ui/icons/Settings";
+// import SettingsIcon from "@material-ui/icons/Settings";
 import { Link } from "react-router-dom";
 import { deleteCookie } from "../cookieHelper";
 
@@ -27,9 +27,12 @@ export default function RightDrawer(props) {
   const logOut = () => {
     deleteCookie();
   };
-  const menuItem = ["My account", "Settings", "Log out"];
-  const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
-  const menuLink = [`/profile/${username}`, "/setting", "/"];
+  // const menuItem = ["My account", "Settings", "Log out"];
+  const menuItem = ["My account", "Log out"];
+  // const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
+  const menuIcon = [<AccountCircleIcon />, <ExitToAppIcon />];
+  // const menuLink = [`/profile/${username}`, "/setting", "/"];
+  const menuLink = [`/profile/${username}`, "/"];
   const menu = menuItem.map((text, index) => (
     <Link
       to={menuLink[index]}
