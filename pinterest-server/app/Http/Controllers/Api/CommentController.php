@@ -20,10 +20,10 @@ class CommentController extends BaseController{
             ->get();
         return response()->json($comments, 200);
     }
-    public function showByPost($post){
+    public function showByPost(Request $request){
         $comments = DB::table('comments')
             ->join('users', 'users.id', '=', 'comments.user_id')
-            ->where('post_id', $post)
+            ->where('post_id', $request['post'])
             ->select('comments.*', 'users.name as user_name')
             ->orderBy('updated_at', 'DESC')
             ->get();

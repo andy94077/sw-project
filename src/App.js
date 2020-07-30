@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import {
-  BrowserRouter as Router,
+  // BrowserRouter as Router,
   Switch,
   Route,
   useHistory,
+  useLocation,
 } from "react-router-dom";
+import Bar from "./Bar/Bar";
 import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
 import Content from "./Content/Content";
@@ -17,6 +19,7 @@ import { getCookie } from "./cookieHelper";
 export default function App() {
   const [user, setUser] = useState({ username: null, userId: null });
   const [isReady, setIsReady] = useState(true);
+  const location = useLocation();
   const history = useHistory();
 
   useEffect(() => {
@@ -28,17 +31,21 @@ export default function App() {
           accessToken,
         })
         .then((res) => {
-          setIsReady(true);
-          if (res.data.isValid === true)
+          if (res.data.isValid === true) {
             setUser({ username: res.data.username, userId: res.data.user_id });
-          else history.push("/");
+            setIsReady(true);
+          } else {
+            setIsReady(true);
+            history.push("/");
+          }
         });
     }
-  }, [window.location.pathname]);
+  }, [location, history]);
 
   if (isReady) {
     return (
-      <Router>
+      <div>
+        {window.location.pathname !== "/" && <Bar username={user.username} />}
         <Switch>
           <Route exact path="/" component={SignUpPage} />
           <Route exact path="/home" component={Homepage} />
@@ -68,7 +75,7 @@ export default function App() {
           <Route exact path="/setting" component={() => <>setting</>} />
           <Route exact path="/logout" component={() => <>logout</>} />
         </Switch>
-      </Router>
+      </div>
     );
   }
   return <Loading />;
