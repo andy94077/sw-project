@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.up("md")]: {
       flex: "50%",
-      heught: "100%",
+      height: "100%",
     },
   },
   cover: {
@@ -70,10 +70,11 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "5%",
   },
   comment: {
-    marginLeft: "5%",
-    width: "90%",
+    marginLeft: "10%",
     display: "flex",
     margin: "5px",
+    flex: "10%",
+    width: "80%",
   },
   input: {
     resize: "none",
@@ -85,22 +86,41 @@ const useStyles = makeStyles((theme) => ({
   button: {
     maxHeight: "35px",
     maxWidth: "30px",
+    marginLeft: "10%",
   },
   comments: {
     overflow: "auto",
     weight: "100%",
-    [theme.breakpoints.down("xs")]: {
-      maxHeight: "20%",
-      marginLeft: "10%",
-    },
-    [theme.breakpoints.only("sm")]: {
-      maxHeight: "20%",
-      marginLeft: "10%",
-    },
-    [theme.breakpoints.up("md")]: {
-      maxHeight: "70%",
-      marginLeft: "10%",
-    },
+    height: "87%",
+    flexGrow: "1",
+    marginLeft: "10%",
+    // [theme.breakpoints.down("xs")]: {
+    //   maxHeight: "20%",
+    //   marginLeft: "10%",
+    // },
+    // [theme.breakpoints.only("sm")]: {
+    //   maxHeight: "20%",
+    //   marginLeft: "10%",
+    // },
+    // [theme.breakpoints.up("md")]: {
+    //   maxHeight: "70%",
+    //   marginLeft: "10%",
+    // },
+  },
+  content: {
+    overflow: "auto",
+    maxHeight: "40%",
+    minHeight: "20%",
+  },
+  collapse: {
+    display: "flex",
+    width: "100%",
+    flexGrow: "1",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  wrapper: {
+    height: "100%",
   },
 }));
 
@@ -175,7 +195,10 @@ export default function ContentCard(props) {
         >
           <ExpandMoreIcon />
         </Fab>
-        <Collapse in={expand}>
+        <Collapse
+          in={expand}
+          classes={{ container: classes.collapse, wrapper: classes.wrapper }}
+        >
           <div className={classes.comments}>
             {comments.map((i) => (
               <div className={classes.command} key={i.id}>
