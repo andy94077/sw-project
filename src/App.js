@@ -8,6 +8,7 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+import Bar from "./Bar/Bar";
 import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
 import Content from "./Content/Content";
@@ -43,35 +44,38 @@ export default function App() {
 
   if (isReady) {
     return (
-      <Switch>
-        <Route exact path="/" component={SignUpPage} />
-        <Route exact path="/home" component={Homepage} />
-        <Route exact path="/home/:tag" component={Homepage} />
-        <Route
-          exact
-          path="/picture/:pictureId"
-          render={(props) => (
-            <Content
-              username={user.username}
-              userId={user.userId}
-              match={props.match}
-            />
-          )}
-        />
-        <Route
-          exact
-          path="/profile/:name"
-          render={(props) => (
-            <Profile
-              username={user.username}
-              userId={user.userId}
-              match={props.match}
-            />
-          )}
-        />
-        <Route exact path="/setting" component={() => <>setting</>} />
-        <Route exact path="/logout" component={() => <>logout</>} />
-      </Switch>
+      <div>
+        {window.location.pathname !== "/" && <Bar username={user.username} />}
+        <Switch>
+          <Route exact path="/" component={SignUpPage} />
+          <Route exact path="/home" component={Homepage} />
+          <Route exact path="/home/:tag" component={Homepage} />
+          <Route
+            exact
+            path="/picture/:pictureId"
+            render={(props) => (
+              <Content
+                username={user.username}
+                userId={user.userId}
+                match={props.match}
+              />
+            )}
+          />
+          <Route
+            exact
+            path="/profile/:name"
+            render={(props) => (
+              <Profile
+                username={user.username}
+                userId={user.userId}
+                match={props.match}
+              />
+            )}
+          />
+          <Route exact path="/setting" component={() => <>setting</>} />
+          <Route exact path="/logout" component={() => <>logout</>} />
+        </Switch>
+      </div>
     );
   }
   return <Loading />;
