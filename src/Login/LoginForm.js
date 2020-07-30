@@ -24,7 +24,10 @@ const useStyles = makeStyles(() => ({
     margin: "auto",
     height: "600px",
     overflow: "hidden",
-    width: "420px",
+    width: "84%",
+    [`@media (min-width: 500px)`]: {
+      width: "420px",
+    },
   },
   logoFrame: {
     backgroundColor: `rgb(255,0,0)`,

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
   formTEXT: {
     height: "90%",
-    maxWidth: "100%",
+    maxWidth: "90%",
   },
 
   pageSetting: {

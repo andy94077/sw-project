@@ -18,10 +18,16 @@ const useStyles = makeStyles((theme) => ({
   controlSpace: {
     marginTop: "10px",
     width: "300px",
+    [`@media (max-width: 400px)`]: {
+      width: "80%",
+    },
   },
   controlButton: {
     marginTop: "30px",
     width: "200px",
+    [`@media (max-width: 400px)`]: {
+      width: "170px",
+    },
   },
 }));
 
