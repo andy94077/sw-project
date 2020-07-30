@@ -128,7 +128,7 @@ export default function SignUpFormInfo() {
 
   return (
     <div className={classes.centerMargin}>
-      <form className={classes.root} noVlidate autoComplete="off">
+      <form className={classes.root} noValidate autoComplete="off">
         <TextField
           value={info.username}
           label="User Name"
