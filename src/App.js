@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import {
-  BrowserRouter as Router,
+  // BrowserRouter as Router,
   Switch,
   Route,
   useHistory,
+  useLocation,
 } from "react-router-dom";
 import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
@@ -17,6 +18,7 @@ import { getCookie } from "./cookieHelper";
 export default function App() {
   const [user, setUser] = useState({ username: null, userId: null });
   const [isReady, setIsReady] = useState(true);
+  const location = useLocation();
   const history = useHistory();
 
   useEffect(() => {
@@ -34,41 +36,39 @@ export default function App() {
           else history.push("/");
         });
     }
-  }, [window.location.pathname]);
+  }, [location]);
 
   if (isReady) {
     return (
-      <Router>
-        <Switch>
-          <Route exact path="/" component={SignUpPage} />
-          <Route exact path="/home" component={Homepage} />
-          <Route exact path="/home/:tag" component={Homepage} />
-          <Route
-            exact
-            path="/picture/:pictureId"
-            render={(props) => (
-              <Content
-                username={user.username}
-                userId={user.userId}
-                match={props.match}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/profile/:name"
-            render={(props) => (
-              <Profile
-                username={user.username}
-                userId={user.userId}
-                match={props.match}
-              />
-            )}
-          />
-          <Route exact path="/setting" component={() => <>setting</>} />
-          <Route exact path="/logout" component={() => <>logout</>} />
-        </Switch>
-      </Router>
+      <Switch>
+        <Route exact path="/" component={SignUpPage} />
+        <Route exact path="/home" component={Homepage} />
+        <Route exact path="/home/:tag" component={Homepage} />
+        <Route
+          exact
+          path="/picture/:pictureId"
+          render={(props) => (
+            <Content
+              username={user.username}
+              userId={user.userId}
+              match={props.match}
+            />
+          )}
+        />
+        <Route
+          exact
+          path="/profile/:name"
+          render={(props) => (
+            <Profile
+              username={user.username}
+              userId={user.userId}
+              match={props.match}
+            />
+          )}
+        />
+        <Route exact path="/setting" component={() => <>setting</>} />
+        <Route exact path="/logout" component={() => <>logout</>} />
+      </Switch>
     );
   }
   return <Loading />;
