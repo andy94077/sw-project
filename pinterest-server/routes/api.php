@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
-    Route::get('/comment/{post}', 'CommentController@showByPost');
+    Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload');
     Route::apiResource('comment', 'CommentController');
 
