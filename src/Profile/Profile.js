@@ -7,7 +7,6 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import PhotoGrid from "../components/PhotoGrid";
-import Bar from "../Bar/Bar";
 import Upload from "./Upload";
 
 const useStyles = makeStyles((theme) => ({
@@ -191,7 +190,6 @@ export default function Profile(props) {
   if (isReady === "OK") {
     return (
       <div>
-        <Bar />
         <img
           alt="Avatar"
           className={`${classes.central} ${classes.rounded}`}

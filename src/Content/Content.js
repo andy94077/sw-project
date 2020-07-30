@@ -7,7 +7,6 @@ import { Grid } from "@material-ui/core";
 import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
-import Bar from "../Bar/Bar";
 import Loading from "../components/Loading";
 
 const useStyles = makeStyles(() => ({
@@ -60,7 +59,6 @@ export default function Content(props) {
   if (pageState === "Done") {
     return (
       <>
-        <Bar />
         <Grid container className={classes.gird} justify="center">
           <Grid item xs={9}>
             <ContentCard

@@ -24,6 +24,7 @@ export default function App() {
 
   useEffect(() => {
     const accessToken = getCookie();
+    setUser({ username: null, userId: null });
     if (window.location.pathname !== "/") {
       setIsReady(false);
       axios
@@ -32,7 +33,10 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            setUser({ username: res.data.username, userId: res.data.user_id });
+            setUser({
+              username: res.data.username,
+              userId: res.data.user_id,
+            });
             setIsReady(true);
           } else {
             setIsReady(true);
