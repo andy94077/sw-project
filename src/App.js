@@ -23,7 +23,8 @@ export default function App() {
 
   useEffect(() => {
     const accessToken = getCookie();
-    if (window.location.pathname !== "/") {
+    setUser({ username: null, userId: null });
+    if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
         .post("http://pinterest-server.test/api/v1/user/authentication", {
@@ -31,8 +32,12 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            setUser({ username: res.data.username, userId: res.data.user_id });
+            setUser({
+              username: res.data.username,
+              userId: res.data.user_id,
+            });
             setIsReady(true);
+            if (location.pathname === "/") history.push("/home");
           } else {
             setIsReady(true);
             history.push("/");
@@ -41,6 +46,7 @@ export default function App() {
     }
   }, [location, history]);
 
+  console.log(user);
   if (isReady) {
     return (
       <Switch>
