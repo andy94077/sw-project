@@ -47,7 +47,6 @@ export default function App() {
     }
   }, [location, history]);
 
-  console.log(user);
   if (isReady) {
     return (
       <div>
