@@ -16,6 +16,16 @@ use stdClass;
 class UserController extends BaseController
 {
 
+    public function logIn(Request $request)
+    {
+        if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true], 200);
+        }
+        else {
+            return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
+        }
+    }
+
     public function register(Request $request)
     {
         $isValid = RegisterController::validator($request);
@@ -27,17 +37,12 @@ class UserController extends BaseController
         }
         else{
             $user = RegisterController::create($request);
-            return response()->json(['Message' => "Sign up seccess!",'isSignUp' => true], 200);
-        }
-    }
-
-    public function logIn(Request $request)
-    {
-        if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true], 200);
-        }
-        else {
-            return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
+            if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+                return response()->json(['name' => Auth::user()->name, 'Message' => "Sign up seccess!",'isSignUp' => true, 'isLogin' => true, 'token' => Auth::user()->remember_token], 200);
+            }
+            else {
+                return response()->json(['Message' => "Sign up seccess but Login fails!",'isSignUp' => false, 'isLogin' => false], 200);
+            }
         }
     }
 

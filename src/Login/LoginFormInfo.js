@@ -87,7 +87,6 @@ export default function LoginFormInfo() {
       .post("http://pinterest-server.test/api/v1/user/logIn", formdata, config)
       .then((response) => {
         if (response.data.isLogin) {
-          alert(response.data.Message);
           setState({
             isError: false,
             nowLoading: false,
@@ -95,7 +94,6 @@ export default function LoginFormInfo() {
           setCookie("accessToken", response.data.token, 1);
           history.push("/home");
         } else {
-          alert(response.data.Message);
           setState({
             isError: true,
             nowLoading: false,
