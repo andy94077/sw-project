@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
   root: {
-    height: "40px",
+    minHeight: "20px",
     width: "90%",
-    boxShadow: "rgba(0,0,0,0.3) 0px 2px 10px",
     borderRadius: "30px",
     margin: "5px",
     display: "flex",
@@ -15,7 +14,7 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    margin: "20px",
+    margin: "5px 20px 5px 20px",
     fontWeight: "bold",
   },
   content: {
@@ -23,6 +22,9 @@ const useStyles = makeStyles(() => ({
     justifyContent: "center",
     alignItems: "center",
     margin: "5px",
+    wordBreak: "break-all",
+    padding: "0",
+    lineHeight: "20px",
   },
 }));
 
