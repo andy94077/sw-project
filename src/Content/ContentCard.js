@@ -18,25 +18,36 @@ import SendIcon from "@material-ui/icons/Send";
 
 import { Link } from "react-router-dom";
 import CommentBox from "./CommentBox";
+import Loading from "../components/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
-    height: "75vh",
     boxShadow: "rgba(0,0,0,0.45) 0px 2px 10px",
     borderRadius: "30px",
-    marginTop: "50px",
+    [theme.breakpoints.down("xs")]: {
+      height: "90vh",
+      marginTop: "0px",
+    },
+    [theme.breakpoints.only("sm")]: {
+      height: "85vh",
+      marginTop: "25px",
+    },
+    [theme.breakpoints.up("md")]: {
+      height: "75vh",
+      marginTop: "50px",
+    },
   },
   details: {
     display: "flex",
     flexDirection: "column",
     [theme.breakpoints.down("xs")]: {
-      height: "65%",
+      height: "55%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
-      height: "60%",
+      height: "55%",
       flex: "100%",
     },
     [theme.breakpoints.up("md")]: {
@@ -46,17 +57,33 @@ const useStyles = makeStyles((theme) => ({
   },
   cover: {
     [theme.breakpoints.down("xs")]: {
-      height: "35%",
+      height: "45%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
-      height: "40%",
+      height: "45%",
       flex: "100%",
     },
     [theme.breakpoints.up("md")]: {
       flex: "50%",
       height: "100%",
     },
+    cursor: "zoom-in",
+  },
+  coverOpen: {
+    [theme.breakpoints.down("xs")]: {
+      height: "100%",
+      flex: "100%",
+    },
+    [theme.breakpoints.only("sm")]: {
+      height: "100%",
+      flex: "100%",
+    },
+    [theme.breakpoints.up("md")]: {
+      flex: "100%",
+      height: "100%",
+    },
+    cursor: "zoom-out",
   },
   expand: {
     transform: "rotate(0deg)",
@@ -93,22 +120,10 @@ const useStyles = makeStyles((theme) => ({
     weight: "100%",
     flexGrow: "1",
     marginLeft: "10%",
-    // [theme.breakpoints.down("xs")]: {
-    //   maxHeight: "20%",
-    //   marginLeft: "10%",
-    // },
-    // [theme.breakpoints.only("sm")]: {
-    //   maxHeight: "20%",
-    //   marginLeft: "10%",
-    // },
-    // [theme.breakpoints.up("md")]: {
-    //   maxHeight: "70%",
-    //   marginLeft: "10%",
-    // },
   },
   content: {
     maxHeight: "50%",
-    minHeight: "30%",
+    minHeight: "25%",
     display: "flex",
     flexDirection: "column",
   },
@@ -133,6 +148,9 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexGrow: "1",
   },
+  cardMedia: {
+    style: "",
+  },
 }));
 
 export default function ContentCard(props) {
@@ -141,6 +159,8 @@ export default function ContentCard(props) {
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
   const [comments, setComments] = useState([]);
+  const [isUpload, setIsUpload] = useState(false);
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
 
   function refreshComment() {
     Axios.get(`http://pinterest-server.test/api/v1/comment/post`, {
@@ -148,15 +168,39 @@ export default function ContentCard(props) {
     })
       .then(({ data }) => {
         setComments(data.reverse());
+        setIsUpload(false);
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
+  function upload() {
+    if (value !== "") {
+      setIsUpload(true);
+      Axios.request({
+        method: "post",
+        url: "http://pinterest-server.test/api/v1/comment/upload",
+        data: {
+          content: value,
+          user_id: userId,
+          post_id: id,
+        },
+      }).then(() => {
+        refreshComment();
+      });
+      setValue("");
+    }
+  }
+
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    if (value !== "") {
+    upload();
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter" && value !== "") {
+      setIsUpload(true);
       Axios.request({
         method: "post",
         url: "http://pinterest-server.test/api/v1/comment/upload",
@@ -172,6 +216,8 @@ export default function ContentCard(props) {
     }
   };
 
+  console.log(isUpload);
+
   useEffect(() => {
     refreshComment();
   }, [id]);
@@ -179,13 +225,18 @@ export default function ContentCard(props) {
   return (
     <Card className={classes.root}>
       <CardMedia
-        className={classes.cover}
+        className={clsx(classes.cover, {
+          [classes.coverOpen]: isCoverOpen,
+        })}
         image={src}
         title="Live from space album cover"
+        onClick={() => {
+          setIsCoverOpen(!isCoverOpen);
+        }}
       />
       <div className={classes.details}>
         <CardContent className={classes.content}>
-          <CardActionArea>
+          <CardActionArea className={classes.cardMedia}>
             <Link to={`/profile/${author}`}>
               <Typography
                 component="h5"
@@ -213,6 +264,7 @@ export default function ContentCard(props) {
           className={clsx(classes.expand, {
             [classes.expandOpen]: expand,
           })}
+          size={expand ? "small" : ""}
         >
           <ExpandMoreIcon />
         </Fab>
@@ -239,15 +291,20 @@ export default function ContentCard(props) {
               rowsMax={3}
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              onKeyUp={handleEnter}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              className={classes.button}
-            >
-              <SendIcon />
-            </Button>
+            {isUpload ? (
+              <Loading />
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                className={classes.button}
+              >
+                <SendIcon />
+              </Button>
+            )}
           </form>
         </Collapse>
       </div>
