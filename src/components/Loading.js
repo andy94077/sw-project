@@ -1,7 +1,16 @@
 import React from "react";
-import Loader from "react-loader-spinner";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+  loading: {
+    marginTop: "10px",
+    color: "#bbbbbb",
+  },
+}));
 
 export default function Loading() {
+  const classes = useStyles();
   return (
     <div
       style={{
@@ -12,7 +21,8 @@ export default function Loading() {
         alignItems: "center",
       }}
     >
-      <Loader type="Oval" color="#bbbbbb" height="50" width="50" />
+      ß
+      <CircularProgress className={classes.loading} />
     </div>
   );
 }
