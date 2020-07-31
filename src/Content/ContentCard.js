@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
 
 import { Link } from "react-router-dom";
+import ScrollToBottom from "react-scroll-to-bottom";
 import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
 
@@ -276,13 +277,13 @@ export default function ContentCard(props) {
             wrapperInner: classes.wrapperInner,
           }}
         >
-          <div className={classes.comments}>
+          <ScrollToBottom className={classes.comments}>
             {comments.map((i) => (
               <div className={classes.command} key={i.id}>
                 <CommentBox author={i.user_name} command={i.content} />
               </div>
             ))}
-          </div>
+          </ScrollToBottom>
           <form className={classes.comment} onSubmit={handleOnSubmit}>
             <TextareaAutosize
               id="standard-basic"
