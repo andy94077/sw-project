@@ -60,7 +60,7 @@ export default function Content(props) {
     return (
       <>
         <Grid container className={classes.gird} justify="center">
-          <Grid item xs={9}>
+          <Grid item xs={11} sm={9} md={9}>
             <ContentCard
               id={pictureId}
               src={info.src}
@@ -69,7 +69,7 @@ export default function Content(props) {
               userId={userId}
             />
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={12} sm={11} md={10}>
             <PhotoGrid />
           </Grid>
         </Grid>
