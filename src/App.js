@@ -15,6 +15,7 @@ import Content from "./Content/Content";
 import Profile from "./Profile/Profile";
 import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
+import { CONCAT_SERVER_URL } from "./constants";
 
 export default function App() {
   const [user, setUser] = useState({ username: null, userId: null });
@@ -28,7 +29,7 @@ export default function App() {
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
-        .post("http://pinterest-server.test/api/v1/user/authentication", {
+        .post(CONCAT_SERVER_URL("/api/v1/user/authentication"), {
           accessToken,
         })
         .then((res) => {

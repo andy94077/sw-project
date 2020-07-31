@@ -8,6 +8,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Loading from "../components/Loading";
 import ErrorGrid from "../components/ErrorGrid";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -34,13 +35,13 @@ export default function Content(props) {
     const source = CancelToken.source();
     setPageState("Loading");
 
-    Axios.get("http://pinterest-server.test/api/v1/post/id", {
+    Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
     })
       .then((res) => {
         setInfo({
           authorName: res.data[0].user_name,
-          src: res.data[0].url,
+          src: CONCAT_SERVER_URL(res.data[0].url),
           content: res.data[0].content,
         });
         setPageState("Done");
@@ -57,6 +58,7 @@ export default function Content(props) {
   if (pageState === "invalid") {
     return <ErrorGrid mes="picture" />;
   }
+
   if (pageState === "Done") {
     return (
       <>
