@@ -21,7 +21,6 @@ export default function Loading() {
         alignItems: "center",
       }}
     >
-      ß
       <CircularProgress className={classes.loading} />
     </div>
   );
