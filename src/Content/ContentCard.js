@@ -217,8 +217,6 @@ export default function ContentCard(props) {
     }
   };
 
-  console.log(isUpload);
-
   useEffect(() => {
     refreshComment();
   }, [id]);
@@ -259,6 +257,7 @@ export default function ContentCard(props) {
           </Typography>
         </CardContent>
         <Fab
+          component="span"
           onClick={() => {
             setExpand(!expand);
           }}
@@ -284,7 +283,7 @@ export default function ContentCard(props) {
               </div>
             ))}
           </ScrollToBottom>
-          <form className={classes.comment} onSubmit={handleOnSubmit}>
+          <form className={classes.comment}>
             <TextareaAutosize
               id="standard-basic"
               className={classes.input}
@@ -300,7 +299,8 @@ export default function ContentCard(props) {
               <Button
                 variant="contained"
                 color="primary"
-                type="submit"
+                onClick={handleOnSubmit}
+                component="span"
                 className={classes.button}
               >
                 <SendIcon />
