@@ -42,7 +42,6 @@ export default function LoginFormInfo() {
   });
 
   const [state, setState] = useState({
-    username: "",
     isError: false,
     nowLoading: false,
     errorMes: "",
@@ -90,6 +89,7 @@ export default function LoginFormInfo() {
           setState({
             isError: false,
             nowLoading: false,
+            errorMes: "",
           });
           setCookie("accessToken", response.data.token, 1);
           history.push("/home");
