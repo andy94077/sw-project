@@ -45,11 +45,6 @@ const useStyles = makeStyles((theme) => ({
   input: {
     display: "none",
   },
-  tmp: {
-    marginTop: "100px",
-    fontSize: "21px",
-    color: "#a3a19a",
-  },
   paper: {
     padding: "10px",
     paddingTop: "50px",
