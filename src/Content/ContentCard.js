@@ -124,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     maxHeight: "50%",
-    minHeight: "25%",
+    minHeight: "110px",
     display: "flex",
     flexDirection: "column",
   },
