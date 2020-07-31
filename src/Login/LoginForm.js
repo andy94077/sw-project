@@ -51,6 +51,27 @@ const useStyles = makeStyles(() => ({
     fontWeight: "700",
     color: "#111",
   },
+  outerFrame: {
+    padding: "20px 10px 24px",
+    height: "552px",
+  },
+  mainText: {
+    fontSize: "50px",
+    fontWeight: "bold",
+  },
+  subText: {
+    letterSpacing: "2px",
+    color: "gray",
+    fontSize: "15px",
+    fontWeight: "bold",
+    margin: "0",
+  },
+  contentPosition: {
+    margin: "30px auto 0px",
+  },
+  textPosition: {
+    margin: "0px auto 0px",
+  },
 }));
 
 export default function LoginForm(props) {
@@ -66,24 +87,14 @@ export default function LoginForm(props) {
       dialogClassName={classes.jumpFrame}
     >
       <div>
-        <div style={{ padding: "20px 10px 24px", height: "552px" }}>
+        <div className={classes.outerFrame}>
           <div className={classes.logoFrame} />
           <div style={{ height: "10px" }} />
-          <div style={{ margin: "0px auto 0px" }}>
-            <h1 style={{ fontSize: "50px", fontWeight: "bold" }}>Welcome</h1>
-            <h1
-              style={{
-                letterSpacing: "2px",
-                color: "gray",
-                fontSize: "15px",
-                fontWeight: "bold",
-                margin: "0",
-              }}
-            >
-              Login to enjoy your new day
-            </h1>
+          <div className={classes.textPosition}>
+            <h1 className={classes.mainText}>Welcome</h1>
+            <h1 className={classes.subText}>Login to enjoy your new day</h1>
           </div>
-          <div style={{ margin: "30px auto 0px" }}>
+          <div className={classes.formPosition}>
             <LoginFormInfo />
           </div>
         </div>

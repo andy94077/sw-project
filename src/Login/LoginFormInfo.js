@@ -45,7 +45,7 @@ export default function LoginFormInfo() {
     username: "",
     isError: false,
     nowLoading: false,
-    errorMes: "",
+    errorMes: ["", ""],
   });
 
   const handleChangeEmail = (e) => {
@@ -97,7 +97,7 @@ export default function LoginFormInfo() {
           setState({
             isError: true,
             nowLoading: false,
-            errorMes: "email or password is not found",
+            errorMes: ["", "Email or Password is not found"],
           });
         }
       })
@@ -106,7 +106,7 @@ export default function LoginFormInfo() {
         setState({
           isError: true,
           nowLoading: false,
-          errorMes: "connection fail",
+          errorMes: ["", "Connection fail"],
         });
       });
   };
@@ -126,7 +126,7 @@ export default function LoginFormInfo() {
           variant="outlined"
           required
           error={state.isError}
-          helperText={state.errorMes}
+          helperText={state.errorMes[0]}
           placeholder="enter your email"
           color="primary"
           className={classes.controlSpace}
@@ -141,7 +141,7 @@ export default function LoginFormInfo() {
           variant="outlined"
           required
           error={state.isError}
-          helperText={state.errorMes}
+          helperText={state.errorMes[1]}
           placeholder="enter your password"
           color="primary"
           className={classes.controlSpace}
