@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     flex: "50%",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down("xs")]: {
       flex: "100%",
     },
   },
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "540px",
     height: "100%",
     flex: "50%",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down("xs")]: {
       flex: "100%",
       minHeight: "0px",
       height: "calc(100% - 200px)",
@@ -96,7 +96,7 @@ export default function ContentCard(props) {
     }
 
     const jsonData = {
-      url: src,
+      url: `http://pinterest-server.test/${src}`,
       user_id: userId,
       username,
       content: desc.current.value,
