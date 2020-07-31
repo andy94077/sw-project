@@ -63,35 +63,31 @@ export default function SignUpPage() {
   const classes = useStyles();
 
   return (
-    <>
-      <div>
-        <div className={classes.Background}>
-          {!modalShow ? (
-            <div className={classes.itemFormat}>
-              <div className={classes.pageSetting}>
-                <div className={classes.titleTEXT}>
-                  <div className={classes.itemFormat}>
-                    <p className={classes.homePage}>
-                      Sign up to enjoy your new day
-                    </p>
-                  </div>
-                </div>
-                <div className={classes.spaceControl} />
-                <div className={classes.formTEXT}>
-                  <div className={classes.itemFormat}>
-                    <SignUpForm
-                      show={modalShow}
-                      setModalShow={() => setModalShow(true)}
-                    />
-                  </div>
-                </div>
+    <div className={classes.Background}>
+      {modalShow ? (
+        <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
+      ) : (
+        <div className={classes.itemFormat}>
+          <div className={classes.pageSetting}>
+            <div className={classes.titleTEXT}>
+              <div className={classes.itemFormat}>
+                <p className={classes.homePage}>
+                  Sign up to enjoy your new day
+                </p>
               </div>
             </div>
-          ) : (
-            <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
-          )}
+            <div className={classes.spaceControl} />
+            <div className={classes.formTEXT}>
+              <div className={classes.itemFormat}>
+                <SignUpForm
+                  show={modalShow}
+                  setModalShow={() => setModalShow(true)}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
