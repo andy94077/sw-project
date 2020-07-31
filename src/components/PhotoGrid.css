@@ -27,10 +27,7 @@
   .grid {
     column-count: 2;
   }
-}
-
-@media (max-width: 400px) {
-  .grid {
-    column-count: 1;
+  .grid div {
+    margin: 0 3px 10px 3px;
   }
 }
