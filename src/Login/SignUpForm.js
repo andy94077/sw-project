@@ -43,10 +43,10 @@ export default function SignUpForm(props) {
   return (
     <div className={classes.formFrame}>
       <div style={{ padding: "20px 10px 24px", height: "552px" }}>
-        <div className={classes.logoFrame} />
+        {/* <div className={classes.logoFrame} /> */}
         <div style={{ height: "10px" }} />
         <div style={{ margin: "0px auto 0px" }}>
-          <h1 style={{ fontSize: "40px", fontWeight: "bold", margin: "0" }}>
+          <h1 style={{ fontSize: "50px", fontWeight: "bold", margin: "0" }}>
             Sign Up
           </h1>
           <div style={{ height: "15px" }} />
