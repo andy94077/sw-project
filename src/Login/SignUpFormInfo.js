@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   controlButton: {
-    marginTop: "30px",
+    marginTop: "20px",
     width: "200px",
     [`@media (max-width: 400px)`]: {
       width: "170px",
