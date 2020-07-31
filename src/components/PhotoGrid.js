@@ -7,6 +7,7 @@ import { Typography } from "@material-ui/core";
 import Loading from "./Loading";
 import Photo from "./Photo";
 import "./PhotoGrid.css";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles(() => ({
   loading: {
@@ -28,8 +29,8 @@ export default function PhotoGrid(props) {
     setIsReady(false);
     const url =
       userId !== undefined && userId !== null
-        ? "http://pinterest-server.test/api/v1/post/user"
-        : "http://pinterest-server.test/api/v1/post/picture";
+        ? CONCAT_SERVER_URL("/api/v1/post/user")
+        : CONCAT_SERVER_URL("/api/v1/post/picture");
     axios
       .get(url, {
         params: { user_id: userId, number, tag },
@@ -40,15 +41,6 @@ export default function PhotoGrid(props) {
       })
       .catch((res) => console.log(res));
   }, [tag, number, userId]);
-
-  let photos;
-  if (isReady) {
-    photos = imageListWithid.map(({ id, url }) => (
-      <Link to={`/picture/${id}`} key={id}>
-        <Photo image={url.split("/").slice(-1)[0]} src={url} />
-      </Link>
-    ));
-  }
 
   if (isReady) {
     if (imageListWithid.length === 0) {
@@ -63,7 +55,18 @@ export default function PhotoGrid(props) {
         </Typography>
       );
     }
-    return <div className="grid">{photos}</div>;
+    return (
+      <div className="grid">
+        {imageListWithid.map(({ id, url }) => (
+          <Link to={`/picture/${id}`} key={id}>
+            <Photo
+              image={url.split("/").slice(-1)[0]}
+              src={CONCAT_SERVER_URL(url)}
+            />
+          </Link>
+        ))}
+      </div>
+    );
   }
   return (
     <div className={classes.loading}>

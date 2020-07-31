@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
 import { setCookie } from "../cookieHelper";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,11 +93,7 @@ export default function SignUpFormInfo() {
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
     axios
-      .post(
-        "http://pinterest-server.test/api/v1/user/register",
-        formdata,
-        config
-      )
+      .post(CONCAT_SERVER_URL("/api/v1/user/register"), formdata, config)
       .then((response) => {
         if (response.data.isSignUp) {
           setState({

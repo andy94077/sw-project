@@ -10,6 +10,7 @@ import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import { useHistory } from "react-router-dom";
 import Loading from "../components/Loading";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -96,7 +97,7 @@ export default function ContentCard(props) {
     }
 
     const jsonData = {
-      url: `http://pinterest-server.test/${src}`,
+      url: src,
       user_id: userId,
       username,
       content: desc.current.value,
@@ -106,7 +107,7 @@ export default function ContentCard(props) {
     axios
       .request({
         method: "POST",
-        url: "http://pinterest-server.test/api/v1/profile/uploadDesc",
+        url: CONCAT_SERVER_URL("/api/v1/profile/uploadDesc"),
         data: jsonData,
       })
       .then((res) => {
@@ -123,7 +124,7 @@ export default function ContentCard(props) {
       ) : (
         <CardMedia
           className={classes.cover}
-          image={`http://pinterest-server.test${src}`}
+          image={CONCAT_SERVER_URL(src)}
           title="Live from space album cover"
         />
       )}
