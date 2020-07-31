@@ -96,7 +96,7 @@ export default function ContentCard(props) {
     }
 
     const jsonData = {
-      url: src,
+      url: `http://pinterest-server.test/${src}`,
       user_id: userId,
       username,
       content: desc.current.value,
