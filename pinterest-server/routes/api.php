@@ -19,21 +19,16 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
     Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload');
-    Route::delete('/comment/delete', 'CommentController@delete');
+    Route::delete('/comment', 'CommentController@delete');
     Route::post('comment/modification', 'CommentController@update');
     Route::apiResource('comment', 'CommentController');
 
 
     Route::get('/posts', 'PostController@index');
     Route::get('/post/id', 'PostController@getPictureFromId');
-    Route::get('/poststatus/{status}', 'PostController@showByStatus')->name('post.showByStatus');
-    Route::patch('/post/status', 'PostController@updateStatus')->name('post.updateStatus');
-    Route::get('/post/deleted', 'PostController@deleted')->name('post.deleted');
-    Route::post('/post/restore', 'PostController@restore')->name('post.restore');
-    Route::patch('/post/delete', 'PostController@delete')->name('post.delete');
+    Route::delete('/image', 'PostController@deleteImage');
+    Route::delete('/post', 'PostController@delete');
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
-    // Route::get('/post/labels', 'PostController@getPostLabel')->name('post.getPostLabel');
-    Route::patch('/post/publish/{id}', 'PostController@publish')->name('post.publish');
     Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('post', 'PostController');

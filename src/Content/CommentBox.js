@@ -57,7 +57,7 @@ export default function CommentBox(props) {
   const handleDelete = () => {
     if (!onDelete) {
       setOnDelete(true);
-      Axios.delete(CONCAT_SERVER_URL("/api/v1/comment/delete"), {
+      Axios.delete(CONCAT_SERVER_URL("/api/v1/comment"), {
         data: {
           id: commentId,
         },
