@@ -61,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
   coverOpen: {
     flex: "100%",
     cursor: "zoom-out",
+    [theme.breakpoints.down("xs")]: {
+      height: "100%",
+    },
   },
   select: {
     margin: "20px",

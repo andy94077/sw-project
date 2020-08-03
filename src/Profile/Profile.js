@@ -206,7 +206,7 @@ export default function Profile(props) {
           </span>
         </div>
 
-        {isMyself ? uploadButton : followButton}
+        {username !== "" && (isMyself ? uploadButton : followButton)}
 
         <div className={classes.central}>
           <PhotoGrid userId={id} />
