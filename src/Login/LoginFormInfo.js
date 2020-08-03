@@ -93,7 +93,7 @@ export default function LoginFormInfo() {
             errorMes: "",
           });
           setCookie("accessToken", response.data.token, 1);
-          history.push("/home");
+          if (history.location.pathname === "/") history.push("/home");
         } else {
           setState({
             isError: true,

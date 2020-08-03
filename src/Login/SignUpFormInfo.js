@@ -103,7 +103,7 @@ export default function SignUpFormInfo() {
           });
           if (response.data.isLogin) {
             setCookie("accessToken", response.data.token, 1);
-            history.push("/home");
+            if (history.location.pathname === "/") history.push("/home");
           }
         } else {
           setState({
