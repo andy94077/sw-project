@@ -19,6 +19,7 @@ const useStyles = makeStyles(() => ({
 export default function Content(props) {
   const {
     userId,
+    username,
     match: {
       params: { pictureId },
     },
@@ -73,6 +74,7 @@ export default function Content(props) {
               author={info.authorName}
               content={info.content}
               userId={userId}
+              username={username}
             />
           </Grid>
           <Grid item xs={12} sm={11} md={10}>

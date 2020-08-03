@@ -22,13 +22,11 @@ class CommentController extends BaseController{
             ->select('comments.*', 'users.name as user_name')
             ->orderBy('updated_at', 'DESC')
             ->get();
-        var_dump($comments);
         return response()->json($comments, 200);
     }
     public function upload(Request $request){
         try{
             DB::beginTransaction();
-            var_dump($request['content']);
             $comment = Comment::create(
                 [
                     'post_id' => $request['post_id'],
@@ -38,7 +36,6 @@ class CommentController extends BaseController{
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
             );
-            var_dump($comment);
             DB::commit();
             return $this->sendResponse("", "success");
         }
@@ -49,6 +46,7 @@ class CommentController extends BaseController{
     }
 
     public function delete(Request $request){
+        var_dump($request['id']);
         $comment = Comment::find($request['id']);
         $comment->delete();
         return $this->sendResponse($comment, "success");

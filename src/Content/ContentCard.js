@@ -111,7 +111,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     weight: "100%",
     flexGrow: "1",
-    marginLeft: "10%",
+    marginLeft: "5%",
+    display: "flex",
   },
   content: {
     maxHeight: "50%",
@@ -146,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src, id, author, content, userId } = props;
+  const { src, id, author, content, userId, username } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
@@ -169,14 +170,10 @@ export default function ContentCard(props) {
 
   function upload() {
     setIsUpload(true);
-    Axios.request({
-      method: "post",
-      url: CONCAT_SERVER_URL("/api/v1/comment/upload"),
-      data: {
-        content: value,
-        user_id: userId,
-        post_id: id,
-      },
+    Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
+      content: value,
+      user_id: userId,
+      post_id: id,
     })
       .then(() => {
         refreshComment();
@@ -243,7 +240,7 @@ export default function ContentCard(props) {
           className={clsx(classes.expand, {
             [classes.expandOpen]: expand,
           })}
-          size={expand ? "small" : ""}
+          size={expand ? "small" : "medium"}
         >
           <ExpandMoreIcon />
         </Fab>
@@ -257,9 +254,14 @@ export default function ContentCard(props) {
         >
           <ScrollToBottom className={classes.comments}>
             {comments.map((i) => (
-              <div className={classes.command} key={i.id}>
-                <CommentBox author={i.user_name} command={i.content} />
-              </div>
+              <CommentBox
+                key={i.id}
+                author={i.user_name}
+                comment={i.content}
+                commentId={i.id}
+                canDelete={username === i.user_name || username === author}
+                refresh={refreshComment}
+              />
             ))}
           </ScrollToBottom>
           <form className={classes.comment}>
