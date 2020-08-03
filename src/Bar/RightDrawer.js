@@ -27,21 +27,36 @@ export default function RightDrawer(props) {
   const logOut = () => {
     deleteCookie();
   };
-  // const menuItem = ["My account", "Settings", "Log out"];
-  const menuItem = ["My account", "Log out"];
-  // const menuIcon = [<AccountCircleIcon />, <SettingsIcon />, <ExitToAppIcon />];
-  const menuIcon = [<AccountCircleIcon />, <ExitToAppIcon />];
-  // const menuLink = [`/profile/${username}`, "/setting", "/"];
-  const menuLink = [`/profile/${username}`, "/"];
-  const menu = menuItem.map((text, index) => (
-    <Link
-      to={menuLink[index]}
-      key={text}
-      onClick={text === "Log out" ? logOut : null}
-    >
+
+  // Settings hasn't implemented.
+  const menuList = [
+    {
+      label: "My account",
+      icon: <AccountCircleIcon />,
+      link: `/profile/${username}`,
+      event: null,
+    },
+    /*
+    {
+      label: "Setting",
+      icon: <SettingsIcon />,
+      link: "/setting",
+      event: null,
+    },
+    */
+    {
+      label: "Log out",
+      icon: <ExitToAppIcon />,
+      link: "/",
+      event: logOut,
+    },
+  ];
+
+  const menu = menuList.map((page) => (
+    <Link to={page.link} key={page.label} onClick={page.event}>
       <ListItem button>
-        <ListItemIcon>{menuIcon[index]}</ListItemIcon>
-        <ListItemText primary={text} />
+        <ListItemIcon>{page.icon}</ListItemIcon>
+        <ListItemText primary={page.label} />
       </ListItem>
     </Link>
   ));

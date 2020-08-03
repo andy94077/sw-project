@@ -103,7 +103,8 @@ export default function Profile(props) {
         }
         setId(res.data.id);
         setIsReady("OK");
-      });
+      })
+      .catch((error) => console.log(error));
   }, [username, name]);
 
   const handleUploadImage = (event) => {
@@ -123,7 +124,8 @@ export default function Profile(props) {
       })
       .then((res) => {
         setImageURL(res.data.url);
-      });
+      })
+      .catch((error) => console.log(error));
   };
 
   const handleUploadCancel = () => {
@@ -134,11 +136,13 @@ export default function Profile(props) {
     const formData = new FormData();
     formData.append("canceledURL", imageURL);
 
-    axios.request({
-      method: "POST",
-      url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
-      data: formData,
-    });
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
+        data: formData,
+      })
+      .catch((error) => console.log(error));
   };
 
   const uploadButton = (

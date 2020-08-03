@@ -83,16 +83,16 @@ export default function ContentCard(props) {
   const history = useHistory();
 
   const [tag, setTag] = useState("");
-  const [error, setError] = useState(false);
+  const [empty, setEmpty] = useState(false);
 
   const handleSelectTag = (event) => {
-    setError(false);
+    setEmpty(false);
     setTag(event.target.value);
   };
 
   const handleUploadDesc = () => {
     if (tag === "") {
-      setError(true);
+      setEmpty(true);
       return;
     }
 
@@ -112,7 +112,8 @@ export default function ContentCard(props) {
       })
       .then((res) => {
         history.push(`/picture/${res.data.id}`);
-      });
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -132,7 +133,7 @@ export default function ContentCard(props) {
         <FormControl
           variant="outlined"
           className={classes.select}
-          error={error}
+          error={empty}
         >
           <InputLabel id="demo-simple-select-outlined-label">Tag *</InputLabel>
           <Select
@@ -148,7 +149,7 @@ export default function ContentCard(props) {
             <MenuItem value="cat">cat</MenuItem>
             <MenuItem value="dog">dog</MenuItem>
           </Select>
-          {error ? <FormHelperText>A tag is necessary</FormHelperText> : null}
+          {empty ? <FormHelperText>A tag is necessary</FormHelperText> : null}
         </FormControl>
         <FormControl>
           <Button
