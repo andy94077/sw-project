@@ -32,6 +32,11 @@ const useStyles = makeStyles((theme) => ({
       width: "170px",
     },
   },
+  visitorHref: {
+    display: "block",
+    marginTop: "80px",
+    color: "gray",
+  },
 }));
 
 export default function LoginFormInfo() {
@@ -164,6 +169,9 @@ export default function LoginFormInfo() {
             Continue
           </Button>
         )}
+        <a href="/home" className={classes.visitorHref}>
+          ----以訪客身份登入----
+        </a>
       </form>
     </div>
   );
