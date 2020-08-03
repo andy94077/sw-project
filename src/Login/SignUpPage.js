@@ -65,7 +65,11 @@ export default function SignUpPage() {
   return (
     <div className={classes.Background}>
       {modalShow ? (
-        <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
+        <LoginForm
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          otherOption="Create a new account"
+        />
       ) : (
         <div className={classes.itemFormat}>
           <div className={classes.pageSetting}>

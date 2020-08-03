@@ -75,7 +75,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function LoginForm(props) {
-  const { onHide, show } = props;
+  const { onHide, show, otherOption } = props;
   const classes = useStyles();
   return (
     <CustomModal show={show} jumpFrame={classes.jumpFrame}>
@@ -96,7 +96,7 @@ export default function LoginForm(props) {
           className={classes.signUpFrame}
           onClick={onHide}
         >
-          <div className={classes.signUpText}>Create a new account</div>
+          <div className={classes.signUpText}>{otherOption}</div>
         </Button>
       </div>
     </CustomModal>
