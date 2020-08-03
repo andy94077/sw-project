@@ -12,11 +12,15 @@ import {
   CardContent,
   Card,
   CardActionArea,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
 import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
@@ -141,8 +145,12 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexGrow: "1",
   },
-  cardMedia: {
-    style: "",
+  cardAction: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  user: {
+    flexGrow: "1",
   },
 }));
 
@@ -154,6 +162,8 @@ export default function ContentCard(props) {
   const [comments, setComments] = useState([]);
   const [isUpload, setIsUpload] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
+  const [onDelete, setOnDelete] = useState(0);
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -179,8 +189,11 @@ export default function ContentCard(props) {
         refreshComment();
         setValue("");
       })
-      .catch(() => {
-        setIsUpload(false);
+      .catch((e) => {
+        if (e.message === "Network Error") {
+          /// 彈出顯示連線失敗請重新傳送訊息
+          setIsUpload(false);
+        }
       });
   }
 
@@ -197,99 +210,148 @@ export default function ContentCard(props) {
     refreshComment();
   }, [id]);
 
-  return (
-    <Card className={classes.root}>
-      <CardMedia
-        className={clsx(classes.cover, {
-          [classes.coverOpen]: isCoverOpen,
-        })}
-        image={src}
-        title="Live from space album cover"
-        onClick={() => {
-          setIsCoverOpen(!isCoverOpen);
-        }}
-      />
-      <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <CardActionArea className={classes.cardMedia}>
-            <Link to={`/profile/${author}`}>
-              <Typography
-                component="h5"
-                variant="h5"
-                className={classes.author}
-              >
-                {author}
-              </Typography>
-            </Link>
-          </CardActionArea>
-          <Typography
-            variant="subtitle1"
-            color="textSecondary"
-            display="block"
-            component="div"
-            className={classes.text}
-          >
-            {content}
-          </Typography>
-        </CardContent>
-        <Fab
-          component="span"
-          onClick={() => {
-            setExpand(!expand);
-          }}
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expand,
+  const handleClick = (event) => {
+    setMenu(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMenu(null);
+  };
+
+  async function handleDelete() {
+    setOnDelete(1);
+    Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), { data: { id } })
+      .then((res) => {
+        console.log(res);
+        setOnDelete(2);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  if (onDelete === 1) {
+    return <Loading />;
+  }
+  if (onDelete === 2) {
+    return <Redirect to="/home" />;
+  }
+  if (onDelete === 0) {
+    return (
+      <Card className={classes.root}>
+        <CardMedia
+          className={clsx(classes.cover, {
+            [classes.coverOpen]: isCoverOpen,
           })}
-          size={expand ? "small" : "medium"}
-        >
-          <ExpandMoreIcon />
-        </Fab>
-        <Collapse
-          in={expand}
-          classes={{
-            container: classes.collapse,
-            wrapper: classes.wrapper,
-            wrapperInner: classes.wrapperInner,
+          image={src}
+          title="Live from space album cover"
+          onClick={() => {
+            setIsCoverOpen(!isCoverOpen);
           }}
-        >
-          <ScrollToBottom className={classes.comments}>
-            {comments.map((i) => (
-              <CommentBox
-                key={i.id}
-                author={i.user_name}
-                comment={i.content}
-                commentId={i.id}
-                canDelete={username === i.user_name || username === author}
-                refresh={refreshComment}
+        />
+        <div className={classes.details}>
+          <CardContent className={classes.content}>
+            <CardActionArea className={classes.cardAction}>
+              <Link to={`/profile/${author}`} className={classes.user}>
+                <Typography
+                  component="h5"
+                  variant="h5"
+                  className={classes.author}
+                >
+                  {author}
+                </Typography>
+              </Link>
+              {author === username && (
+                <>
+                  <IconButton
+                    size="small"
+                    onClick={handleClick}
+                    aria-controls="m"
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id="m"
+                    anchorEl={menu}
+                    keepMounted
+                    open={Boolean(menu)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleDelete}>delete</MenuItem>
+                    <MenuItem>Edit</MenuItem>
+                  </Menu>
+                </>
+              )}
+            </CardActionArea>
+            <Typography
+              variant="subtitle1"
+              color="textSecondary"
+              display="block"
+              component="div"
+              className={classes.text}
+            >
+              {content}
+            </Typography>
+          </CardContent>
+          <Fab
+            component="span"
+            onClick={() => {
+              setExpand(!expand);
+            }}
+            className={clsx(classes.expand, {
+              [classes.expandOpen]: expand,
+            })}
+            size={expand ? "small" : "medium"}
+          >
+            <ExpandMoreIcon />
+          </Fab>
+          <Collapse
+            in={expand}
+            classes={{
+              container: classes.collapse,
+              wrapper: classes.wrapper,
+              wrapperInner: classes.wrapperInner,
+            }}
+          >
+            <ScrollToBottom className={classes.comments}>
+              {comments.map((i) => (
+                <CommentBox
+                  key={i.id}
+                  author={i.user_name}
+                  comment={i.content}
+                  commentId={i.id}
+                  canDelete={username === i.user_name || username === author}
+                  canEdit={username === i.user_name}
+                  refresh={refreshComment}
+                />
+              ))}
+            </ScrollToBottom>
+            <form className={classes.comment}>
+              <TextareaAutosize
+                id="standard-basic"
+                className={classes.input}
+                rowsMin={1}
+                rowsMax={3}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyUp={handleEnter}
               />
-            ))}
-          </ScrollToBottom>
-          <form className={classes.comment}>
-            <TextareaAutosize
-              id="standard-basic"
-              className={classes.input}
-              rowsMin={1}
-              rowsMax={3}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyUp={handleEnter}
-            />
-            {isUpload ? (
-              <Loading />
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleOnSubmit}
-                component="span"
-                className={classes.button}
-              >
-                <SendIcon />
-              </Button>
-            )}
-          </form>
-        </Collapse>
-      </div>
-    </Card>
-  );
+              {isUpload ? (
+                <Loading />
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOnSubmit}
+                  component="span"
+                  className={classes.button}
+                >
+                  <SendIcon />
+                </Button>
+              )}
+            </form>
+          </Collapse>
+        </div>
+      </Card>
+    );
+  }
 }

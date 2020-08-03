@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CommentBox(props) {
-  const { author, comment, commentId, canDelete, refresh } = props;
+  const { author, comment, commentId, canDelete, refresh, canEdit } = props;
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
   const classes = useStyles();
@@ -57,7 +57,7 @@ export default function CommentBox(props) {
   const handleDelete = () => {
     if (!onDelete) {
       setOnDelete(true);
-      Axios.delete(CONCAT_SERVER_URL("/api/v1/comment/delete"), {
+      Axios.delete(CONCAT_SERVER_URL("/api/v1/comment"), {
         data: {
           id: commentId,
         },
@@ -93,6 +93,8 @@ export default function CommentBox(props) {
         onClose={handleClose}
       >
         {canDelete && <MenuItem onClick={handleDelete}>delete</MenuItem>}
+        {canEdit && <MenuItem>Edit</MenuItem>}
+        {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
       </Menu>
     </div>
   );
