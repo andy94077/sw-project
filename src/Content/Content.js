@@ -51,8 +51,12 @@ export default function Content(props) {
         });
         setPageState("Done");
       })
-      .catch(() => {
-        setPageState("invalid");
+      .catch((e) => {
+        if (e.message === "Network Error") {
+          /// 彈出顯示連線失敗請重新整理
+        } else {
+          setPageState("invalid");
+        }
       });
     return source.cancel();
   }, [pictureId]);

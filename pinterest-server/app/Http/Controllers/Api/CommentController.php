@@ -46,9 +46,15 @@ class CommentController extends BaseController{
     }
 
     public function delete(Request $request){
-        var_dump($request['id']);
         $comment = Comment::find($request['id']);
         $comment->delete();
         return $this->sendResponse($comment, "success");
+    }
+
+    public function update(Request $request){
+        $comment = Comment::find($request['id']);
+        $comment->content = $request['content'];
+        $comment->save();
+        return $this->sendResponse($comment, 'Comment was successfully restored');
     }
 }

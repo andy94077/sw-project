@@ -12,9 +12,13 @@ import {
   CardContent,
   Card,
   CardActionArea,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 import { Link } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -141,8 +145,12 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexGrow: "1",
   },
-  cardMedia: {
-    style: "",
+  cardAction: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  user: {
+    flexGrow: "1",
   },
 }));
 
@@ -154,6 +162,7 @@ export default function ContentCard(props) {
   const [comments, setComments] = useState([]);
   const [isUpload, setIsUpload] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -179,8 +188,11 @@ export default function ContentCard(props) {
         refreshComment();
         setValue("");
       })
-      .catch(() => {
-        setIsUpload(false);
+      .catch((e) => {
+        if (e.message === "Network Error") {
+          /// 彈出顯示連線失敗請重新傳送訊息
+          setIsUpload(false);
+        }
       });
   }
 
@@ -197,6 +209,14 @@ export default function ContentCard(props) {
     refreshComment();
   }, [id]);
 
+  const handleClick = (event) => {
+    setMenu(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMenu(null);
+  };
+
   return (
     <Card className={classes.root}>
       <CardMedia
@@ -211,8 +231,8 @@ export default function ContentCard(props) {
       />
       <div className={classes.details}>
         <CardContent className={classes.content}>
-          <CardActionArea className={classes.cardMedia}>
-            <Link to={`/profile/${author}`}>
+          <CardActionArea className={classes.cardAction}>
+            <Link to={`/profile/${author}`} className={classes.user}>
               <Typography
                 component="h5"
                 variant="h5"
@@ -221,6 +241,27 @@ export default function ContentCard(props) {
                 {author}
               </Typography>
             </Link>
+            {author === username && (
+              <>
+                <IconButton
+                  size="small"
+                  onClick={handleClick}
+                  aria-controls="m"
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="m"
+                  anchorEl={menu}
+                  keepMounted
+                  open={Boolean(menu)}
+                  onClose={handleClose}
+                >
+                  <MenuItem>delete</MenuItem>
+                  <MenuItem>Edit</MenuItem>
+                </Menu>
+              </>
+            )}
           </CardActionArea>
           <Typography
             variant="subtitle1"
@@ -260,6 +301,7 @@ export default function ContentCard(props) {
                 comment={i.content}
                 commentId={i.id}
                 canDelete={username === i.user_name || username === author}
+                canEdit={username === i.user_name}
                 refresh={refreshComment}
               />
             ))}
