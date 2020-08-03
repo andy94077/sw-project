@@ -1,10 +1,10 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Modal from "react-bootstrap/Modal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
 import LoginFormInfo from "./LoginFormInfo";
 import "./LoginForm.css";
+import CustomModal from "../components/CustomModal";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
@@ -78,14 +78,7 @@ export default function LoginForm(props) {
   const { onHide, show } = props;
   const classes = useStyles();
   return (
-    <Modal
-      show={show}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-      backdrop="static"
-      dialogClassName={classes.jumpFrame}
-    >
+    <CustomModal show={show} jumpFrame={classes.jumpFrame}>
       <div>
         <div className={classes.outerFrame}>
           <div className={classes.logoFrame} />
@@ -106,6 +99,6 @@ export default function LoginForm(props) {
           <div className={classes.signUpText}>Create a new account</div>
         </Button>
       </div>
-    </Modal>
+    </CustomModal>
   );
 }
