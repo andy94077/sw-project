@@ -5,7 +5,6 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
-import AlertDialog from "../components/AlertDialog";
 import { setCookie } from "../cookieHelper";
 import { CONCAT_SERVER_URL } from "../constants";
 
@@ -146,7 +145,6 @@ export default function SignUpFormInfo() {
 
   return (
     <div className={classes.centerMargin}>
-      <AlertDialog />
       <form className={classes.root} noValidate autoComplete="off">
         <TextField
           value={info.username}
