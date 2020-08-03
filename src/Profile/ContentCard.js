@@ -17,6 +17,7 @@ import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    position: "relative",
     display: "flex",
     flexWrap: "wrap",
     height: "75vh",
@@ -32,19 +33,32 @@ const useStyles = makeStyles((theme) => ({
       flex: "100%",
     },
   },
+  load: {
+    position: "absolute",
+    width: "50%",
+    height: "100%",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+      minHeight: "0px",
+      height: "calc(100% - 200px)",
+    },
+  },
+  loadOpen: {
+    width: "100%",
+  },
   cover: {
     minHeight: "540px",
     height: "100%",
     flex: "50%",
+    cursor: "zoom-in",
     [theme.breakpoints.down("xs")]: {
       flex: "100%",
       minHeight: "0px",
       height: "calc(100% - 200px)",
     },
-    cursor: "zoom-in",
+    zIndex: "1111",
   },
   coverOpen: {
-    height: "100%",
     flex: "100%",
     cursor: "zoom-out",
   },
@@ -86,6 +100,11 @@ const useStyles = makeStyles((theme) => ({
   fail: {
     margin: "auto",
   },
+  descLoad: {
+    position: "absolute",
+    bottom: "30px",
+    right: "75px",
+  },
 }));
 
 export default function ContentCard(props) {
@@ -97,6 +116,7 @@ export default function ContentCard(props) {
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isReady, setIsReady] = useState(src === "ERROR" ? "Error" : "Init");
 
   const handleSelectTag = (event) => {
     setEmpty(false);
@@ -108,6 +128,7 @@ export default function ContentCard(props) {
       setEmpty(true);
       return;
     }
+    setIsReady("Loading");
 
     const jsonData = {
       url: src,
@@ -124,28 +145,29 @@ export default function ContentCard(props) {
         data: jsonData,
       })
       .then((res) => history.push(`/picture/${res.data.id}`))
-      .catch((error) => console.log(error));
+      .catch(() => setIsReady("Error"));
   };
 
-  if (src !== "ERROR") {
+  if (isReady !== "Error") {
     return (
       <Card className={classes.root}>
-        {src === "" ? (
-          <div className={classes.cover}>
-            <CardMedia component={Loading} />
-          </div>
-        ) : (
-          <CardMedia
-            className={clsx(classes.cover, {
-              [classes.coverOpen]: isCoverOpen,
-            })}
-            image={CONCAT_SERVER_URL(src)}
-            title="Live from space album cover"
-            onClick={() => {
-              setIsCoverOpen(!isCoverOpen);
-            }}
-          />
-        )}
+        <div
+          className={clsx(classes.load, {
+            [classes.loadOpen]: isCoverOpen,
+          })}
+        >
+          <CardMedia component={Loading} />
+        </div>
+        <CardMedia
+          className={clsx(classes.cover, {
+            [classes.coverOpen]: isCoverOpen,
+          })}
+          image={CONCAT_SERVER_URL(src)}
+          title="Live from space album cover"
+          onClick={() => {
+            setIsCoverOpen(!isCoverOpen);
+          }}
+        />
         <div className={classes.details}>
           <FormControl
             variant="outlined"
@@ -171,14 +193,20 @@ export default function ContentCard(props) {
             {empty ? <FormHelperText>A tag is necessary</FormHelperText> : null}
           </FormControl>
           <FormControl>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={`${classes.central} ${classes.rounded} ${classes.text}`}
-              onClick={handleUploadDesc}
-            >
-              Submit
-            </Button>
+            {isReady === "Loading" ? (
+              <div className={classes.descLoad}>
+                <Loading />
+              </div>
+            ) : (
+              <Button
+                variant="contained"
+                color="secondary"
+                className={`${classes.central} ${classes.rounded} ${classes.text}`}
+                onClick={handleUploadDesc}
+              >
+                Submit
+              </Button>
+            )}
           </FormControl>
           <TextField
             id="outlined-start-adornment"
