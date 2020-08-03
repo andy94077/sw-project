@@ -66,7 +66,9 @@ export default function SignUpPage() {
     <>
       <div>
         <div className={classes.Background}>
-          {!modalShow ? (
+          {modalShow ? (
+            <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
+          ) : (
             <div className={classes.itemFormat}>
               <div className={classes.pageSetting}>
                 <div className={classes.titleTEXT}>
@@ -87,8 +89,6 @@ export default function SignUpPage() {
                 </div>
               </div>
             </div>
-          ) : (
-            <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
           )}
         </div>
       </div>
