@@ -3,12 +3,14 @@ import axios from "axios";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, CardMedia, Card } from "@material-ui/core";
+import ErrorIcon from "@material-ui/icons/Error";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
 import { useHistory } from "react-router-dom";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
@@ -66,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
   },
   central: {
     position: "absolute",
-    bottom: "25px",
+    bottom: "30px",
     right: "20px",
   },
   rounded: {
@@ -80,6 +82,9 @@ const useStyles = makeStyles((theme) => ({
   },
   none: {
     color: "gray",
+  },
+  fail: {
+    margin: "auto",
   },
 }));
 
@@ -118,75 +123,84 @@ export default function ContentCard(props) {
         url: CONCAT_SERVER_URL("/api/v1/profile/uploadDesc"),
         data: jsonData,
       })
-      .then((res) => {
-        history.push(`/picture/${res.data.id}`);
-      })
+      .then((res) => history.push(`/picture/${res.data.id}`))
       .catch((error) => console.log(error));
   };
 
+  if (src !== "ERROR") {
+    return (
+      <Card className={classes.root}>
+        {src === "" ? (
+          <div className={classes.cover}>
+            <CardMedia component={Loading} />
+          </div>
+        ) : (
+          <CardMedia
+            className={clsx(classes.cover, {
+              [classes.coverOpen]: isCoverOpen,
+            })}
+            image={CONCAT_SERVER_URL(src)}
+            title="Live from space album cover"
+            onClick={() => {
+              setIsCoverOpen(!isCoverOpen);
+            }}
+          />
+        )}
+        <div className={classes.details}>
+          <FormControl
+            variant="outlined"
+            className={classes.select}
+            error={empty}
+          >
+            <InputLabel id="demo-simple-select-outlined-label">
+              Tag *
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={tag}
+              onChange={handleSelectTag}
+              label="Tag *"
+            >
+              <MenuItem value="">
+                <em className={classes.none}>None</em>
+              </MenuItem>
+              <MenuItem value="cat">cat</MenuItem>
+              <MenuItem value="dog">dog</MenuItem>
+            </Select>
+            {empty ? <FormHelperText>A tag is necessary</FormHelperText> : null}
+          </FormControl>
+          <FormControl>
+            <Button
+              variant="contained"
+              color="secondary"
+              className={`${classes.central} ${classes.rounded} ${classes.text}`}
+              onClick={handleUploadDesc}
+            >
+              Submit
+            </Button>
+          </FormControl>
+          <TextField
+            id="outlined-start-adornment"
+            className={classes.textfield}
+            label="Image description"
+            multiline
+            rowsMax="19"
+            variant="outlined"
+            InputProps={{
+              className: classes.textarea,
+            }}
+            inputRef={desc}
+          />
+        </div>
+      </Card>
+    );
+  }
   return (
     <Card className={classes.root}>
-      {src === "" ? (
-        <div className={classes.cover}>
-          <CardMedia component={Loading} />
-        </div>
-      ) : (
-        <CardMedia
-          className={clsx(classes.cover, {
-            [classes.coverOpen]: isCoverOpen,
-          })}
-          image={CONCAT_SERVER_URL(src)}
-          title="Live from space album cover"
-          onClick={() => {
-            setIsCoverOpen(!isCoverOpen);
-          }}
-        />
-      )}
-      <div className={classes.details}>
-        <FormControl
-          variant="outlined"
-          className={classes.select}
-          error={empty}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">Tag *</InputLabel>
-          <Select
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            value={tag}
-            onChange={handleSelectTag}
-            label="Tag *"
-          >
-            <MenuItem value="">
-              <em className={classes.none}>None</em>
-            </MenuItem>
-            <MenuItem value="cat">cat</MenuItem>
-            <MenuItem value="dog">dog</MenuItem>
-          </Select>
-          {empty ? <FormHelperText>A tag is necessary</FormHelperText> : null}
-        </FormControl>
-        <FormControl>
-          <Button
-            variant="contained"
-            color="secondary"
-            className={`${classes.central} ${classes.rounded} ${classes.text}`}
-            onClick={handleUploadDesc}
-          >
-            Submit
-          </Button>
-        </FormControl>
-        <TextField
-          id="outlined-start-adornment"
-          className={classes.textfield}
-          label="Image description"
-          multiline
-          rowsMax="19"
-          variant="outlined"
-          InputProps={{
-            className: classes.textarea,
-          }}
-          inputRef={desc}
-        />
-      </div>
+      <Typography className={classes.fail} variant="h5" noWrap>
+        <ErrorIcon /> Connection failed.
+      </Typography>
     </Card>
   );
 }

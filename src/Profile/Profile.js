@@ -122,10 +122,8 @@ export default function Profile(props) {
         url: CONCAT_SERVER_URL("/api/v1/profile/uploadImage"),
         data: formData,
       })
-      .then((res) => {
-        setImageURL(res.data.url);
-      })
-      .catch((error) => console.log(error));
+      .then((res) => setImageURL(res.data.url))
+      .catch(() => setImageURL("ERROR"));
   };
 
   const handleUploadCancel = () => {
@@ -136,13 +134,14 @@ export default function Profile(props) {
     const formData = new FormData();
     formData.append("canceledURL", imageURL);
 
-    axios
-      .request({
+    if (imageURL !== "ERROR") {
+      axios.request({
         method: "POST",
         url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
         data: formData,
-      })
-      .catch((error) => console.log(error));
+      });
+      // No need to catch.
+    }
   };
 
   const uploadButton = (
