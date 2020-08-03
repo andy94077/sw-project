@@ -8,6 +8,7 @@ import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import SearchIcon from "@material-ui/icons/Search";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -210,7 +211,11 @@ export default function Bar(props) {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label="popup 2 new mails" color="inherit">
+        <IconButton
+          aria-label="popup 2 new mails"
+          color="inherit"
+          component="span"
+        >
           <Badge badgeContent={2} color="secondary">
             <MailIcon />
           </Badge>
@@ -218,7 +223,11 @@ export default function Bar(props) {
         <p>Messages</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="popup 3 new notifications" color="inherit">
+        <IconButton
+          aria-label="popup 3 new notifications"
+          color="inherit"
+          component="span"
+        >
           <Badge badgeContent={3} color="secondary">
             <NotificationsIcon />
           </Badge>
@@ -231,8 +240,13 @@ export default function Bar(props) {
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
+          component="span"
         >
-          <img alt="Avatar" className={classes.rounded} src={avatar} />
+          {username === null ? (
+            <AccountCircleIcon />
+          ) : (
+            <img alt="Avatar" className={classes.rounded} src={avatar} />
+          )}
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -273,6 +287,7 @@ export default function Bar(props) {
               aria-haspopup="true"
               onClick={handleContentOpen(mails)}
               color="inherit"
+              component="span"
             >
               <Badge badgeContent={2} color="secondary">
                 <MailIcon />
@@ -284,6 +299,7 @@ export default function Bar(props) {
               aria-haspopup="true"
               onClick={handleContentOpen(notes)}
               color="inherit"
+              component="span"
             >
               <Badge badgeContent={3} color="secondary">
                 <NotificationsIcon />
@@ -300,11 +316,21 @@ export default function Bar(props) {
                   aria-haspopup="true"
                   onClick={toggleDrawer(true)}
                   color="inherit"
+                  component="span"
                 >
-                  <img alt="Avatar" className={classes.rounded} src={avatar} />
+                  {username === null ? (
+                    <AccountCircleIcon />
+                  ) : (
+                    <img
+                      alt="Avatar"
+                      className={classes.rounded}
+                      src={avatar}
+                    />
+                  )}
                 </IconButton>
               }
               username={username}
+              avatar={avatar}
             />
           </div>
           <div className={classes.sectionMobile}>
@@ -314,6 +340,7 @@ export default function Bar(props) {
               aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
+              component="span"
             >
               <MoreIcon />
             </IconButton>

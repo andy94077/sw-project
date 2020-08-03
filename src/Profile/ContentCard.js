@@ -3,15 +3,14 @@ import axios from "axios";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, CardMedia, Card } from "@material-ui/core";
-import ErrorIcon from "@material-ui/icons/Error";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
 import { useHistory } from "react-router-dom";
+import Errormsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 
@@ -101,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
     color: "gray",
   },
   fail: {
-    margin: "auto",
+    display: "block",
   },
   descLoad: {
     position: "absolute",
@@ -232,10 +231,8 @@ export default function ContentCard(props) {
     );
   }
   return (
-    <Card className={classes.root}>
-      <Typography className={classes.fail} variant="h5" noWrap>
-        <ErrorIcon /> Connection failed.
-      </Typography>
+    <Card className={`${classes.root} ${classes.fail}`}>
+      <Errormsg />
     </Card>
   );
 }

@@ -3,6 +3,7 @@ import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import Loading from "../components/Loading";
+import Errormsg from "../components/ErrorMsg";
 import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
@@ -104,7 +105,7 @@ export default function Profile(props) {
         setId(res.data.id);
         setIsReady("OK");
       })
-      .catch((error) => console.log(error));
+      .catch(() => setIsReady("Error"));
   }, [username, name]);
 
   const handleUploadImage = (event) => {
@@ -206,7 +207,7 @@ export default function Profile(props) {
           </span>
         </div>
 
-        {username !== "" && (isMyself ? uploadButton : followButton)}
+        {username !== null && (isMyself ? uploadButton : followButton)}
 
         <div className={classes.central}>
           <PhotoGrid userId={id} />
@@ -217,9 +218,8 @@ export default function Profile(props) {
   if (isReady === "NoUser") {
     return <ErrorGrid mes="user" />;
   }
-  return (
-    <div>
-      <Loading />
-    </div>
-  );
+  if (isReady === "Error") {
+    return <Errormsg />;
+  }
+  return <Loading />;
 }

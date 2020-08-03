@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function PhotoGrid(props) {
+export default function ErrorMsg(props) {
   const {
     message = "Connection Error",
     imgUrl = "/pictures/connection-error.svg",
