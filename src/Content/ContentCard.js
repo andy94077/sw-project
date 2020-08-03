@@ -73,18 +73,8 @@ const useStyles = makeStyles((theme) => ({
     cursor: "zoom-in",
   },
   coverOpen: {
-    [theme.breakpoints.down("xs")]: {
-      height: "100%",
-      flex: "100%",
-    },
-    [theme.breakpoints.only("sm")]: {
-      height: "100%",
-      flex: "100%",
-    },
-    [theme.breakpoints.up("md")]: {
-      flex: "100%",
-      height: "100%",
-    },
+    flex: "100%",
+    height: "100%",
     cursor: "zoom-out",
   },
   expand: {
@@ -174,6 +164,7 @@ export default function ContentCard(props) {
       })
       .catch((err) => {
         console.log(err);
+        setIsUpload(false);
       });
   }
 
@@ -187,10 +178,15 @@ export default function ContentCard(props) {
         user_id: userId,
         post_id: id,
       },
-    }).then(() => {
-      refreshComment();
-    });
-    setValue("");
+    })
+      .then(() => {
+        refreshComment();
+        setValue("");
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsUpload(false);
+      });
   }
 
   const handleOnSubmit = (e) => {

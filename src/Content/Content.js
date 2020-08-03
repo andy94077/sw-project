@@ -30,6 +30,7 @@ export default function Content(props) {
     content: "",
   });
   const [pageState, setPageState] = useState("Loading");
+
   useEffect(() => {
     const { CancelToken } = Axios;
     const source = CancelToken.source();
@@ -39,6 +40,9 @@ export default function Content(props) {
       params: { id: pictureId },
     })
       .then((res) => {
+        if (res.data.length === 0) {
+          throw new "Post not found"();
+        }
         setInfo({
           authorName: res.data[0].user_name,
           src: CONCAT_SERVER_URL(res.data[0].url),

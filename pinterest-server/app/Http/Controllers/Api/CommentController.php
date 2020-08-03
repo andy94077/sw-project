@@ -41,18 +41,12 @@ class CommentController extends BaseController{
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
             );
-            /*Comment::create(['content' => $request['content'],
-                    'post_id' => $request['post_id'],
-                    'user_id' => $request['user_id'],
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')]);  */
             DB::commit();
             return $this->sendResponse("", "success");
         }
         catch(QueryException $e){
             DB::rollBack();
-            $msg = "failed. " . $e;
-            return $this->sendResponse('', $msg);
+            return $this->sendError($e);
         }
     }
 }
