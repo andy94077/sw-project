@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
 
 import Loading from "./Loading";
 import Photo from "./Photo";
+import ErrorMsg from "./ErrorMsg";
 import "./PhotoGrid.css";
 import { CONCAT_SERVER_URL } from "../constants";
 
@@ -13,20 +13,18 @@ const useStyles = makeStyles(() => ({
   loading: {
     marginTop: "40px",
   },
-  noImage: {
-    marginTop: "80px",
-    color: "#707070",
-  },
 }));
 
 export default function PhotoGrid(props) {
   const { tag, userId, number = 120 } = props;
   const classes = useStyles();
   const [isReady, setIsReady] = useState(false);
-  const [imageListWithid, setImageListWithId] = useState();
+  const [error, setError] = useState({ message: "", url: "" });
+  const [imageListWithid, setImageListWithId] = useState([]);
 
   useEffect(() => {
     setIsReady(false);
+    setError({ message: "", url: "" });
     const url =
       userId !== undefined && userId !== null
         ? CONCAT_SERVER_URL("/api/v1/post/user")
@@ -36,24 +34,30 @@ export default function PhotoGrid(props) {
         params: { user_id: userId, number, tag },
       })
       .then((res) => {
-        setImageListWithId(res.data.imageListWithId);
-        setIsReady(true);
+        if (
+          res.data.imageListWithId instanceof Array &&
+          res.data.imageListWithId.length > 0
+        )
+          setImageListWithId(res.data.imageListWithId);
+        else {
+          setError({
+            message: "No Image Found",
+            url: "/pictures/no-image-found.png",
+          });
+        }
       })
-      .catch((res) => console.log(res));
+      .catch(() => {
+        setError({
+          message: "Connection Error",
+          url: "/pictures/connection-error.svg",
+        });
+      })
+      .finally(() => setIsReady(true));
   }, [tag, number, userId]);
 
   if (isReady) {
-    if (imageListWithid.length === 0) {
-      return (
-        <Typography
-          className={classes.noImage}
-          align="center"
-          variant="h4"
-          display="block"
-        >
-          No Images Found
-        </Typography>
-      );
+    if (error.message !== "") {
+      return <ErrorMsg message={error.message} imgUrl={error.url} />;
     }
     return (
       <div className="grid">
