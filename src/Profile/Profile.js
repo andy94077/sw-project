@@ -123,7 +123,7 @@ export default function Profile(props) {
         data: formData,
       })
       .then((res) => setImageURL(res.data.url))
-      .catch(() => setImageURL("ERROR"));
+      .catch(() => setImageURL("Error"));
   };
 
   const handleUploadCancel = () => {
@@ -134,7 +134,7 @@ export default function Profile(props) {
     const formData = new FormData();
     formData.append("canceledURL", imageURL);
 
-    if (imageURL !== "ERROR") {
+    if (imageURL !== "Error") {
       axios.request({
         method: "POST",
         url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),

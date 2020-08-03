@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
@@ -119,7 +119,11 @@ export default function ContentCard(props) {
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
-  const [isReady, setIsReady] = useState(src === "ERROR" ? "Error" : "Init");
+  const [isReady, setIsReady] = useState(null);
+
+  useEffect(() => {
+    setIsReady(src === "Error" ? "Error" : "Init");
+  }, [src]);
 
   const handleSelectTag = (event) => {
     setEmpty(false);
