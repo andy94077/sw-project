@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   central: {
@@ -44,11 +45,6 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     display: "none",
-  },
-  tmp: {
-    marginTop: "100px",
-    fontSize: "21px",
-    color: "#a3a19a",
   },
   paper: {
     padding: "10px",
@@ -91,7 +87,7 @@ export default function Profile(props) {
     axios
       .request({
         method: "POST",
-        url: "http://pinterest-server.test/api/v1/user/userExist",
+        url: CONCAT_SERVER_URL("/api/v1/user/userExist"),
         data: jsonData,
       })
       .then((res) => {
@@ -122,7 +118,7 @@ export default function Profile(props) {
     axios
       .request({
         method: "POST",
-        url: "http://pinterest-server.test/api/v1/profile/uploadImage",
+        url: CONCAT_SERVER_URL("/api/v1/profile/uploadImage"),
         data: formData,
       })
       .then((res) => {
@@ -140,7 +136,7 @@ export default function Profile(props) {
 
     axios.request({
       method: "POST",
-      url: "http://pinterest-server.test/api/v1/profile/deleteImage",
+      url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
       data: formData,
     });
   };

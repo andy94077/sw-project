@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import "./Upload.css";
 import ContentCard from "./ContentCard";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles({
   jumpFrame: {
     display: "flex",
     justifyContent: "center",
@@ -15,8 +15,11 @@ const useStyles = makeStyles(() => ({
     textAlign: "center",
     margin: "auto",
     height: "100%",
-    width: "100%",
+    maxWidth: "800px",
     overflow: "hidden",
+    [`@media (max-width: 800px)`]: {
+      maxWidth: "600px",
+    },
   },
   signUpFrame: {
     height: "48px",
@@ -29,7 +32,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: "700",
     color: "#111",
   },
-}));
+});
 
 export default function Upload(props) {
   const { show, onHide, userId, username, src } = props;
