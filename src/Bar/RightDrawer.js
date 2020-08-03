@@ -45,7 +45,7 @@ export default function RightDrawer(props) {
       icon: <AccountCircleIcon />,
       link: `/profile/${username}`,
       event: null,
-      user: username !== "",
+      user: username !== null,
     },
     /*
     {
@@ -53,7 +53,7 @@ export default function RightDrawer(props) {
       icon: <SettingsIcon />,
       link: "/setting",
       event: null,
-      user: username !== "",
+      user: username !== null,
     },
     */
     {
@@ -61,21 +61,21 @@ export default function RightDrawer(props) {
       icon: <ExitToAppIcon />,
       link: "/",
       event: logOut,
-      user: username !== "",
+      user: username !== null,
     },
     {
       label: "Sign up",
       icon: <ExitToAppIcon />,
       link: "/",
       event: null,
-      user: username === "",
+      user: username === null,
     },
     {
       label: "Log in",
       icon: <ExitToAppIcon />,
       link: null,
       event: (e) => logIn(e),
-      user: username === "",
+      user: username === null,
     },
   ];
 
@@ -110,7 +110,11 @@ export default function RightDrawer(props) {
       <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
         {list()}
       </Drawer>
-      <LoginForm show={modalShow} onHide={() => setModalShow(false)} />
+      <LoginForm
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        otherOption="Cancel"
+      />
     </div>
   );
 }

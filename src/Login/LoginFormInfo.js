@@ -94,6 +94,7 @@ export default function LoginFormInfo() {
           });
           setCookie("accessToken", response.data.token, 1);
           if (history.location.pathname === "/") history.push("/home");
+          else history.push("./");
         } else {
           setState({
             isError: true,
