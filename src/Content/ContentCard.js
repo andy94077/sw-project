@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
 import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -124,7 +125,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     maxHeight: "50%",
-    minHeight: "25%",
+    minHeight: "110px",
     display: "flex",
     flexDirection: "column",
   },
@@ -164,7 +165,7 @@ export default function ContentCard(props) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
 
   function refreshComment() {
-    Axios.get(`http://pinterest-server.test/api/v1/comment/post`, {
+    Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
       params: { post: id },
     })
       .then(({ data }) => {
@@ -177,47 +178,29 @@ export default function ContentCard(props) {
   }
 
   function upload() {
-    if (value !== "") {
-      setIsUpload(true);
-      Axios.request({
-        method: "post",
-        url: "http://pinterest-server.test/api/v1/comment/upload",
-        data: {
-          content: value,
-          user_id: userId,
-          post_id: id,
-        },
-      }).then(() => {
-        refreshComment();
-      });
-      setValue("");
-    }
+    setIsUpload(true);
+    Axios.request({
+      method: "post",
+      url: CONCAT_SERVER_URL("/api/v1/comment/upload"),
+      data: {
+        content: value,
+        user_id: userId,
+        post_id: id,
+      },
+    }).then(() => {
+      refreshComment();
+    });
+    setValue("");
   }
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    upload();
+    if (value !== "") upload();
   };
 
   const handleEnter = (e) => {
-    if (e.key === "Enter" && value !== "") {
-      setIsUpload(true);
-      Axios.request({
-        method: "post",
-        url: "http://pinterest-server.test/api/v1/comment/upload",
-        data: {
-          content: value,
-          user_id: userId,
-          post_id: id,
-        },
-      }).then(() => {
-        refreshComment();
-      });
-      setValue("");
-    }
+    if (e.key === "Enter" && value !== "") upload();
   };
-
-  console.log(isUpload);
 
   useEffect(() => {
     refreshComment();
@@ -259,6 +242,7 @@ export default function ContentCard(props) {
           </Typography>
         </CardContent>
         <Fab
+          component="span"
           onClick={() => {
             setExpand(!expand);
           }}
@@ -284,7 +268,7 @@ export default function ContentCard(props) {
               </div>
             ))}
           </ScrollToBottom>
-          <form className={classes.comment} onSubmit={handleOnSubmit}>
+          <form className={classes.comment}>
             <TextareaAutosize
               id="standard-basic"
               className={classes.input}
@@ -300,7 +284,8 @@ export default function ContentCard(props) {
               <Button
                 variant="contained"
                 color="primary"
-                type="submit"
+                onClick={handleOnSubmit}
+                component="span"
                 className={classes.button}
               >
                 <SendIcon />

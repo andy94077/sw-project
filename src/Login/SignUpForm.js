@@ -35,6 +35,26 @@ const useStyles = makeStyles(() => ({
     fontWeight: "700",
     color: "#111",
   },
+  mainText: {
+    fontSize: "50px",
+    fontWeight: "bold",
+  },
+  subText: {
+    color: "gray",
+    fontSize: "18px",
+    fontWeight: "bold",
+    margin: "0",
+  },
+  textPosition: {
+    margin: "0px auto 0px",
+  },
+  formPosition: {
+    padding: "20px 10px 24px",
+    height: "552px",
+  },
+  contentPosition: {
+    margin: "30px auto 0px",
+  },
 }));
 
 export default function SignUpForm(props) {
@@ -42,26 +62,16 @@ export default function SignUpForm(props) {
   const classes = useStyles();
   return (
     <div className={classes.formFrame}>
-      <div style={{ padding: "20px 10px 24px", height: "552px" }}>
-        {/* <div className={classes.logoFrame} /> */}
+      <div className={classes.formPosition}>
         <div style={{ height: "10px" }} />
-        <div style={{ margin: "0px auto 0px" }}>
-          <h1 style={{ fontSize: "50px", fontWeight: "bold", margin: "0" }}>
-            Sign Up
-          </h1>
+        <div className={classes.textPosition}>
+          <h1 className={classes.mainText}>Sign Up</h1>
           <div style={{ height: "15px" }} />
-          <h1
-            style={{
-              color: "gray",
-              fontSize: "18px",
-              fontWeight: "bold",
-              margin: "0",
-            }}
-          >
+          <h1 className={classes.subText}>
             It is time to start your adventure
           </h1>
         </div>
-        <div style={{ margin: "30px auto 0px" }}>
+        <div className={classes.contentPosition}>
           <SignUpFormInfo />
         </div>
       </div>

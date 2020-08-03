@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
 import { setCookie } from "../cookieHelper";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,10 +43,9 @@ export default function LoginFormInfo() {
   });
 
   const [state, setState] = useState({
-    username: "",
     isError: false,
     nowLoading: false,
-    errorMes: "",
+    errorMes: ["", ""],
   });
 
   const handleChangeEmail = (e) => {
@@ -84,12 +84,13 @@ export default function LoginFormInfo() {
     formdata.append("avatar_url", "/img/avatar.jpeg");
     //
     axios
-      .post("http://pinterest-server.test/api/v1/user/logIn", formdata, config)
+      .post(CONCAT_SERVER_URL("/api/v1/user/logIn"), formdata, config)
       .then((response) => {
         if (response.data.isLogin) {
           setState({
             isError: false,
             nowLoading: false,
+            errorMes: "",
           });
           setCookie("accessToken", response.data.token, 1);
           history.push("/home");
@@ -97,7 +98,7 @@ export default function LoginFormInfo() {
           setState({
             isError: true,
             nowLoading: false,
-            errorMes: "email or password is not found",
+            errorMes: ["", "Email or Password is not found"],
           });
         }
       })
@@ -106,7 +107,7 @@ export default function LoginFormInfo() {
         setState({
           isError: true,
           nowLoading: false,
-          errorMes: "connection fail",
+          errorMes: ["", "Connection fail"],
         });
       });
   };
@@ -126,7 +127,7 @@ export default function LoginFormInfo() {
           variant="outlined"
           required
           error={state.isError}
-          helperText={state.errorMes}
+          helperText={state.errorMes[0]}
           placeholder="enter your email"
           color="primary"
           className={classes.controlSpace}
@@ -141,7 +142,7 @@ export default function LoginFormInfo() {
           variant="outlined"
           required
           error={state.isError}
-          helperText={state.errorMes}
+          helperText={state.errorMes[1]}
           placeholder="enter your password"
           color="primary"
           className={classes.controlSpace}

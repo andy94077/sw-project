@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Redirect } from "react-router-dom";
 
 import { Grid } from "@material-ui/core";
 
@@ -8,6 +7,8 @@ import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Loading from "../components/Loading";
+import ErrorGrid from "../components/ErrorGrid";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -34,19 +35,20 @@ export default function Content(props) {
     const source = CancelToken.source();
     setPageState("Loading");
 
-    Axios.get("http://pinterest-server.test/api/v1/post/id", {
+    Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
     })
       .then((res) => {
         setInfo({
           authorName: res.data[0].user_name,
-          src: res.data[0].url,
+          src: CONCAT_SERVER_URL(res.data[0].url),
           content: res.data[0].content,
         });
         setPageState("Done");
       })
       .catch((e) => {
         console.log(e);
+        setPageState("invalid");
       });
     return source.cancel();
   }, [pictureId]);
@@ -54,8 +56,9 @@ export default function Content(props) {
     return <Loading />;
   }
   if (pageState === "invalid") {
-    return <Redirect to="/" />;
+    return <ErrorGrid mes="picture" />;
   }
+
   if (pageState === "Done") {
     return (
       <>
