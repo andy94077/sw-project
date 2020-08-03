@@ -19,6 +19,7 @@ const useStyles = makeStyles(() => ({
 export default function Content(props) {
   const {
     userId,
+    username,
     match: {
       params: { pictureId },
     },
@@ -30,6 +31,7 @@ export default function Content(props) {
     content: "",
   });
   const [pageState, setPageState] = useState("Loading");
+
   useEffect(() => {
     const { CancelToken } = Axios;
     const source = CancelToken.source();
@@ -39,6 +41,9 @@ export default function Content(props) {
       params: { id: pictureId },
     })
       .then((res) => {
+        if (res.data.length === 0) {
+          throw new Error("Post not found");
+        }
         setInfo({
           authorName: res.data[0].user_name,
           src: CONCAT_SERVER_URL(res.data[0].url),
@@ -46,8 +51,7 @@ export default function Content(props) {
         });
         setPageState("Done");
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setPageState("invalid");
       });
     return source.cancel();
@@ -70,6 +74,7 @@ export default function Content(props) {
               author={info.authorName}
               content={info.content}
               userId={userId}
+              username={username}
             />
           </Grid>
           <Grid item xs={12} sm={11} md={10}>

@@ -13,16 +13,11 @@ use Illuminate\Database\QueryException;
 class CommentController extends BaseController{
     public function index()
     {
-        $comments = DB::table('comments')
-            ->join('users', 'users.id', '=', 'comments.user_id')
-            ->select('comments.*', 'users.name as user_name')
-            ->orderBy('id', 'ASC')
-            ->get();
+        $comments = Comment::all();
         return response()->json($comments, 200);
     }
     public function showByPost(Request $request){
-        $comments = DB::table('comments')
-            ->join('users', 'users.id', '=', 'comments.user_id')
+        $comments = Comment::LeftJoin('users', 'users.id', '=', 'comments.user_id')
             ->where('post_id', $request['post'])
             ->select('comments.*', 'users.name as user_name')
             ->orderBy('updated_at', 'DESC')
@@ -32,27 +27,28 @@ class CommentController extends BaseController{
     public function upload(Request $request){
         try{
             DB::beginTransaction();
-            DB::table('comments')->insert(
+            $comment = Comment::create(
                 [
-                    'content' => $request['content'],
                     'post_id' => $request['post_id'],
+                    'content' => $request['content'],
                     'user_id' => $request['user_id'],
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
             );
-            /*Comment::create(['content' => $request['content'],
-                    'post_id' => $request['post_id'],
-                    'user_id' => $request['user_id'],
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')]);  */
             DB::commit();
             return $this->sendResponse("", "success");
         }
         catch(QueryException $e){
             DB::rollBack();
-            $msg = "failed. " . $e;
-            return $this->sendResponse('', $msg);
+            return $this->sendError($e);
         }
+    }
+
+    public function delete(Request $request){
+        var_dump($request['id']);
+        $comment = Comment::find($request['id']);
+        $comment->delete();
+        return $this->sendResponse($comment, "success");
     }
 }

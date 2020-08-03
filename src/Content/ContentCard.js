@@ -73,18 +73,8 @@ const useStyles = makeStyles((theme) => ({
     cursor: "zoom-in",
   },
   coverOpen: {
-    [theme.breakpoints.down("xs")]: {
-      height: "100%",
-      flex: "100%",
-    },
-    [theme.breakpoints.only("sm")]: {
-      height: "100%",
-      flex: "100%",
-    },
-    [theme.breakpoints.up("md")]: {
-      flex: "100%",
-      height: "100%",
-    },
+    flex: "100%",
+    height: "100%",
     cursor: "zoom-out",
   },
   expand: {
@@ -121,7 +111,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     weight: "100%",
     flexGrow: "1",
-    marginLeft: "10%",
+    marginLeft: "5%",
+    display: "flex",
   },
   content: {
     maxHeight: "50%",
@@ -156,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src, id, author, content, userId } = props;
+  const { src, id, author, content, userId, username } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
@@ -172,25 +163,25 @@ export default function ContentCard(props) {
         setComments(data.reverse());
         setIsUpload(false);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        setIsUpload(false);
       });
   }
 
   function upload() {
     setIsUpload(true);
-    Axios.request({
-      method: "post",
-      url: CONCAT_SERVER_URL("/api/v1/comment/upload"),
-      data: {
-        content: value,
-        user_id: userId,
-        post_id: id,
-      },
-    }).then(() => {
-      refreshComment();
-    });
-    setValue("");
+    Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
+      content: value,
+      user_id: userId,
+      post_id: id,
+    })
+      .then(() => {
+        refreshComment();
+        setValue("");
+      })
+      .catch(() => {
+        setIsUpload(false);
+      });
   }
 
   const handleOnSubmit = (e) => {
@@ -249,7 +240,7 @@ export default function ContentCard(props) {
           className={clsx(classes.expand, {
             [classes.expandOpen]: expand,
           })}
-          size={expand ? "small" : ""}
+          size={expand ? "small" : "medium"}
         >
           <ExpandMoreIcon />
         </Fab>
@@ -263,9 +254,14 @@ export default function ContentCard(props) {
         >
           <ScrollToBottom className={classes.comments}>
             {comments.map((i) => (
-              <div className={classes.command} key={i.id}>
-                <CommentBox author={i.user_name} command={i.content} />
-              </div>
+              <CommentBox
+                key={i.id}
+                author={i.user_name}
+                comment={i.content}
+                commentId={i.id}
+                canDelete={username === i.user_name || username === author}
+                refresh={refreshComment}
+              />
             ))}
           </ScrollToBottom>
           <form className={classes.comment}>

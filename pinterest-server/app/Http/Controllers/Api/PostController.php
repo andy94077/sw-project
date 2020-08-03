@@ -265,8 +265,13 @@ class PostController extends BaseController
 
     public function getPictureFromId(Request $request)
     {
-        $posts = Post::leftJoin('users', 'users.id', '=', 'posts.user_id')->where('posts.id', $request['id'])->select('posts.*', "users.name as user_name")->get();
-        return response()->json($posts, 200);
+        try{
+            $posts = Post::leftJoin('users', 'users.id', '=', 'posts.user_id')->where('posts.id', $request['id'])->select('posts.*', "users.name as user_name")->get();
+            return response()->json($posts, 200);
+        }
+        catch(QueryException $e){
+            return $this->sendError($e);
+        }
     }
 
     public function restore(Request $request)
