@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Bar(props) {
   const { username } = props;
-  const path = window.location.pathname.split("/");
+  const [, page, tag] = window.location.pathname.split("/");
 
   // Classes & States
   const classes = useStyles();
@@ -112,9 +112,7 @@ export default function Bar(props) {
   const [content, setContent] = useState(false);
   const [text, setText] = useState([{ id: 1 }]);
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState(
-    path[1] === "home" ? path[2] : ""
-  );
+  const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
   const avatar = "/pictures/avatar.jpeg";
 

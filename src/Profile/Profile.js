@@ -103,7 +103,8 @@ export default function Profile(props) {
         }
         setId(res.data.id);
         setIsReady("OK");
-      });
+      })
+      .catch((error) => console.log(error));
   }, [username, name]);
 
   const handleUploadImage = (event) => {
@@ -121,9 +122,8 @@ export default function Profile(props) {
         url: CONCAT_SERVER_URL("/api/v1/profile/uploadImage"),
         data: formData,
       })
-      .then((res) => {
-        setImageURL(res.data.url);
-      });
+      .then((res) => setImageURL(res.data.url))
+      .catch(() => setImageURL("Error"));
   };
 
   const handleUploadCancel = () => {
@@ -134,11 +134,14 @@ export default function Profile(props) {
     const formData = new FormData();
     formData.append("canceledURL", imageURL);
 
-    axios.request({
-      method: "POST",
-      url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
-      data: formData,
-    });
+    if (imageURL !== "Error") {
+      axios.request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
+        data: formData,
+      });
+      // No need to catch.
+    }
   };
 
   const uploadButton = (
@@ -203,7 +206,7 @@ export default function Profile(props) {
           </span>
         </div>
 
-        {isMyself ? uploadButton : followButton}
+        {username !== "" && (isMyself ? uploadButton : followButton)}
 
         <div className={classes.central}>
           <PhotoGrid userId={id} />
