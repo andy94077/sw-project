@@ -15,17 +15,21 @@ import Content from "./Content/Content";
 import Profile from "./Profile/Profile";
 import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
+import ErrorMsg from "./components/ErrorMsg";
+
 import { CONCAT_SERVER_URL } from "./constants";
 
 export default function App() {
   const [user, setUser] = useState({ username: null, userId: null });
   const [isReady, setIsReady] = useState(true);
+  const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
   const history = useHistory();
 
   useEffect(() => {
     const accessToken = getCookie();
     setUser({ username: null, userId: null });
+    setError({ message: "", url: "" });
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
@@ -38,17 +42,23 @@ export default function App() {
               username: res.data.username,
               userId: res.data.user_id,
             });
-            setIsReady(true);
             if (location.pathname === "/") history.push("/home");
-          } else {
-            setIsReady(true);
-            history.push("/");
-          }
-        });
+          } else history.push("/");
+        })
+        .catch(() => {
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
+          });
+        })
+        .finally(() => setIsReady(true));
     }
   }, [location, history]);
 
   if (isReady) {
+    if (error.message !== "") {
+      return <ErrorMsg message={error.message} imgUrl={error.url} />;
+    }
     return (
       <div>
         {window.location.pathname !== "/" && <Bar username={user.username} />}
