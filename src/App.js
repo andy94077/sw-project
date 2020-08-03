@@ -43,7 +43,7 @@ export default function App() {
               userId: res.data.user_id,
             });
             if (location.pathname === "/") history.push("/home");
-          } else history.push("/");
+          }
         })
         .catch(() => {
           setError({
