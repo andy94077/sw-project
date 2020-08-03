@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, CardMedia, Card } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
@@ -38,6 +39,12 @@ const useStyles = makeStyles((theme) => ({
       minHeight: "0px",
       height: "calc(100% - 200px)",
     },
+    cursor: "zoom-in",
+  },
+  coverOpen: {
+    height: "100%",
+    flex: "100%",
+    cursor: "zoom-out",
   },
   select: {
     margin: "20px",
@@ -84,6 +91,7 @@ export default function ContentCard(props) {
 
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
 
   const handleSelectTag = (event) => {
     setEmpty(false);
@@ -124,9 +132,14 @@ export default function ContentCard(props) {
         </div>
       ) : (
         <CardMedia
-          className={classes.cover}
+          className={clsx(classes.cover, {
+            [classes.coverOpen]: isCoverOpen,
+          })}
           image={CONCAT_SERVER_URL(src)}
           title="Live from space album cover"
+          onClick={() => {
+            setIsCoverOpen(!isCoverOpen);
+          }}
         />
       )}
       <div className={classes.details}>
