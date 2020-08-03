@@ -13,34 +13,32 @@ use Illuminate\Database\QueryException;
 class CommentController extends BaseController{
     public function index()
     {
-        $comments = DB::table('comments')
-            ->join('users', 'users.id', '=', 'comments.user_id')
-            ->select('comments.*', 'users.name as user_name')
-            ->orderBy('id', 'ASC')
-            ->get();
+        $comments = Comment::all();
         return response()->json($comments, 200);
     }
     public function showByPost(Request $request){
-        $comments = DB::table('comments')
-            ->join('users', 'users.id', '=', 'comments.user_id')
+        $comments = Comment::LeftJoin('users', 'users.id', '=', 'comments.user_id')
             ->where('post_id', $request['post'])
             ->select('comments.*', 'users.name as user_name')
             ->orderBy('updated_at', 'DESC')
             ->get();
+        var_dump($comments);
         return response()->json($comments, 200);
     }
     public function upload(Request $request){
         try{
             DB::beginTransaction();
-            DB::table('comments')->insert(
+            var_dump($request['content']);
+            $comment = Comment::create(
                 [
-                    'content' => $request['content'],
                     'post_id' => $request['post_id'],
+                    'content' => $request['content'],
                     'user_id' => $request['user_id'],
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
             );
+            var_dump($comment);
             DB::commit();
             return $this->sendResponse("", "success");
         }
@@ -48,5 +46,11 @@ class CommentController extends BaseController{
             DB::rollBack();
             return $this->sendError($e);
         }
+    }
+
+    public function delete(Request $request){
+        $comment = Comment::find($request['id']);
+        $comment->delete();
+        return $this->sendResponse($comment, "success");
     }
 }

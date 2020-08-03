@@ -162,8 +162,7 @@ export default function ContentCard(props) {
         setComments(data.reverse());
         setIsUpload(false);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         setIsUpload(false);
       });
   }
@@ -183,8 +182,7 @@ export default function ContentCard(props) {
         refreshComment();
         setValue("");
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setIsUpload(false);
       });
   }

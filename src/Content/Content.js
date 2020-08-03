@@ -41,7 +41,7 @@ export default function Content(props) {
     })
       .then((res) => {
         if (res.data.length === 0) {
-          throw new "Post not found"();
+          throw new Error("Post not found");
         }
         setInfo({
           authorName: res.data[0].user_name,
@@ -50,8 +50,7 @@ export default function Content(props) {
         });
         setPageState("Done");
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setPageState("invalid");
       });
     return source.cancel();

@@ -19,6 +19,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
     Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload');
+    Route::delete('/comment/delete', 'CommentController@delete');
     Route::apiResource('comment', 'CommentController');
 
 
