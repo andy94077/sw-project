@@ -2,6 +2,7 @@
 
 # dependencies
 package-lock.json
+backoffice/node_modules
 /node_modules
 /.pnp
 .pnp.js
@@ -11,6 +12,7 @@ package-lock.json
 
 # production
 /build
+backoffice/build
 
 # misc
 .DS_Store
