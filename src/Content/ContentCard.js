@@ -166,6 +166,8 @@ export default function ContentCard(props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [onDelete, setOnDelete] = useState(0);
+  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
+  const [errMessage, setErrMessage] = useState("");
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -193,7 +195,8 @@ export default function ContentCard(props) {
       })
       .catch((e) => {
         if (e.message === "Network Error") {
-          /// 彈出顯示連線失敗請重新傳送訊息
+          setErrMessage("留言失敗，請重新嘗試");
+          setIsConnectionFailed(true);
           setIsUpload(false);
         }
       });
@@ -229,6 +232,12 @@ export default function ContentCard(props) {
       })
       .catch((e) => {
         console.log(e);
+        setErrMessage("刪除貼文失敗，請重新嘗試");
+        setIsConnectionFailed(true);
+        setOnDelete(0);
+      })
+      .finally(() => {
+        setIsDialogOpen(false);
       });
   }
 
@@ -285,6 +294,7 @@ export default function ContentCard(props) {
                   >
                     <MenuItem
                       onClick={() => {
+                        setMenu(false);
                         setIsDialogOpen(true);
                       }}
                     >
@@ -376,6 +386,25 @@ export default function ContentCard(props) {
             </form>
           </Collapse>
         </div>
+        <AlertDialog
+          open={isConnectionFailed}
+          alertTitle="連線不穩"
+          alertDesciption={errMessage}
+          alertButton={
+            <>
+              <Button
+                onClick={() => {
+                  setIsConnectionFailed(false);
+                }}
+              >
+                確認
+              </Button>
+            </>
+          }
+          onClose={() => {
+            setIsConnectionFailed(false);
+          }}
+        />
       </Card>
     );
   }

@@ -46,6 +46,7 @@ export default function CommentBox(props) {
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
   const classes = useStyles();
 
   const handleClick = (event) => {
@@ -73,6 +74,7 @@ export default function CommentBox(props) {
         })
         .catch((e) => {
           console.log(e);
+          setIsConnectionFailed(true);
         })
         .finally(() => {
           setOnDelete(false);
@@ -125,6 +127,25 @@ export default function CommentBox(props) {
         {canEdit && <MenuItem>Edit</MenuItem>}
         {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
       </Menu>
+      <AlertDialog
+        open={isConnectionFailed}
+        alertTitle="連線不穩"
+        alertDesciption="刪除留言失敗，請重新嘗試"
+        alertButton={
+          <>
+            <Button
+              onClick={() => {
+                setIsConnectionFailed(false);
+              }}
+            >
+              確認
+            </Button>
+          </>
+        }
+        onClose={() => {
+          setIsConnectionFailed(false);
+        }}
+      />
     </div>
   );
 }
