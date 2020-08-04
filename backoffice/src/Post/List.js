@@ -49,7 +49,7 @@ export default function List() {
 
   const data = [
     {
-      image: "avatar.jpeg",
+      image: "pictures/avatar.jpeg",
       id: "1",
       url: "http://pinterest-server.test/uploads/image/1/original/1.jpg",
       user_id: "2",
