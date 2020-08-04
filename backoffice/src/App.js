@@ -11,6 +11,7 @@ import {
 import { Switch, Route, useHistory, useLocation, Link } from "react-router-dom";
 
 import Post from "./Post/Post";
+import User from "./User/User";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -39,7 +40,9 @@ export default function App() {
           <Menu
             theme="dark"
             defaultSelectedKeys={[
-              location.pathname === "/" ? "dashboard" : location.pathname.split("/")[1],
+              location.pathname === "/"
+                ? "dashboard"
+                : location.pathname.split("/")[1],
             ]}
             mode="inline"
           >
@@ -66,7 +69,7 @@ export default function App() {
           <Content className="content">
             <Switch>
               <Route exact path="/" component={() => <div>Dashboard</div>} />
-              <Route exact path="/user" component={() => <div>User</div>} />
+              <Route exact path="/user" component={User} />
               <Route exact path="/post" component={Post} />
             </Switch>
           </Content>

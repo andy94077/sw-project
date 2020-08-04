@@ -83,6 +83,7 @@ class List extends PureComponent {
 
     const data = [
       {
+        avatar: "/pictures/avatar.jpeg",
         name: "erwrwer",
         nickName: "rrjwierjw",
         age: "rrjwierjw",
@@ -96,10 +97,6 @@ class List extends PureComponent {
     return (
       <Table
         dataSource={data}
-        pagination={{
-          ...tableProps.pagination,
-          showTotal: (total) => i18n.t`Total ${total} Items`,
-        }}
         className={styles.table}
         bordered
         scroll={{ x: 1200 }}
