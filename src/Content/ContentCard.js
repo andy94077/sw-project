@@ -171,7 +171,7 @@ export default function ContentCard(props) {
   const [errMessage, setErrMessage] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
-  const [newPost, setNewPost] = useState("");
+  const [newPost, setNewPost] = useState(content);
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -199,10 +199,11 @@ export default function ContentCard(props) {
       })
       .catch((e) => {
         if (e.message === "Network Error") {
-          setErrMessage("留言失敗，請重新嘗試");
+          setErrMessage("Failed to send comment, pleace retry");
           setIsConnectionFailed(true);
           setIsUpload(false);
         }
+        setIsUpload(false);
       });
   }
 
@@ -236,7 +237,7 @@ export default function ContentCard(props) {
       })
       .catch((e) => {
         console.log(e);
-        setErrMessage("刪除貼文失敗，請重新嘗試");
+        setErrMessage("Failed to delete post, pleace retry");
         setIsConnectionFailed(true);
         setOnDelete(0);
       })
@@ -265,7 +266,7 @@ export default function ContentCard(props) {
           refresh();
         })
         .catch(() => {
-          setErrMessage("編輯貼文失敗，請新嘗試");
+          setErrMessage("Failed to edit post, pleace retry");
           setIsConnectionFailed(true);
         })
         .finally(() => {
@@ -340,29 +341,29 @@ export default function ContentCard(props) {
                   </Menu>
                   <AlertDialog
                     open={isDialogOpen}
-                    alertTitle="警告"
-                    alertDesciption="你正在嘗試刪除一則貼文"
+                    alertTitle="Warning"
+                    alertDesciption="You are trying to delete a post"
                     alertButton={
                       <>
-                        <Button onClick={handleDelete}>確認</Button>
-                        <Button onClick={handleDialogClose}>取消</Button>
+                        <Button onClick={handleDelete}>Yes</Button>
+                        <Button onClick={handleDialogClose}>No</Button>
                       </>
                     }
                     onClose={handleDialogClose}
                   />
                   <AlertDialog
                     open={isEditDialogOpen}
-                    alertTitle="編輯留言"
-                    alertDesciption={content}
+                    alertTitle="Edit Commit"
                     alertButton={
                       <>
-                        <Button onClick={handleEdit}>確認</Button>
-                        <Button onClick={handleEditDialogClose}>取消</Button>
+                        <Button onClick={handleEdit}>Yes</Button>
+                        <Button onClick={handleEditDialogClose}>No</Button>
                       </>
                     }
                     onClose={handleEditDialogClose}
                     moreComponent={
                       <TextField
+                        value={newPost}
                         onChange={(e) => {
                           setNewPost(e.target.value);
                         }}
@@ -424,7 +425,7 @@ export default function ContentCard(props) {
                   rowsMax={3}
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  onKeyUp={handleEnter}
+                  onKeyDown={handleEnter}
                 />
                 {isUpload ? (
                   <Loading />
@@ -445,7 +446,7 @@ export default function ContentCard(props) {
         </div>
         <AlertDialog
           open={isConnectionFailed}
-          alertTitle="連線不穩"
+          alertTitle="Network Error"
           alertDesciption={errMessage}
           alertButton={
             <>
@@ -454,7 +455,7 @@ export default function ContentCard(props) {
                   setIsConnectionFailed(false);
                 }}
               >
-                確認
+                Got it!
               </Button>
             </>
           }

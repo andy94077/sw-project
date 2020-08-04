@@ -49,7 +49,7 @@ export default function CommentBox(props) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isConnectionFailed, setIsConnectionFailed] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState(comment);
   const [errMessage, setErrMessage] = useState("");
   const classes = useStyles();
 
@@ -82,7 +82,7 @@ export default function CommentBox(props) {
         })
         .catch((e) => {
           console.log(e);
-          setErrMessage("刪除留言失敗，請新嘗試");
+          setErrMessage("Failed to delete the comment, please retry");
           setIsConnectionFailed(true);
         })
         .finally(() => {
@@ -104,7 +104,7 @@ export default function CommentBox(props) {
           setIsEditDialogOpen(false);
         })
         .catch(() => {
-          setErrMessage("編輯留言失敗，請新嘗試");
+          setErrMessage("Failed to edit the comment, please retry");
           setIsConnectionFailed(true);
         })
         .finally(() => {
@@ -132,63 +132,28 @@ export default function CommentBox(props) {
         onClose={handleClose}
       >
         {canDelete && (
-          <>
-            <MenuItem
-              onClick={() => {
-                setIsDeleteDialogOpen(true);
-              }}
-            >
-              delete
-            </MenuItem>
-            <AlertDialog
-              open={isDeleteDialogOpen}
-              alertTitle="警告"
-              alertDesciption="你正在嘗試刪除一則留言"
-              alertButton={
-                <>
-                  <Button onClick={handleDelete}>確認</Button>
-                  <Button onClick={handleDeleteDialogClose}>取消</Button>
-                </>
-              }
-              onClose={handleDeleteDialogClose}
-            />
-          </>
+          <MenuItem
+            onClick={() => {
+              setIsDeleteDialogOpen(true);
+            }}
+          >
+            delete
+          </MenuItem>
         )}
         {canEdit && (
-          <>
-            <MenuItem
-              onClick={() => {
-                setIsEditDialogOpen(true);
-              }}
-            >
-              Edit
-            </MenuItem>
-            <AlertDialog
-              open={isEditDialogOpen}
-              alertTitle="編輯留言"
-              alertDesciption={comment}
-              alertButton={
-                <>
-                  <Button onClick={handleEdit}>確認</Button>
-                  <Button onClick={handleEditDialogClose}>取消</Button>
-                </>
-              }
-              onClose={handleEditDialogClose}
-              moreComponent={
-                <TextField
-                  onChange={(e) => {
-                    setNewComment(e.target.value);
-                  }}
-                />
-              }
-            />
-          </>
+          <MenuItem
+            onClick={() => {
+              setIsEditDialogOpen(true);
+            }}
+          >
+            Edit
+          </MenuItem>
         )}
         {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
       </Menu>
       <AlertDialog
         open={isConnectionFailed}
-        alertTitle="連線不穩"
+        alertTitle="Network Error"
         alertDesciption={errMessage}
         alertButton={
           <>
@@ -197,13 +162,44 @@ export default function CommentBox(props) {
                 setIsConnectionFailed(false);
               }}
             >
-              確認
+              Got it!
             </Button>
           </>
         }
         onClose={() => {
           setIsConnectionFailed(false);
         }}
+      />
+      <AlertDialog
+        open={isEditDialogOpen}
+        alertTitle="Edit comment"
+        alertButton={
+          <>
+            <Button onClick={handleEdit}>Yes</Button>
+            <Button onClick={handleEditDialogClose}>No</Button>
+          </>
+        }
+        onClose={handleEditDialogClose}
+        moreComponent={
+          <TextField
+            value={newComment}
+            onChange={(e) => {
+              setNewComment(e.target.value);
+            }}
+          />
+        }
+      />
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        alertTitle="Warning"
+        alertDesciption="You are trying to delete a comment"
+        alertButton={
+          <>
+            <Button onClick={handleDelete}>Yes</Button>
+            <Button onClick={handleDeleteDialogClose}>No</Button>
+          </>
+        }
+        onClose={handleDeleteDialogClose}
       />
     </div>
   );
