@@ -57,4 +57,16 @@ class CommentController extends BaseController{
         $comment->save();
         return $this->sendResponse($comment, 'Comment was successfully restored');
     }
+
+    public function adminall(Request $request){
+        $query = Comment::withTrashed();
+        if($request['post_id']){
+            $query = $query->where("post_id", $request['post_id']);
+        }
+        if($request['user_id']){
+            $query = $query->where("user_id", $request['user_id']);
+        }
+        $comments = $query->get();
+        return $this->sendResponse($comments, 'Comment was successfully got');
+    }
 }

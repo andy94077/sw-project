@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
+    Route::get('comments/admin', 'CommentController@adminall');
     Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload');
     Route::delete('/comment', 'CommentController@delete');
@@ -25,6 +26,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
 
     Route::get('/posts', 'PostController@index');
+    Route::get('posts/admin', 'PostController@adminall');
     Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
     Route::delete('/post', 'PostController@delete');
