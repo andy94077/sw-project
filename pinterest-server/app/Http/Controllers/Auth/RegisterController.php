@@ -62,6 +62,7 @@ class RegisterController extends Controller
                 'name.max' => 'Username must be less than 64 character',
                 'name.alpha_num' => 'Username must only contain number or alpha',
                 'email.required' => 'Email can\'t be empty',
+                'email.email' => 'The email must be a valid email address.',
                 'email.unique' => 'This email is already registered',
                 'email.max' => 'Email must be less than 64 character',
                 'password.required' => 'Password  can\'t be empty',

@@ -8,6 +8,22 @@ import Loading from "../components/Loading";
 import { setCookie } from "../cookieHelper";
 import { CONCAT_SERVER_URL } from "../constants";
 
+const keyNote = {
+  "name.required": "Username can't be empty",
+  "name.unique": "This username is already registered",
+  "name.max": "Username must be less than 64 characters",
+  "name.alpha_num": "Username can't contain special characters",
+  "email.required": "Email can't be empty",
+  "email.email": "The email must be a valid email address.",
+  "email.unique": "This email is already registered",
+  "email.max": "Email must be less than 64 characters",
+  "password.required": "Password  can't be empty",
+  "password.regex": "Password must only contain number or alpha",
+  "password.unique": "This password is already registered",
+  "password.min": "Password must be at least 8 characters",
+  "password.max": "Password must be less than 255 characters",
+};
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '"& > *"': {
@@ -68,6 +84,145 @@ export default function SignUpFormInfo() {
       ...info,
       password: e.target.value,
     });
+  };
+
+  const handleErrorUsername = (e) => {
+    const inputUsername = e.target.value;
+    if (/\s/.test(inputUsername) || inputUsername.length === 0) {
+      setState((preState) => ({
+        ...preState,
+        isError: [true, false, false],
+        errorMes: [
+          keyNote["name.required"],
+          preState.errorMes[1],
+          preState.errorMes[2],
+        ],
+      }));
+    } else if (
+      /^[a-zA-Z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+$/.test(
+        inputUsername
+      ) === false
+    ) {
+      setState((preState) => ({
+        ...preState,
+        isError: [true, false, false],
+        errorMes: [
+          keyNote["name.alpha_num"],
+          preState.errorMes[1],
+          preState.errorMes[2],
+        ],
+      }));
+    } else if (inputUsername.length > 64) {
+      setState((preState) => ({
+        ...preState,
+        isError: [true, false, false],
+        errorMes: [
+          keyNote["name.max"],
+          preState.errorMes[1],
+          preState.errorMes[2],
+        ],
+      }));
+    } else {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, false],
+        errorMes: ["", preState.errorMes[1], preState.errorMes[2]],
+      }));
+    }
+  };
+
+  const handleErrorEmail = (e) => {
+    const inputEmail = e.target.value;
+    if (/\s/.test(inputEmail) || inputEmail.length === 0) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, true, false],
+        errorMes: [
+          preState.errorMes[0],
+          keyNote["email.required"],
+          preState.errorMes[2],
+        ],
+      }));
+    } else if (
+      /^[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+\.[A-Za-z]+$/.test(inputEmail) === false
+    ) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, true, false],
+        errorMes: [
+          preState.errorMes[0],
+          keyNote["email.email"],
+          preState.errorMes[2],
+        ],
+      }));
+    } else if (inputEmail.length > 64) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, true, false],
+        errorMes: [
+          preState.errorMes[0],
+          keyNote["email.max"],
+          preState.errorMes[2],
+        ],
+      }));
+    } else {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, false],
+        errorMes: [preState.errorMes[0], "", preState.errorMes[2]],
+      }));
+    }
+  };
+
+  const handleErrorPassword = (e) => {
+    const inputPassword = e.target.value;
+    if (/\s/.test(inputPassword) || inputPassword.length === 0) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, true],
+        errorMes: [
+          preState.errorMes[0],
+          preState.errorMes[1],
+          keyNote["password.required"],
+        ],
+      }));
+    } else if (inputPassword.length < 8) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, true],
+        errorMes: [
+          preState.errorMes[0],
+          preState.errorMes[1],
+          keyNote["password.min"],
+        ],
+      }));
+    } else if (/^[A-Za-z0-9]+$/.test(inputPassword)) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, true],
+        errorMes: [
+          preState.errorMes[0],
+          preState.errorMes[1],
+          keyNote["password.regex"],
+        ],
+      }));
+    } else if (inputPassword.length > 64) {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, true],
+        errorMes: [
+          preState.errorMes[0],
+          preState.errorMes[1],
+          keyNote["password.max"],
+        ],
+      }));
+    } else {
+      setState((preState) => ({
+        ...preState,
+        isError: [false, false, false],
+        errorMes: [preState.errorMes[0], preState.errorMes[1], ""],
+      }));
+    }
   };
 
   const handleSubmit = () => {
@@ -158,6 +313,7 @@ export default function SignUpFormInfo() {
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
           onChange={handleChangeUsername}
+          onBlur={handleErrorUsername}
         />
 
         <TextField
@@ -172,6 +328,7 @@ export default function SignUpFormInfo() {
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
           onChange={handleChangeEmail}
+          onBlur={handleErrorEmail}
         />
 
         <TextField
@@ -187,6 +344,7 @@ export default function SignUpFormInfo() {
           className={classes.controlSpace}
           InputProps={{ style: { borderRadius: "50px" } }}
           onChange={handleChangePassword}
+          onBlur={handleErrorPassword}
           onKeyUp={handleSearch}
         />
 
