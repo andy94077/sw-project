@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles, Paper } from "@material-ui/core";
+import { makeStyles, Paper, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -8,6 +8,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Axios from "axios";
 
 import { CONCAT_SERVER_URL } from "../constants";
+import AlertDialog from "../components/AlertDialog";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -44,6 +45,8 @@ export default function CommentBox(props) {
   const { author, comment, commentId, canDelete, refresh, canEdit } = props;
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
   const classes = useStyles();
 
   const handleClick = (event) => {
@@ -53,6 +56,10 @@ export default function CommentBox(props) {
   const handleClose = () => {
     setMenu(null);
   };
+
+  function handleDialogClose() {
+    setIsDialogOpen(false);
+  }
 
   const handleDelete = () => {
     if (!onDelete) {
@@ -67,9 +74,11 @@ export default function CommentBox(props) {
         })
         .catch((e) => {
           console.log(e);
+          setIsConnectionFailed(true);
         })
         .finally(() => {
           setOnDelete(false);
+          setIsDialogOpen(false);
         });
     }
   };
@@ -92,10 +101,51 @@ export default function CommentBox(props) {
         open={Boolean(menu)}
         onClose={handleClose}
       >
-        {canDelete && <MenuItem onClick={handleDelete}>delete</MenuItem>}
+        {canDelete && (
+          <>
+            <MenuItem
+              onClick={() => {
+                setIsDialogOpen(true);
+              }}
+            >
+              delete
+            </MenuItem>
+            <AlertDialog
+              open={isDialogOpen}
+              alertTitle="警告"
+              alertDesciption="你正在嘗試刪除一則留言"
+              alertButton={
+                <>
+                  <Button onClick={handleDelete}>確認</Button>
+                  <Button onClick={handleDialogClose}>取消</Button>
+                </>
+              }
+              onClose={handleDialogClose}
+            />
+          </>
+        )}
         {canEdit && <MenuItem>Edit</MenuItem>}
         {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
       </Menu>
+      <AlertDialog
+        open={isConnectionFailed}
+        alertTitle="連線不穩"
+        alertDesciption="刪除留言失敗，請重新嘗試"
+        alertButton={
+          <>
+            <Button
+              onClick={() => {
+                setIsConnectionFailed(false);
+              }}
+            >
+              確認
+            </Button>
+          </>
+        }
+        onClose={() => {
+          setIsConnectionFailed(false);
+        }}
+      />
     </div>
   );
 }
