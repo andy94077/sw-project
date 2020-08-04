@@ -10,17 +10,20 @@ import {
 } from "@ant-design/icons";
 import { Switch, Route, useHistory, useLocation, Link } from "react-router-dom";
 
+import Post from "./Post/Post";
+
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
 export default function App() {
   const [state, setState] = useState({ collapsed: false });
+  const location = useLocation();
 
   const onCollapse = (collapsed) => {
     console.log(collapsed);
     setState({ collapsed });
   };
-
+  console.log(location.pathname);
   return (
     <Layout className="base-layout">
       <Header className="header">
@@ -33,18 +36,24 @@ export default function App() {
       </Header>
       <Layout className="site-layout">
         <Sider collapsible collapsed={state.collapsed} onCollapse={onCollapse}>
-          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={[
+              location.pathname === "/" ? "dashboard" : location.pathname.split("/")[1],
+            ]}
+            mode="inline"
+          >
             <Menu.Item
-              key="1"
+              key="dashboard"
               icon={<PieChartOutlined />}
               className="first-menu-item"
             >
               <Link to="/">Dashboard</Link>
             </Menu.Item>
-            <Menu.Item key="2" icon={<UserOutlined />}>
+            <Menu.Item key="user" icon={<UserOutlined />}>
               <Link to="/user">Users</Link>
             </Menu.Item>
-            <Menu.Item key="3" icon={<TeamOutlined />}>
+            <Menu.Item key="post" icon={<TeamOutlined />}>
               <Link to="/post">Posts</Link>
             </Menu.Item>
           </Menu>
@@ -58,7 +67,7 @@ export default function App() {
             <Switch>
               <Route exact path="/" component={() => <div>Dashboard</div>} />
               <Route exact path="/user" component={() => <div>User</div>} />
-              <Route exact path="/post" component={() => <div>Post</div>} />
+              <Route exact path="/post" component={Post} />
             </Switch>
           </Content>
           <Footer className="footer">
