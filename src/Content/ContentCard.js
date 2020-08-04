@@ -415,30 +415,32 @@ export default function ContentCard(props) {
                 />
               ))}
             </ScrollToBottom>
-            <form className={classes.comment}>
-              <TextareaAutosize
-                id="standard-basic"
-                className={classes.input}
-                rowsMin={1}
-                rowsMax={3}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyUp={handleEnter}
-              />
-              {isUpload ? (
-                <Loading />
-              ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleOnSubmit}
-                  component="span"
-                  className={classes.button}
-                >
-                  <SendIcon />
-                </Button>
-              )}
-            </form>
+            {username && (
+              <form className={classes.comment}>
+                <TextareaAutosize
+                  id="standard-basic"
+                  className={classes.input}
+                  rowsMin={1}
+                  rowsMax={3}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyUp={handleEnter}
+                />
+                {isUpload ? (
+                  <Loading />
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOnSubmit}
+                    component="span"
+                    className={classes.button}
+                  >
+                    <SendIcon />
+                  </Button>
+                )}
+              </form>
+            )}
           </Collapse>
         </div>
         <AlertDialog
