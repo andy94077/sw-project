@@ -196,7 +196,7 @@ export default function SignUpFormInfo() {
           keyNote["password.min"],
         ],
       }));
-    } else if (/^[A-Za-z0-9]+$/.test(inputPassword)) {
+    } else if (/^[A-Za-z0-9]+$/.test(inputPassword) === false) {
       setState((preState) => ({
         ...preState,
         isError: [preState.isError[0], preState.isError[1], true],
