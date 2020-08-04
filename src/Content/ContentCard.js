@@ -15,6 +15,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  TextField,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
@@ -156,7 +157,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src, id, author, content, userId, username } = props;
+  const { src, id, author, content, userId, username, refresh } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
@@ -168,6 +169,9 @@ export default function ContentCard(props) {
   const [onDelete, setOnDelete] = useState(0);
   const [isConnectionFailed, setIsConnectionFailed] = useState(false);
   const [errMessage, setErrMessage] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [onEdit, setOnEdit] = useState(0);
+  const [newPost, setNewPost] = useState("");
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -245,6 +249,31 @@ export default function ContentCard(props) {
     setIsDialogOpen(false);
   }
 
+  function handleEditDialogClose() {
+    setIsEditDialogOpen(false);
+  }
+
+  async function handleEdit() {
+    if (onEdit === 0) {
+      setOnEdit(1);
+      Axios.post(CONCAT_SERVER_URL("/api/v1/post/modification"), {
+        id,
+        content: newPost,
+      })
+        .then(() => {
+          setIsEditDialogOpen(false);
+          refresh();
+        })
+        .catch(() => {
+          setErrMessage("編輯貼文失敗，請新嘗試");
+          setIsConnectionFailed(true);
+        })
+        .finally(() => {
+          setOnEdit(0);
+        });
+    }
+  }
+
   if (onDelete === 1) {
     return <Loading />;
   }
@@ -300,7 +329,14 @@ export default function ContentCard(props) {
                     >
                       delete
                     </MenuItem>
-                    <MenuItem>Edit</MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setMenu(false);
+                        setIsEditDialogOpen(true);
+                      }}
+                    >
+                      Edit
+                    </MenuItem>
                   </Menu>
                   <AlertDialog
                     open={isDialogOpen}
@@ -313,6 +349,25 @@ export default function ContentCard(props) {
                       </>
                     }
                     onClose={handleDialogClose}
+                  />
+                  <AlertDialog
+                    open={isEditDialogOpen}
+                    alertTitle="編輯留言"
+                    alertDesciption={content}
+                    alertButton={
+                      <>
+                        <Button onClick={handleEdit}>確認</Button>
+                        <Button onClick={handleEditDialogClose}>取消</Button>
+                      </>
+                    }
+                    onClose={handleEditDialogClose}
+                    moreComponent={
+                      <TextField
+                        onChange={(e) => {
+                          setNewPost(e.target.value);
+                        }}
+                      />
+                    }
                   />
                 </>
               )}

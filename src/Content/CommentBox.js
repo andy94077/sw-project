@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles, Paper, Button } from "@material-ui/core";
+import { makeStyles, Paper, Button, TextField } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -45,8 +45,12 @@ export default function CommentBox(props) {
   const { author, comment, commentId, canDelete, refresh, canEdit } = props;
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [onEdit, setOnEdit] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isConnectionFailed, setIsConnectionFailed] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [errMessage, setErrMessage] = useState("");
   const classes = useStyles();
 
   const handleClick = (event) => {
@@ -57,8 +61,12 @@ export default function CommentBox(props) {
     setMenu(null);
   };
 
-  function handleDialogClose() {
-    setIsDialogOpen(false);
+  function handleDeleteDialogClose() {
+    setIsDeleteDialogOpen(false);
+  }
+
+  function handleEditDialogClose() {
+    setIsEditDialogOpen(false);
   }
 
   const handleDelete = () => {
@@ -74,14 +82,36 @@ export default function CommentBox(props) {
         })
         .catch((e) => {
           console.log(e);
+          setErrMessage("刪除留言失敗，請新嘗試");
           setIsConnectionFailed(true);
         })
         .finally(() => {
           setOnDelete(false);
-          setIsDialogOpen(false);
+          setIsDeleteDialogOpen(false);
         });
     }
   };
+
+  function handleEdit() {
+    if (!onEdit) {
+      setOnEdit(true);
+      Axios.post(CONCAT_SERVER_URL("/api/v1/comment/modification"), {
+        id: commentId,
+        content: newComment,
+      })
+        .then(() => {
+          refresh();
+          setIsEditDialogOpen(false);
+        })
+        .catch(() => {
+          setErrMessage("編輯留言失敗，請新嘗試");
+          setIsConnectionFailed(true);
+        })
+        .finally(() => {
+          setOnEdit(false);
+        });
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -105,32 +135,61 @@ export default function CommentBox(props) {
           <>
             <MenuItem
               onClick={() => {
-                setIsDialogOpen(true);
+                setIsDeleteDialogOpen(true);
               }}
             >
               delete
             </MenuItem>
             <AlertDialog
-              open={isDialogOpen}
+              open={isDeleteDialogOpen}
               alertTitle="警告"
               alertDesciption="你正在嘗試刪除一則留言"
               alertButton={
                 <>
                   <Button onClick={handleDelete}>確認</Button>
-                  <Button onClick={handleDialogClose}>取消</Button>
+                  <Button onClick={handleDeleteDialogClose}>取消</Button>
                 </>
               }
-              onClose={handleDialogClose}
+              onClose={handleDeleteDialogClose}
             />
           </>
         )}
-        {canEdit && <MenuItem>Edit</MenuItem>}
+        {canEdit && (
+          <>
+            <MenuItem
+              onClick={() => {
+                setIsEditDialogOpen(true);
+              }}
+            >
+              Edit
+            </MenuItem>
+            <AlertDialog
+              open={isEditDialogOpen}
+              alertTitle="編輯留言"
+              alertDesciption={comment}
+              alertButton={
+                <>
+                  <Button onClick={handleEdit}>確認</Button>
+                  <Button onClick={handleEditDialogClose}>取消</Button>
+                </>
+              }
+              onClose={handleEditDialogClose}
+              moreComponent={
+                <TextField
+                  onChange={(e) => {
+                    setNewComment(e.target.value);
+                  }}
+                />
+              }
+            />
+          </>
+        )}
         {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
       </Menu>
       <AlertDialog
         open={isConnectionFailed}
         alertTitle="連線不穩"
-        alertDesciption="刪除留言失敗，請重新嘗試"
+        alertDesciption={errMessage}
         alertButton={
           <>
             <Button
