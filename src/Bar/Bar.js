@@ -20,12 +20,15 @@ import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
 const useStyles = makeStyles((theme) => ({
+  grow: {
+    flexGrow: 1,
+  },
+  root: {
+    zIndex: 1000,
+  },
   rounded: {
     width: "32px",
     borderRadius: "16px",
-  },
-  grow: {
-    flexGrow: 1,
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -256,7 +259,7 @@ export default function Bar(props) {
   // The bar
   return (
     <div className={classes.grow}>
-      <AppBar position="fixed">
+      <AppBar className={classes.root} position="fixed">
         <Toolbar>
           <Link to="/home">
             <Typography className={classes.title} variant="h6" noWrap>
