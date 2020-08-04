@@ -78,7 +78,7 @@ export default function RightDrawer(props) {
     {
       label: "Log in",
       icon: <AccountCircleIcon />,
-      link: null,
+      link: "",
       event: (e) => logIn(e),
       user: username === null,
     },
