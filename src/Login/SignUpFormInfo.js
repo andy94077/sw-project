@@ -91,7 +91,7 @@ export default function SignUpFormInfo() {
     if (/\s/.test(inputUsername) || inputUsername.length === 0) {
       setState((preState) => ({
         ...preState,
-        isError: [true, false, false],
+        isError: [true, preState.isError[1], preState.isError[2]],
         errorMes: [
           keyNote["name.required"],
           preState.errorMes[1],
@@ -105,7 +105,7 @@ export default function SignUpFormInfo() {
     ) {
       setState((preState) => ({
         ...preState,
-        isError: [true, false, false],
+        isError: [true, preState.isError[1], preState.isError[2]],
         errorMes: [
           keyNote["name.alpha_num"],
           preState.errorMes[1],
@@ -115,7 +115,7 @@ export default function SignUpFormInfo() {
     } else if (inputUsername.length > 64) {
       setState((preState) => ({
         ...preState,
-        isError: [true, false, false],
+        isError: [true, preState.isError[1], preState.isError[2]],
         errorMes: [
           keyNote["name.max"],
           preState.errorMes[1],
@@ -125,7 +125,7 @@ export default function SignUpFormInfo() {
     } else {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, false],
+        isError: [false, preState.isError[1], preState.isError[2]],
         errorMes: ["", preState.errorMes[1], preState.errorMes[2]],
       }));
     }
@@ -136,7 +136,7 @@ export default function SignUpFormInfo() {
     if (/\s/.test(inputEmail) || inputEmail.length === 0) {
       setState((preState) => ({
         ...preState,
-        isError: [false, true, false],
+        isError: [preState.isError[0], true, preState.isError[2]],
         errorMes: [
           preState.errorMes[0],
           keyNote["email.required"],
@@ -148,7 +148,7 @@ export default function SignUpFormInfo() {
     ) {
       setState((preState) => ({
         ...preState,
-        isError: [false, true, false],
+        isError: [preState.isError[0], true, preState.isError[2]],
         errorMes: [
           preState.errorMes[0],
           keyNote["email.email"],
@@ -158,7 +158,7 @@ export default function SignUpFormInfo() {
     } else if (inputEmail.length > 64) {
       setState((preState) => ({
         ...preState,
-        isError: [false, true, false],
+        isError: [preState.isError[0], true, preState.isError[2]],
         errorMes: [
           preState.errorMes[0],
           keyNote["email.max"],
@@ -168,7 +168,7 @@ export default function SignUpFormInfo() {
     } else {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, false],
+        isError: [preState.isError[0], false, preState.isError[2]],
         errorMes: [preState.errorMes[0], "", preState.errorMes[2]],
       }));
     }
@@ -179,7 +179,7 @@ export default function SignUpFormInfo() {
     if (/\s/.test(inputPassword) || inputPassword.length === 0) {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, true],
+        isError: [preState.isError[0], preState.isError[1], true],
         errorMes: [
           preState.errorMes[0],
           preState.errorMes[1],
@@ -189,7 +189,7 @@ export default function SignUpFormInfo() {
     } else if (inputPassword.length < 8) {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, true],
+        isError: [preState.isError[0], preState.isError[1], true],
         errorMes: [
           preState.errorMes[0],
           preState.errorMes[1],
@@ -199,7 +199,7 @@ export default function SignUpFormInfo() {
     } else if (/^[A-Za-z0-9]+$/.test(inputPassword)) {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, true],
+        isError: [preState.isError[0], preState.isError[1], true],
         errorMes: [
           preState.errorMes[0],
           preState.errorMes[1],
@@ -209,7 +209,7 @@ export default function SignUpFormInfo() {
     } else if (inputPassword.length > 64) {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, true],
+        isError: [preState.isError[0], preState.isError[1], true],
         errorMes: [
           preState.errorMes[0],
           preState.errorMes[1],
@@ -219,7 +219,7 @@ export default function SignUpFormInfo() {
     } else {
       setState((preState) => ({
         ...preState,
-        isError: [false, false, false],
+        isError: [preState.isError[0], preState.isError[1], false],
         errorMes: [preState.errorMes[0], preState.errorMes[1], ""],
       }));
     }
