@@ -20,7 +20,14 @@ const useStyles = makeStyles(() => ({
 export default function AlertDialog(props) {
   const classes = useStyles();
 
-  const { open, alertTitle, alertDesciption, alertButton } = props;
+  const {
+    open,
+    alertTitle,
+    alertDesciption,
+    alertButton,
+    moreComponent,
+    onClose,
+  } = props;
 
   return (
     <div>
@@ -29,6 +36,7 @@ export default function AlertDialog(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         classes={{ paper: classes.frame }}
+        onClose={onClose}
       >
         <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
         <DialogContent>
@@ -36,6 +44,7 @@ export default function AlertDialog(props) {
             {alertDesciption}
           </DialogContentText>
         </DialogContent>
+        {moreComponent}
         <DialogActions>{alertButton}</DialogActions>
       </Dialog>
     </div>

@@ -25,6 +25,7 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
+import AlertDialog from "../components/AlertDialog";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -162,6 +163,7 @@ export default function ContentCard(props) {
   const [comments, setComments] = useState([]);
   const [isUpload, setIsUpload] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [onDelete, setOnDelete] = useState(0);
 
@@ -218,7 +220,7 @@ export default function ContentCard(props) {
     setMenu(null);
   };
 
-  async function handleDelete() {
+  function handleDelete() {
     setOnDelete(1);
     Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), { data: { id } })
       .then((res) => {
@@ -229,6 +231,11 @@ export default function ContentCard(props) {
         console.log(e);
       });
   }
+
+  function handleDialogClose() {
+    setIsDialogOpen(false);
+  }
+
   if (onDelete === 1) {
     return <Loading />;
   }
@@ -276,9 +283,27 @@ export default function ContentCard(props) {
                     open={Boolean(menu)}
                     onClose={handleClose}
                   >
-                    <MenuItem onClick={handleDelete}>delete</MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      delete
+                    </MenuItem>
                     <MenuItem>Edit</MenuItem>
                   </Menu>
+                  <AlertDialog
+                    open={isDialogOpen}
+                    alertTitle="警告"
+                    alertDesciption="你正在嘗試刪除一則貼文"
+                    alertButton={
+                      <>
+                        <Button onClick={handleDelete}>確認</Button>
+                        <Button onClick={handleDialogClose}>取消</Button>
+                      </>
+                    }
+                    onClose={handleDialogClose}
+                  />
                 </>
               )}
             </CardActionArea>
