@@ -107,4 +107,11 @@ class PostController extends BaseController
         return $this->sendResponse($post, "success");
     }
 
+    public function update(Request $request){
+        $post = Post::find($request['id']);
+        $post->content = $request['content'];
+        $post->save();
+        return $this->sendResponse($post, 'Post was successfully restored');
+    }
+
 }

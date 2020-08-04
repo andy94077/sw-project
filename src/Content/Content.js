@@ -32,11 +32,8 @@ export default function Content(props) {
   });
   const [pageState, setPageState] = useState("Loading");
 
-  useEffect(() => {
-    const { CancelToken } = Axios;
-    const source = CancelToken.source();
+  async function refresh() {
     setPageState("Loading");
-
     Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
     })
@@ -58,6 +55,12 @@ export default function Content(props) {
           setPageState("invalid");
         }
       });
+  }
+
+  useEffect(() => {
+    const { CancelToken } = Axios;
+    const source = CancelToken.source();
+    refresh();
     return source.cancel();
   }, [pictureId]);
   if (pageState === "Loading") {
@@ -79,6 +82,7 @@ export default function Content(props) {
               content={info.content}
               userId={userId}
               username={username}
+              refresh={refresh}
             />
           </Grid>
           <Grid item xs={12} sm={11} md={10}>
