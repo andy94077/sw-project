@@ -17,25 +17,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
-    Route::get('comments/admin', 'CommentController@adminall');
+    Route::get('/comments/admin', 'CommentController@adminAll');
     Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload');
     Route::delete('/comment', 'CommentController@delete');
-    Route::post('comment/modification', 'CommentController@update');
+    Route::post('/comment/modification', 'CommentController@update');
     Route::apiResource('comment', 'CommentController');
 
 
     Route::get('/posts', 'PostController@index');
-    Route::get('posts/admin', 'PostController@adminall');
+    Route::get('/posts/admin', 'PostController@adminAll');
     Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
     Route::delete('/post', 'PostController@delete');
-    Route::post('post/modification', 'PostController@update');
+    Route::post('/post/modification', 'PostController@update');
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('post', 'PostController');
 
+    Route::get('/users/admin', 'UserController@adminAll');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
     Route::post('/user/register','UserController@register')->name('user.register');
     Route::post('/user/logIn','UserController@logIn')->name('user.logIn');

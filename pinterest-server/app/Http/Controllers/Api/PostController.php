@@ -114,10 +114,10 @@ class PostController extends BaseController
         return $this->sendResponse($post, 'Post was successfully restored');
     }
 
-    public function adminall(Request $request){
+    public function adminAll(Request $request){
         $query = Post::withTrashed();
         if($request['id']){
-            $query = $query->find($request['id']);
+            $query = $query->where('id', $request['id']);
         }
         if($request['tag']){
             $query = $query->where('tag', $request['tag']);

@@ -92,9 +92,14 @@ class UserController extends BaseController
     }
 
     public function count(Request $request){
-        $post = User::find($request['id']);
-        $post->online_time = date("Y-m-d H:i:s");
-        $post->save();
+        $user = User::find($request['id']);
+        $user->online_time = date("Y-m-d H:i:s");
+        $user->save();
         return response()->json("", 200);
+    }
+
+    public function adminAll(Request $request){
+        $users = User::all();
+        return $this->sendResponse($users, 'Users was successfully got');
     }
 }
