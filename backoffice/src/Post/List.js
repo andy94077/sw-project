@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Avatar, Button, Modal, Table, Tag, Tooltip } from "antd";
-import { DeleteOutlined, DownOutlined, UndoOutlined } from "@ant-design/icons";
+import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  DeleteOutlined,
+  DownOutlined,
+  SearchOutlined,
+  UndoOutlined,
+} from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function List() {
   const [data, setData] = useState([]);
   const [motion, setMotion] = useState(false);
+  const [searchText, setSearchText] = useState(false);
+  const [searchedColumn, setSearchedColumn] = useState(false);
+  const searchInput = useRef();
 
   useEffect(() => {
     setMotion(false);
@@ -86,6 +95,69 @@ export default function List() {
     });
   };
 
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          ref={searchInput}
+          value={selectedKeys[0]}
+          onChange={(event) =>
+            setSelectedKeys(event.target.value ? [event.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().includes(`${value}`)
+        : "",
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current.select());
+      }
+    },
+  });
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
   const columns = [
     {
       title: "Post",
@@ -99,7 +171,19 @@ export default function List() {
     {
       title: "Id",
       dataIndex: "id",
+      render: (id) =>
+        searchedColumn === "id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={`${id}`}
+          />
+        ) : (
+          id
+        ),
       sorter: (a, b) => a.id - b.id,
+      ...getColumnSearchProps("id"),
     },
     {
       title: "Position",
@@ -119,10 +203,21 @@ export default function List() {
     {
       title: "Username",
       dataIndex: "username",
-      render: (username) => (
-        <a href={`http://localhost:3000/profile/${username}`}>{username}</a>
-      ),
+      render: (username) =>
+        searchedColumn === "username" ? (
+          <a href={`http://localhost:3000/profile/${username}`}>
+            <Highlighter
+              highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={username}
+            />
+          </a>
+        ) : (
+          <a href={`http://localhost:3000/profile/${username}`}>{username}</a>
+        ),
       sorter: (a, b) => a.username.localeCompare(b.username),
+      ...getColumnSearchProps("username"),
     },
     {
       title: "Content",
