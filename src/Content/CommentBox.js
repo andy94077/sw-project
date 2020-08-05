@@ -42,7 +42,15 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CommentBox(props) {
-  const { author, comment, commentId, canDelete, refresh, canEdit } = props;
+  const {
+    author,
+    comment,
+    commentId,
+    canDelete,
+    refresh,
+    canEdit,
+    isUser,
+  } = props;
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
   const [onEdit, setOnEdit] = useState(false);
@@ -124,33 +132,35 @@ export default function CommentBox(props) {
       <IconButton size="small" onClick={handleClick} aria-controls="m">
         <MoreVertIcon />
       </IconButton>
-      <Menu
-        id="m"
-        anchorEl={menu}
-        keepMounted
-        open={Boolean(menu)}
-        onClose={handleClose}
-      >
-        {canDelete && (
-          <MenuItem
-            onClick={() => {
-              setIsDeleteDialogOpen(true);
-            }}
-          >
-            delete
-          </MenuItem>
-        )}
-        {canEdit && (
-          <MenuItem
-            onClick={() => {
-              setIsEditDialogOpen(true);
-            }}
-          >
-            Edit
-          </MenuItem>
-        )}
-        {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
-      </Menu>
+      {isUser && (
+        <Menu
+          id="m"
+          anchorEl={menu}
+          keepMounted
+          open={Boolean(menu)}
+          onClose={handleClose}
+        >
+          {canDelete && (
+            <MenuItem
+              onClick={() => {
+                setIsDeleteDialogOpen(true);
+              }}
+            >
+              delete
+            </MenuItem>
+          )}
+          {canEdit && (
+            <MenuItem
+              onClick={() => {
+                setIsEditDialogOpen(true);
+              }}
+            >
+              Edit
+            </MenuItem>
+          )}
+          {!canDelete && !canEdit && <MenuItem>Permission denied</MenuItem>}
+        </Menu>
+      )}
       <AlertDialog
         open={isConnectionFailed}
         alertTitle="Network Error"

@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     maxHeight: "50%",
-    minHeight: "110px",
+    minHeight: "130px",
     display: "flex",
     flexDirection: "column",
   },
@@ -147,6 +147,10 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexGrow: "1",
   },
+  time: {
+    overflow: "hidden",
+    flexGrow: "1",
+  },
   cardAction: {
     display: "flex",
     flexDirection: "row",
@@ -157,7 +161,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ContentCard(props) {
-  const { src, id, author, content, userId, username, refresh } = props;
+  const {
+    src,
+    id,
+    author,
+    content,
+    userId,
+    username,
+    refresh,
+    timeAgo,
+  } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
@@ -374,6 +387,15 @@ export default function ContentCard(props) {
               )}
             </CardActionArea>
             <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              display="block"
+              component="div"
+              className={classes.time}
+            >
+              {timeAgo}
+            </Typography>
+            <Typography
               variant="subtitle1"
               color="textSecondary"
               display="block"
@@ -413,6 +435,7 @@ export default function ContentCard(props) {
                   canDelete={username === i.user_name || username === author}
                   canEdit={username === i.user_name}
                   refresh={refreshComment}
+                  isUser={username !== null}
                 />
               ))}
             </ScrollToBottom>
