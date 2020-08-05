@@ -20,7 +20,9 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('avatar_url');
             $table->string('online_time')->default(date("Y-m-d H:i:s"));
+            $table->string('bucket_time')->nullable()->default(null);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -6,10 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar_url', 'browser_count'
+        'name', 'email', 'password', 'avatar_url', 'online_time', 'bucket_time'
     ];
 
     /**
