@@ -18,7 +18,6 @@ class CreateSuperUsersTable extends Migration
             $table->string('name')->comment('username for login purpose');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('avatar_url');
             $table->rememberToken();
             $table->timestamps();
         });

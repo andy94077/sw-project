@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class SuperUsersTableSeeder extends Seeder
 {
@@ -16,7 +17,6 @@ class SuperUsersTableSeeder extends Seeder
             'name' => "admin",
             'email' => "admin@funpodium.net",
             'password' => Hash::make("admin"),
-            'avatar_url' => "/img/avatar.jpeg",
             'created_at' => date("Y-m-d H:i:s"),
         ]);
     }

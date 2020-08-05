@@ -1,14 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import "./LoginForm.css";
 import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
+import { CONCAT_SERVER_URL } from "../constants";
+import { setCookie } from "../cookieHelper";
 
-export default function NormalLoginForm() {
+export default function LoginForm() {
+  const [state, setState] = useState({
+    isLoading: false,
+    validateStatus: null,
+    errMsgs: "",
+  });
   const history = useHistory();
+
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
-    history.push("/dashboard");
+    setState({ ...state, isLoading: true });
+    axios
+      .post(CONCAT_SERVER_URL("/api/v1/superUser/logIn"), {
+        email: values.email,
+        password: values.password,
+      })
+      .then((res) => {
+        if (res.data.isLogin === true) {
+          setCookie("accessToken", res.data.token, 1);
+          setState({
+            isLoading: false,
+            validateStatus: "success",
+            errMsgs: "",
+          });
+          history.push("/dashboard");
+        } else {
+          setState({
+            isLoading: false,
+            validateStatus: "error",
+            errMsg: "Email or Password is not found",
+          });
+        }
+      })
+      .catch(() => {
+        setState({
+          isLoading: false,
+          validateStatus: "error",
+          errMsgs: "Connection fail",
+        });
+      });
   };
 
   return (
@@ -22,29 +60,19 @@ export default function NormalLoginForm() {
       style={{ flex: 1 }}
     >
       <Form.Item
-        name="username"
-        rules={[
-          {
-            required: true,
-            message: "Please input your Username!",
-          },
-        ]}
-        hasFeedback
+        name="email"
+        validateStatus={state.validateStatus}
       >
         <Input
           prefix={<UserOutlined className="site-form-item-icon" />}
-          placeholder="Username"
+          placeholder="email"
         />
       </Form.Item>
       <Form.Item
         name="password"
-        rules={[
-          {
-            required: true,
-            message: "Please input your Password!",
-          },
-        ]}
         hasFeedback
+        validateStatus={state.validateStatus}
+        help={state.errMsg}
       >
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
@@ -52,8 +80,13 @@ export default function NormalLoginForm() {
         />
       </Form.Item>
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit" className="login-form-button">
+      <Form.Item style={{ marginTop: "10px" }}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="login-form-button"
+          loading={state.isLoading}
+        >
           Log in
         </Button>
       </Form.Item>
