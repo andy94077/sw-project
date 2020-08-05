@@ -1,35 +1,34 @@
-import React, { useEffect, PureComponent } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Table, Modal, Avatar } from "antd";
+import { Table, Avatar } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
 
-const { confirm } = Modal;
+// const { confirm } = Modal;
 
 // @withI18n()
-export function List(props) {
+export default function List(props) {
+  const [data, setData] = useState([]);
   useEffect(() => {
-    axios
-      .post({
-        method: "GET",
-        url: CONCAT_SERVER_URL(""),
-        data: "",
+    axios({
+      method: "GET",
+      url: CONCAT_SERVER_URL("/api/v1/users/admin"),
+    })
+      .then((response) => {
+        if (response.data.success !== null) {
+          if (response.data.success === true) {
+            setData(response.data.data);
+          }
+        }
       })
-      .then()
-      .catch();
+      .catch((error) => {
+        alert("There are some problems during loading");
+      });
   }, []);
 
   const columns = [
-    {
-      title: "Avatar",
-      dataIndex: "avatar",
-      key: "avatar",
-      //width: 72,
-      //fixed: "left",
-      render: (text) => <Avatar style={{ marginLeft: 8 }} src={text} />,
-    },
     {
       title: "Id",
       dataIndex: "id",
@@ -47,19 +46,22 @@ export function List(props) {
       key: "email",
     },
     {
-      title: "CreateTime",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: "Avatar",
+      dataIndex: "avatar_url",
+      key: "avatar",
+      //width: 72,
+      //fixed: "left",
+      render: (text) => <Avatar style={{ marginLeft: 8 }} src={text} />,
     },
     {
-      title: "LastLoginTime",
-      dataIndex: "lastloginTime",
-      key: "lastloginTime",
+      title: "created_at",
+      dataIndex: "created_at",
+      key: "created_at",
     },
     {
-      title: "LastLogoutTime",
-      dataIndex: "lastlogoutTime",
-      key: "lastlogoutTime",
+      title: "updated_at",
+      dataIndex: "updated_at",
+      key: "updated_at",
     },
     {
       title: "Operation",
@@ -71,18 +73,18 @@ export function List(props) {
     },
   ];
 
-  const data = [
-    {
-      avatar: "/pictures/avatar.jpeg",
-      id: "rrjwierjw",
-      name: "erwrwer",
-      email: "rrjwierjw",
-      createTime: "rrjwierjw",
-      lastloginTime: "rrjwierjw",
-      lastlogoutTime: "rrjwierjw",
-    },
-  ];
-
+  // const data = [
+  //   {
+  //     avatar: "/pictures/avatar.jpeg",
+  //     id: "rrjwierjw",
+  //     name: "erwrwer",
+  //     email: "rrjwierjw",
+  //     createTime: "rrjwierjw",
+  //     lastloginTime: "rrjwierjw",
+  //     lastlogoutTime: "rrjwierjw",
+  //   },
+  // ];
+  console.log(data);
   return (
     <Table
       dataSource={data}
@@ -101,5 +103,3 @@ List.propTypes = {
   onEditItem: PropTypes.func,
   location: PropTypes.object,
 };
-
-export default List;
