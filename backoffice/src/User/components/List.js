@@ -4,6 +4,7 @@ import { Table, Avatar } from "antd";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
+import { format } from "date-fns";
 
 export default function List(props) {
   const [data, setData] = useState([]);
@@ -15,7 +16,27 @@ export default function List(props) {
       .then((response) => {
         if (response.data.success !== null) {
           if (response.data.success === true) {
-            setData(response.data.data);
+            setData(
+              response.data.data.map((item) => {
+                item.created_at = format(
+                  new Date(item.created_at),
+                  "yyyy-mm-dd hh:mm:ss"
+                );
+                item.bucket_time =
+                  item.bucket_time === null
+                    ? ""
+                    : format(new Date(item.bucket_time), "yyyy-mm-dd hh:mm:ss");
+                item.deleted_at =
+                  item.deleted_at === null
+                    ? ""
+                    : format(new Date(item.deleted_at), "yyyy-mm-dd hh:mm:ss");
+                item.updated_at =
+                  item.updated_at === null
+                    ? ""
+                    : format(new Date(item.updated_at), "yyyy-mm-dd hh:mm:ss");
+                return item;
+              })
+            );
           }
         }
       })
@@ -77,15 +98,15 @@ export default function List(props) {
       sorter: (a, b) => a.created_at.localeCompare(b.created_at),
     },
     {
-      title: "delete_at",
-      dataIndex: "delete_at",
-      key: "delete_at",
+      title: "deleted_at",
+      dataIndex: "deleted_at",
+      key: "deleted_at",
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: "update_at",
-      dataIndex: "update_at",
-      key: "update_at",
+      title: "updated_at",
+      dataIndex: "updated_at",
+      key: "updated_at",
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
