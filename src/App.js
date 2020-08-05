@@ -37,9 +37,20 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            setUser({
-              username: res.data.username,
-              userId: res.data.user_id,
+            setUser((preUser) => {
+              if (preUser.userId !== res.data.user_id) {
+                axios
+                  .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
+                    id: res.data.user_id,
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                  });
+              }
+              return {
+                username: res.data.username,
+                userId: res.data.user_id,
+              };
             });
             if (location.pathname === "/") history.push("/home");
           } else {
@@ -62,7 +73,7 @@ export default function App() {
     const timer = setInterval(() => {
       if (user.userId !== null) {
         axios
-          .post(CONCAT_SERVER_URL("api/v1/user/count"), {
+          .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
             id: user.userId,
           })
           .catch((e) => {
