@@ -79,7 +79,7 @@ export default function Profile(props) {
   const [modalShow, setModalShow] = useState(false);
   const [isReady, setIsReady] = useState("Loading");
   const [isMyself, setIsMyself] = useState(false);
-  const [id, setId] = useState(null);
+  const [id, setId] = useState(0);
 
   useEffect(() => {
     setIsReady("Loading");
