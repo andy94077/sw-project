@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Avatar, Tag } from "antd";
-import styles from "./List.less";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function List() {
@@ -38,6 +37,11 @@ export default function List() {
       title: "Position",
       dataIndex: "url",
       render: (url) => <a href={CONCAT_SERVER_URL(url)}>{url}</a>,
+      onCell: () => ({
+        style: {
+          maxWidth: "135px",
+        },
+      }),
     },
     {
       title: "User id",
@@ -55,7 +59,15 @@ export default function List() {
     {
       title: "Content",
       dataIndex: "content",
-      width: 300,
+      onCell: () => ({
+        style: {
+          padding: "10px",
+          minWidth: "300px",
+        },
+      }),
+      render: (content) => (
+        <div style={{ maxHeight: "100px", overflow: "auto" }}>{content}</div>
+      ),
     },
     {
       title: "Tag",
@@ -65,7 +77,11 @@ export default function List() {
     {
       title: "Publish time",
       dataIndex: "publish_time",
-      width: 200,
+      onCell: () => ({
+        style: {
+          minWidth: "150px",
+        },
+      }),
       sorter: (a, b) => a.publish_time.localeCompare(b.publish_time),
     },
     {
@@ -91,7 +107,6 @@ export default function List() {
       dataSource={data}
       bordered
       scroll={{ x: 1200 }}
-      className={styles.table}
       columns={columns}
       simple
       rowKey={(record) => record.id}
