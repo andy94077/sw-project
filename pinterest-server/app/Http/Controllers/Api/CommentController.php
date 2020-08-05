@@ -55,6 +55,12 @@ class CommentController extends BaseController{
         $comment = Comment::find($request['id']);
         $comment->content = $request['content'];
         $comment->save();
+        return $this->sendResponse($comment, 'Comment was successfully updated');
+    }
+
+    public function recover(Request $request){
+        $comment = Comment::withTrashed()->find($request['id']);
+        $comment->restore();
         return $this->sendResponse($comment, 'Comment was successfully restored');
     }
 
