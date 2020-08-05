@@ -118,7 +118,7 @@ export default function ContentCard(props) {
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
-  const [isReady, setIsReady] = useState(null);
+  const [isReady, setIsReady] = useState("");
 
   useEffect(() => {
     setIsReady(src === "Error" ? "Error" : "Init");

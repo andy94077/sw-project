@@ -113,7 +113,7 @@ export default function Bar(props) {
   const classes = useStyles();
   const history = useHistory();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const [content, setContent] = useState(false);
+  const [content, setContent] = useState(null);
   const [text, setText] = useState([{ id: 1 }]);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");

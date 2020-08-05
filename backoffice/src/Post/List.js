@@ -5,7 +5,7 @@ import styles from "./List.less";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function List() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     axios
@@ -21,7 +21,7 @@ export default function List() {
 
   const columns = [
     {
-      title: "Image",
+      title: "Post",
       dataIndex: "id",
       render: (id, row) => (
         <a href={`http://localhost:3000/picture/${id}`}>
@@ -32,7 +32,6 @@ export default function List() {
     {
       title: "Id",
       dataIndex: "id",
-      render: (id) => <a href={`http://localhost:3000/picture/${id}`}>{id}</a>,
       sorter: (a, b) => a.id - b.id,
     },
     {
@@ -56,6 +55,7 @@ export default function List() {
     {
       title: "Content",
       dataIndex: "content",
+      width: 300,
     },
     {
       title: "Tag",
@@ -65,6 +65,7 @@ export default function List() {
     {
       title: "Publish time",
       dataIndex: "publish_time",
+      width: 200,
       sorter: (a, b) => a.publish_time.localeCompare(b.publish_time),
     },
     {
