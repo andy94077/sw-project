@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Avatar, Tag } from "antd";
+import { Avatar, Button, Modal, Table, Tag, Tooltip } from "antd";
+import { DeleteOutlined, DownOutlined, UndoOutlined } from "@ant-design/icons";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function List() {
   const [data, setData] = useState([]);
+  const [motion, setMotion] = useState(false);
 
   useEffect(() => {
+    setMotion(false);
+
     axios
       .request({
         method: "GET",
@@ -16,7 +20,71 @@ export default function List() {
         setData(res.data["data"]);
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [motion]);
+
+  const handleDeletePost = (event) => {
+    const id = event.currentTarget.value;
+    Modal.confirm({
+      title: "Are you sure you want to delete this post?",
+      content: "(Image id = " + id + ")",
+      onOk() {
+        const jsonData = { id };
+        console.log(jsonData);
+
+        axios
+          .request({
+            method: "DELETE",
+            url: CONCAT_SERVER_URL("/api/v1/post"),
+            data: jsonData,
+          })
+          .then(() => {
+            setMotion(true);
+            Modal.success({
+              title: "Deleted successfully.",
+              content: "(Image id = " + id + ")",
+            });
+          })
+          .catch(() =>
+            Modal.error({
+              title: "Deleted failed.",
+              content: "Connection error.",
+            })
+          );
+      },
+    });
+  };
+
+  const handleRecoverPost = (event) => {
+    const id = event.currentTarget.value;
+    Modal.confirm({
+      title: "Are you sure you want to recover this post?",
+      content: "(Image id = " + id + ")",
+      onOk() {
+        const jsonData = { id };
+        console.log(jsonData);
+
+        axios
+          .request({
+            method: "POST",
+            url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
+            data: jsonData,
+          })
+          .then(() => {
+            setMotion(true);
+            Modal.success({
+              title: "Recovered successfully.",
+              content: "(Image id = " + id + ")",
+            });
+          })
+          .catch(() =>
+            Modal.error({
+              title: "Recovered failed.",
+              content: "Connection error.",
+            })
+          );
+      },
+    });
+  };
 
   const columns = [
     {
@@ -66,7 +134,26 @@ export default function List() {
         },
       }),
       render: (content) => (
-        <div style={{ maxHeight: "100px", overflow: "auto" }}>{content}</div>
+        <div>
+          <div
+            style={{
+              float: "left",
+              maxHeight: "100px",
+              overflow: "auto",
+            }}
+          >
+            {content}
+          </div>
+          <Tooltip title="Comments">
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<DownOutlined />}
+              size="small"
+              style={{ float: "right" }}
+            />
+          </Tooltip>
+        </div>
       ),
     },
     {
@@ -99,6 +186,53 @@ export default function List() {
         const B = b.deleted_at === null ? "null" : b.deleted_at;
         A.localeCompare(B);
       },
+    },
+    {
+      title: "Options",
+      onHeaderCell: () => ({
+        style: {
+          background: "#fafafa",
+          boxShadow: "-2px 0px 3px -1.5px #ddd",
+          position: "sticky",
+          right: "0",
+        },
+      }),
+      onCell: () => ({
+        style: {
+          background: "#fff",
+          boxShadow: "-2px 0px 3px -1.5px #ddd",
+          position: "sticky",
+          right: "0",
+        },
+      }),
+      render: (_, row) => (
+        <div style={{ textAlign: "center" }}>
+          {row.deleted_at === null ? (
+            <Tooltip title="Delete">
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleDeletePost}
+                shape="circle"
+                size="small"
+                type="primary"
+                value={row.id}
+              />
+            </Tooltip>
+          ) : (
+            <Tooltip title="Recover">
+              <Button
+                icon={<UndoOutlined />}
+                onClick={handleRecoverPost}
+                shape="circle"
+                size="small"
+                type="primary"
+                value={row.id}
+              />
+            </Tooltip>
+          )}
+        </div>
+      ),
     },
   ];
 
