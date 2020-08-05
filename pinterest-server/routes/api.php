@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('Api')->prefix('v1')->group(function () {
+    Route::post('/comment/recovery', 'CommentController@recover');
     Route::get('/comments', 'CommentController@index');
     Route::get('/comments/admin', 'CommentController@adminAll');
     Route::get('/comment/post', 'CommentController@showByPost');
@@ -25,6 +26,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::apiResource('comment', 'CommentController');
 
 
+    Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts', 'PostController@index');
     Route::get('/posts/admin', 'PostController@adminAll');
     Route::get('/post/id', 'PostController@getPictureFromId');
@@ -36,8 +38,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('post', 'PostController');
 
+    Route::delete('/user/admin', 'UserController@adminDelete');
+    Route::post('user/admin', 'UserController@adminRecover');
     Route::get('/users/admin', 'UserController@adminAll');
     Route::post('user/bucket', 'UserController@bucket');
+    Route::delete('user/bucket', 'UserController@unBucket');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
     Route::post('/user/register','UserController@register')->name('user.register');
     Route::post('/user/logIn','UserController@logIn')->name('user.logIn');
@@ -48,6 +53,12 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('user', 'UserController');
 
+    Route::post('/superUser/register','SuperUserController@register')->name('superUser.register');
+    Route::post('/superUser/logIn','SuperUserController@logIn')->name('superUser.logIn');
+    Route::post('/superUser/authentication','SuperUserController@authentication')->name('superUser.authentication');
+    Route::post('/superUser/userExist','SuperUserController@userExist')->name('superUser.userExist');
+    Route::middleware('auth:api')->put('/superUser/password/reset', 'SuperUserController@reset');
+    Route::apiResource('superUser', 'SuperUserController');
     // for upload images
     Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage');
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
