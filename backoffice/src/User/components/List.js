@@ -1,12 +1,77 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
-import { Table, Avatar } from "antd";
+import { Table, Avatar, Modal, Button } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
 import { format } from "date-fns";
+import DropOption from "./DropOption";
 
 export default function List(props) {
+  const showUnbucketModal = () => {
+    Modal.confirm({
+      title: "Do you want to unbucket this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Some descriptions",
+      onOk() {
+        console.log("OK");
+      },
+      onCancel() {},
+    });
+  };
+
+  const showDeleteModal = () => {
+    Modal.confirm({
+      title: "Do you want to delete this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Some descriptions",
+      onOk() {
+        console.log("OK");
+      },
+      onCancel() {},
+    });
+  };
+
+  const showRecoverModal = () => {
+    Modal.confirm({
+      title: "Do you want to recover this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Some descriptions",
+      onOk() {
+        console.log("OK");
+      },
+      onCancel() {},
+    });
+  };
+
+  const handleMenuClick = ({ key, id }) => {
+    console.log(key);
+    switch (key) {
+      case "Bucket":
+        setState({
+          ...state,
+          visible: true,
+        });
+        break;
+      case "Unbucket":
+        showUnbucketModal();
+        break;
+      case "Delete":
+        showDeleteModal();
+        break;
+      case "Recover":
+        showRecoverModal();
+        break;
+
+      default:
+        break;
+    }
+  };
+  const [state, setState] = useState({
+    loading: false,
+    visible: false,
+  });
   const [data, setData] = useState([]);
   useEffect(() => {
     axios({
@@ -44,6 +109,17 @@ export default function List(props) {
         alert("There are some problems during loading");
       });
   }, []);
+
+  const handleOk = () => {
+    setState({ ...state, loading: true });
+    setTimeout(() => {
+      setState({ loading: false, visible: false });
+    }, 3000);
+  };
+
+  const handleCancel = () => {
+    setState({ ...state, visible: false });
+  };
 
   const columns = [
     {
@@ -114,21 +190,59 @@ export default function List(props) {
       key: "operation",
       fixed: "right",
       render: (text, record) => {
-        return "HaHaHagergwergwergewrg";
+        return (
+          <DropOption
+            id={record.id}
+            onMenuClick={handleMenuClick}
+            menuOptions={[
+              { key: "Bucket", name: "Bucket" },
+              { key: "Unbucket", name: "Unbucket" },
+              { key: "Delete", name: "Delete" },
+              { key: "Recover", name: "Recover" },
+            ]}
+          />
+        );
       },
     },
   ];
 
   return (
-    <Table
-      dataSource={data}
-      className={styles.table}
-      bordered
-      scroll={{ x: 1200 }}
-      columns={columns}
-      simple
-      rowKey={(record) => record.id}
-    />
+    <>
+      <Table
+        dataSource={data}
+        className={styles.table}
+        bordered
+        scroll={{ x: 1200 }}
+        columns={columns}
+        simple
+        rowKey={(record) => record.id}
+      />
+      <Modal
+        visible={state.visible}
+        title="Title"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Return
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={state.loading}
+            onClick={handleOk}
+          >
+            Submit
+          </Button>,
+        ]}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
+    </>
   );
 }
 
