@@ -64,7 +64,7 @@ class UserController extends BaseController
         if($userToken === null || $userToken === ''){
             return response()->json(['isValid' => false], 200);
         }
-        $userInfo = DB::table('users')->where('remember_token', $userToken)->first();
+        $userInfo = User::where('remember_token', $userToken)->first();
         if($userInfo === null){
             return response()->json(['isValid' => false], 200);
         }
@@ -79,7 +79,7 @@ class UserController extends BaseController
     
     public function userExist(Request $request)
     {
-        $userInfo = DB::table('users')->where('name', $request['name'])->first();
+        $userInfo = User::where('name', $request['name'])->first();
         if($userInfo === null){
             return response()->json(['isValid' => false], 200);
         }
@@ -110,6 +110,7 @@ class UserController extends BaseController
             $m = ($request['month'])?$request['month']:0;
             $date->add(new DateInterval("P{$y}Y{$m}M{$d}DT{$h}H0M0S"));
             $user->bucket_time = $date->format('Y-m-d H:i:s');
+            $user->save();
             return response()->json( $user, 200);
         }
         return $this->sendError("id not found", 404);
@@ -119,6 +120,7 @@ class UserController extends BaseController
         if($request['id']){
             $user = User::find($request['id']);
             $user->bucket_time = null;
+            $user->save();
             return response()->json( $user, 200);
         }
         return $this->sendError("id not found", 404);
