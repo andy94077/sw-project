@@ -4,7 +4,7 @@ import { Table, Avatar } from "antd";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
-import { format } from "date-fns";
+import { format, addHours } from "date-fns";
 
 export default function List(props) {
   const [data, setData] = useState([]);
@@ -20,20 +20,39 @@ export default function List(props) {
               response.data.data.map((item) => {
                 item.created_at = format(
                   new Date(item.created_at),
-                  "yyyy-mm-dd hh:mm:ss"
+                  "yyyy-MM-dd HH:mm:ss",
+                  { timeZone: "Asia/China" }
                 );
                 item.bucket_time =
                   item.bucket_time === null
                     ? ""
-                    : format(new Date(item.bucket_time), "yyyy-mm-dd hh:mm:ss");
+                    : format(
+                        addHours(new Date(item.bucket_time), 8),
+                        "yyyy-MM-DD HH:mm:ss",
+                        { timeZone: "Asia/China" }
+                      );
                 item.deleted_at =
                   item.deleted_at === null
                     ? ""
-                    : format(new Date(item.deleted_at), "yyyy-mm-dd hh:mm:ss");
+                    : format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                        timeZone: "Asia/China",
+                      });
                 item.updated_at =
                   item.updated_at === null
                     ? ""
-                    : format(new Date(item.updated_at), "yyyy-mm-dd hh:mm:ss");
+                    : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                        timeZone: "Asia/China",
+                      });
+                item.online_time =
+                  item.online_time === null
+                    ? ""
+                    : format(
+                        addHours(new Date(item.online_time), 8),
+                        "yyyy-MM-dd HH:mm:ss",
+                        {
+                          timeZone: "Asia/China",
+                        }
+                      );
                 return item;
               })
             );
