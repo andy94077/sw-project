@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { Table, Avatar } from "antd";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
 
-// const { confirm } = Modal;
-
-// @withI18n()
 export default function List(props) {
   const [data, setData] = useState([]);
   useEffect(() => {
@@ -51,7 +47,9 @@ export default function List(props) {
       dataIndex: "name",
       key: "name",
       width: 120,
-      render: (text, record) => <Link to={`user/${record.id}`}>{text}</Link>,
+      render: (name) => (
+        <a href={`http://localhost:3000/profile/${name}`}>{name}</a>
+      ),
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
@@ -76,7 +74,7 @@ export default function List(props) {
       title: "created_at",
       dataIndex: "created_at",
       key: "created_at",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.created_at.localeCompare(b.created_at),
     },
     {
       title: "delete_at",
@@ -100,18 +98,6 @@ export default function List(props) {
     },
   ];
 
-  // const data = [
-  //   {
-  //     avatar: "/pictures/avatar.jpeg",
-  //     id: "rrjwierjw",
-  //     name: "erwrwer",
-  //     email: "rrjwierjw",
-  //     createTime: "rrjwierjw",
-  //     lastloginTime: "rrjwierjw",
-  //     lastlogoutTime: "rrjwierjw",
-  //   },
-  // ];
-  console.log(data);
   return (
     <Table
       dataSource={data}
@@ -125,8 +111,8 @@ export default function List(props) {
   );
 }
 
-List.propTypes = {
-  onDeleteItem: PropTypes.func,
-  onEditItem: PropTypes.func,
-  location: PropTypes.object,
-};
+// List.propTypes = {
+//   onDeleteItem: PropTypes.func,
+//   onEditItem: PropTypes.func,
+//   location: PropTypes.object,
+// };
