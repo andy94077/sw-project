@@ -11,7 +11,7 @@ use App\Notifications\ResetPasswordNotification;
 class SuperUser extends Authenticatable
 {
     use Notifiable;
-
+    protected $table = 'super_users';
     /**
      * The attributes that are mass assignable.
      *
