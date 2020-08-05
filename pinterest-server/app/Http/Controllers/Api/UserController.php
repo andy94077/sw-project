@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Image;
 use stdClass;
+use DateTime;
+use DateInterval;
 
 class UserController extends BaseController
 {
@@ -96,6 +98,21 @@ class UserController extends BaseController
         $user->online_time = date("Y-m-d H:i:s");
         $user->save();
         return response()->json("", 200);
+    }
+
+    public function bucket(Request $request){
+        if($request['id']){
+            $user = User::find($request['id']);
+            $date = new DateTime(date("Y-m-d H:i:s"));
+            $h = ($request['h'])?$request['h']:0;
+            $d = ($request['day'])?$request['day']:0;
+            $y = ($request['year'])?$request['year']:0;
+            $m = ($request['month'])?$request['month']:0;
+            $date->add(new DateInterval("P{$y}Y{$m}M{$d}DT{$h}H0M0S"));
+            $user->bucket_time = $date->format('Y-m-d H:i:s');
+            return response()->json( $user, 200);
+        }
+        return $this->sendError("id not found", 404);
     }
 
     public function adminAll(Request $request){
