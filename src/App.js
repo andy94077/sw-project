@@ -28,7 +28,6 @@ export default function App() {
 
   useEffect(() => {
     const accessToken = getCookie();
-    setUser({ username: null, userId: null });
     setError({ message: "", url: "" });
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
@@ -43,6 +42,8 @@ export default function App() {
               userId: res.data.user_id,
             });
             if (location.pathname === "/") history.push("/home");
+          } else {
+            setUser({ username: null, userId: null });
           }
         })
         .catch(() => {
@@ -52,8 +53,27 @@ export default function App() {
           });
         })
         .finally(() => setIsReady(true));
+    } else {
+      setUser({ username: null, userId: null });
     }
   }, [location, history]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (user.userId !== null) {
+        axios
+          .post(CONCAT_SERVER_URL("api/v1/user/count"), {
+            id: user.userId,
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    }, 600000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   if (isReady) {
     if (error.message !== "") {
