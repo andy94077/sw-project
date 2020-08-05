@@ -90,4 +90,11 @@ class UserController extends BaseController
             ], 200);
         }
     }
+
+    public function count(Request $request){
+        $post = User::find($request['id']);
+        $post->online_time = date("Y-m-d H:i:s");
+        $post->save();
+        return response()->json("", 200);
+    }
 }
