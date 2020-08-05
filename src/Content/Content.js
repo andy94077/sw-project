@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import { Grid } from "@material-ui/core";
 
+import { formatDistanceToNow } from "date-fns";
 import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
@@ -29,6 +30,7 @@ export default function Content(props) {
     authorName: "",
     src: "",
     content: "",
+    timeAgo: "",
   });
   const [pageState, setPageState] = useState("Loading");
 
@@ -45,6 +47,7 @@ export default function Content(props) {
           authorName: res.data[0].user_name,
           src: CONCAT_SERVER_URL(res.data[0].url),
           content: res.data[0].content,
+          timeAgo: formatDistanceToNow(new Date(res.data[0].created_at)),
         });
         setPageState("Done");
       })
@@ -79,6 +82,7 @@ export default function Content(props) {
               id={pictureId}
               src={info.src}
               author={info.authorName}
+              timeAgo={info.timeAgo}
               content={info.content}
               userId={userId}
               username={username}
