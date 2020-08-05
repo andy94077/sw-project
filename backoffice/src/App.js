@@ -2,41 +2,40 @@ import React, { useState } from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
 import "./App.css";
 import {
-  DesktopOutlined,
   PieChartOutlined,
-  FileOutlined,
   TeamOutlined,
+  FileTextOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Switch, Route, useHistory, useLocation, Link } from "react-router-dom";
+import { Switch, Route, useLocation, Link } from "react-router-dom";
 
 import Post from "./Post/Post";
 import User from "./User/User";
 
 const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
 
 export default function App() {
-  const [state, setState] = useState({ collapsed: false });
+  const [user, setUser] = useState({ username: "admin", userId: null });
   const location = useLocation();
 
-  const onCollapse = (collapsed) => {
-    console.log(collapsed);
-    setState({ collapsed });
-  };
-  console.log(location.pathname);
   return (
     <Layout className="base-layout">
       <Header className="header">
-        <div className="logo">pinterest-server</div>
-        <Menu theme="dark" mode="horizontal">
-          <Menu.Item key="1">nav 1</Menu.Item>
-          <Menu.Item key="2">nav 2</Menu.Item>
-          <Menu.Item key="3">nav 3</Menu.Item>
+        <div className="logo">sw-project-backoffice</div>
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          className="horizontal-menu"
+          selectable={false}
+          triggerSubMenuAction="click"
+        >
+          <Menu.SubMenu icon={<UserOutlined />} title={user.username}>
+            <Menu.Item>Log out</Menu.Item>
+          </Menu.SubMenu>
         </Menu>
       </Header>
       <Layout className="site-layout">
-        <Sider collapsible collapsed={state.collapsed} onCollapse={onCollapse}>
+        <Sider collapsible>
           <Menu
             theme="dark"
             defaultSelectedKeys={[
@@ -53,10 +52,10 @@ export default function App() {
             >
               <Link to="/">Dashboard</Link>
             </Menu.Item>
-            <Menu.Item key="user" icon={<UserOutlined />}>
+            <Menu.Item key="user" icon={<TeamOutlined />}>
               <Link to="/user">Users</Link>
             </Menu.Item>
-            <Menu.Item key="post" icon={<TeamOutlined />}>
+            <Menu.Item key="post" icon={<FileTextOutlined />}>
               <Link to="/post">Posts</Link>
             </Menu.Item>
           </Menu>
@@ -74,7 +73,7 @@ export default function App() {
             </Switch>
           </Content>
           <Footer className="footer">
-            Ant Design ©2018 Created by Ant UED
+            sw-project ©2020 Created by Funpodium
           </Footer>
         </Layout>
       </Layout>
