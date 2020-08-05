@@ -1,16 +1,17 @@
 <?php
 
-namespace App\models;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\SuperUser as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 
 class SuperUser extends Authenticatable
 {
     use Notifiable;
+    protected $guard = 'super_user';
     protected $table = 'super_users';
     /**
      * The attributes that are mass assignable.
@@ -50,7 +51,7 @@ class SuperUser extends Authenticatable
         $this->notify(new ResetPasswordNotification($token, $this->name));
     }
 
-    public function superUsers()
+    public function super_users()
     {
         return $this->belongsTo('App\Models\SuperUser', 'user_id', 'id');
     }
