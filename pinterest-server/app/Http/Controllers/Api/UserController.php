@@ -115,8 +115,29 @@ class UserController extends BaseController
         return $this->sendError("id not found", 404);
     }
 
+    public function unBucket(Request $request){
+        if($request['id']){
+            $user = User::find($request['id']);
+            $user->bucket_time = null;
+            return response()->json( $user, 200);
+        }
+        return $this->sendError("id not found", 404);
+    }
+
     public function adminAll(Request $request){
-        $users = User::all();
+        $users = User::withTrashed()->get();
         return $this->sendResponse($users, 'Users was successfully got');
+    }
+
+    public function adminDelete(Request $request){
+        $user = User::find($request['id']);
+        $user->delete();
+        return $this->sendResponse($user, "success");
+    }
+
+    public function adminRecover(Request $request){
+        $user = User::withTrashed()->find($request['id']);
+        $user->restore();
+        return $this->sendResponse($user, "success");
     }
 }
