@@ -72,7 +72,8 @@ class UserController extends BaseController
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
-                'isValid' => true
+                'isValid' => true,
+                'bucket_time' => $userInfo->bucket_time,
             ], 200);
         }
     }
