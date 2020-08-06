@@ -128,7 +128,10 @@ class UserController extends BaseController
     }
 
     public function adminAll(Request $request){
-        $users = User::withTrashed()->get();
+        $query = User::withTrashed();
+        $size = $query->count();
+        $users = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $users['page_size'] = $size;
         return $this->sendResponse($users, 'Users was successfully got');
     }
 
