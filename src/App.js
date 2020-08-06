@@ -149,6 +149,7 @@ export default function App() {
                 userId={user.userId}
                 match={props.match}
                 userBucketTime={addHours(new Date(user.userBucketTime), 8)}
+                isBucket={checkBucket(user.userBucketTime)}
               />
             )}
           />

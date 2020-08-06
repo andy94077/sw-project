@@ -62,6 +62,7 @@ export default function Profile(props) {
     match: {
       params: { name },
     },
+    isBucket,
   } = props;
 
   // const userId = 1;
@@ -145,7 +146,9 @@ export default function Profile(props) {
     }
   };
 
-  const uploadButton = (
+  const uploadButton = isBucket ? (
+    <div className={classes.center}>In Bucket</div>
+  ) : (
     <div className={classes.center}>
       <label htmlFor="contained-button-file">
         <input
