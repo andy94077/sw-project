@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
-import { Table, Avatar, Modal } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { Avatar, Button, Input, Modal, Space, Table } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
@@ -20,6 +21,32 @@ export default function List(props) {
     length: null,
   });
   const [refresh, setRefresh] = useState(false);
+  const columnTitle = {
+    id: "ID",
+    name: "Name",
+    email: "Email",
+    online_time: "Online Time",
+    bucket_time: "Bucket Time",
+    created_at: "created_at",
+    deleted_at: "deleted_at",
+    updated_at: "updated_at",
+  };
+  const columnObj = {
+    id: "",
+    name: "",
+    email: "",
+    online_time: "",
+    bucket_time: "",
+    created_at: "",
+    deleted_at: "",
+    updated_at: "",
+  };
+  const [searchText, setSearchText] = useState({ ...columnObj });
+  const [filter, setFilter] = useState({
+    ...columnObj,
+    page: 1,
+    size: 10,
+  });
 
   const errorMessageModal = (text) => {
     Modal.info({
@@ -129,10 +156,7 @@ export default function List(props) {
   useEffect(() => {
     axios
       .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
-        params: {
-          page: "1",
-          size: "15",
-        },
+        params: filter,
       })
       .then((response) => {
         console.log(response.data);
@@ -186,7 +210,7 @@ export default function List(props) {
         alert("There are some problems during loading");
         console.log(error);
       });
-  }, [refresh]);
+  }, [refresh, filter]);
 
   const handleOk = () => {
     setState({ ...state, loading: true });
@@ -198,6 +222,23 @@ export default function List(props) {
 
   const handleCancel = () => {
     setState({ ...state, visible: false });
+  };
+
+  const handleSearch = () => {
+    setFilter({
+      ...searchText,
+      page: 1,
+      size: 10,
+    });
+  };
+
+  const handleReset = () => {
+    setSearchText({ ...columnObj });
+    setFilter({
+      ...columnObj,
+      page: 1,
+      size: 10,
+    });
   };
 
   const columns = [
@@ -285,8 +326,45 @@ export default function List(props) {
     },
   ];
 
+  const searchFields = [];
+  Object.keys(columnObj).forEach(function (key) {
+    searchFields.push(
+      <Input
+        key={key}
+        placeholder={`Search ${columnTitle[key]}`}
+        value={searchText[key]}
+        onChange={(event) => {
+          setSearchText({
+            ...searchText,
+            [key]: event.target.value,
+          });
+          console.log(searchText);
+        }}
+        onPressEnter={handleSearch}
+        style={{ width: 188, margin: 8, display: "inline" }}
+      />
+    );
+  });
+
   return (
     <>
+      <div style={{ padding: 8 }}>
+        {searchFields}
+        <Space>
+          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSearch}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+        </Space>
+      </div>
       <Table
         dataSource={data.info}
         pagination={{
