@@ -45,7 +45,7 @@ export default function List(props) {
   const [filter, setFilter] = useState({
     ...columnObj,
     page: 1,
-    size: 10,
+    size: 15,
   });
 
   const errorMessageModal = (text) => {
@@ -228,7 +228,7 @@ export default function List(props) {
     setFilter({
       ...searchText,
       page: 1,
-      size: 10,
+      size: 15,
     });
   };
 
@@ -237,7 +237,7 @@ export default function List(props) {
     setFilter({
       ...columnObj,
       page: 1,
-      size: 10,
+      size: 15,
     });
   };
 
