@@ -31,7 +31,6 @@ export default function App() {
 
   useEffect(() => {
     const accessToken = getCookie();
-    console.log("check", accessToken);
     setError({ message: "", url: "" });
     setUser({ username: null, userId: null });
     if (location.pathname !== "/" || accessToken !== null) {
