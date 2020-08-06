@@ -83,8 +83,10 @@ class CommentController extends BaseController{
         if($request['user_id']){
             $query = $query->where("user_id", $request['user_id']);
         }
-        $comments = $query->get();
-        return $this->sendResponse($comments, 'Comment was successfully got');
+        $size = $query->count();
+        $comments['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $comments['total'] = $size;
+        return response()->json($comments);
     }
 
     public function destroy($id){
