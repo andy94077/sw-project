@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { Layout, Menu } from "antd";
 import "./App.css";
 import {
   PieChartOutlined,
@@ -13,6 +13,7 @@ import { Switch, Route, useLocation, useHistory, Link } from "react-router-dom";
 import Post from "./Post/Post";
 import User from "./User/User";
 import LoginPage from "./Login/LoginPage";
+import BOUser from "./BOUser/BOUser";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 
@@ -44,6 +45,7 @@ export default function App() {
             setUser({ username: res.data.username, userId: res.data.user_id });
             if (location.pathname === "/") history.push("/dashboard");
           } else {
+            deleteCookie();
             history.push("/");
           }
         })
@@ -109,6 +111,9 @@ export default function App() {
               <Menu.Item key="post" icon={<FileTextOutlined />}>
                 <Link to="/post">Posts</Link>
               </Menu.Item>
+              <Menu.Item key="BOUser" icon={<TeamOutlined />}>
+                <Link to="/BOUser">BO Users</Link>
+              </Menu.Item>
             </Menu>
           </Sider>
           <Layout>
@@ -121,6 +126,7 @@ export default function App() {
                 />
                 <Route exact path="/user" component={User} />
                 <Route exact path="/post" component={Post} />
+                <Route exact path="/BOUser" component={BOUser} />
               </Switch>
             </Content>
             <Footer className="footer">

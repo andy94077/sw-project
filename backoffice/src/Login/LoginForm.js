@@ -52,9 +52,6 @@ export default function LoginForm() {
     <Form
       name="normal_login"
       className="login-form"
-      initialValues={{
-        remember: true,
-      }}
       onFinish={onFinish}
       style={{ flex: 1 }}
     >
