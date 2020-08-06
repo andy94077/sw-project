@@ -9,13 +9,33 @@ import { format } from "date-fns";
 import DropOption from "./DropOption";
 
 export default function List(props) {
-  const showUnbucketModal = () => {
+  const errorMessageModal = (text) => {
+    Modal.info({
+      title: "",
+      content: (
+        <div>
+          <p>{text}</p>
+        </div>
+      ),
+      onOk() {},
+    });
+  };
+
+  const showUnbucketModal = (id) => {
     Modal.confirm({
       title: "Do you want to unbucket this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        console.log("OK");
+        axios({
+          method: "delete",
+          url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
+          data: { id },
+        })
+          .then((response) => {
+            errorMessageModal("Success !");
+          })
+          .catch(errorMessageModal("Oops~ Please try again !"));
       },
       onCancel() {},
     });
@@ -27,7 +47,7 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        console.log("OK");
+        axios({}).then().catch();
       },
       onCancel() {},
     });
@@ -39,7 +59,7 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        console.log("OK");
+        axios({}).then().catch();
       },
       onCancel() {},
     });
@@ -55,13 +75,13 @@ export default function List(props) {
         });
         break;
       case "Unbucket":
-        showUnbucketModal();
+        showUnbucketModal(id);
         break;
       case "Delete":
-        showDeleteModal();
+        showDeleteModal(id);
         break;
       case "Recover":
-        showRecoverModal();
+        showRecoverModal(id);
         break;
 
       default:
