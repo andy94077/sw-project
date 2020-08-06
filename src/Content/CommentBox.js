@@ -83,6 +83,7 @@ export default function CommentBox(props) {
       Axios.delete(CONCAT_SERVER_URL("/api/v1/comment"), {
         data: {
           id: commentId,
+          user: true,
         },
       })
         .then(() => {
@@ -106,6 +107,7 @@ export default function CommentBox(props) {
       Axios.post(CONCAT_SERVER_URL("/api/v1/comment/modification"), {
         id: commentId,
         content: newComment,
+        user: true,
       })
         .then(() => {
           refresh();
