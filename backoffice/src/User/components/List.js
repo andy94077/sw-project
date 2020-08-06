@@ -124,13 +124,17 @@ export default function List(props) {
     }
   };
   useEffect(() => {
-    axios({
-      method: "GET",
-      url: CONCAT_SERVER_URL("/api/v1/users/admin"),
-    })
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
+        params: {
+          page: "1",
+          size: "15",
+        },
+      })
       .then((response) => {
-        if (response.data.success !== null) {
-          if (response.data.success === true) {
+        console.log(response.data);
+        if (response.data.data !== null) {
+          if (response.data.length !== 0) {
             setData(
               response.data.data.map((item) => {
                 item.created_at = format(
@@ -281,6 +285,12 @@ export default function List(props) {
     <>
       <Table
         dataSource={data}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+        }}
         className={styles.table}
         bordered
         scroll={{ x: 1200 }}
