@@ -12,7 +12,6 @@ import { CONCAT_SERVER_URL } from "../constants";
 
 export default function List() {
   const [data, setData] = useState([]);
-  const [motion, setMotion] = useState(false);
   const columnTitle = {
     id: "Id",
     url: "Position",
@@ -30,6 +29,12 @@ export default function List() {
     tag: "",
   };
   const [searchText, setSearchText] = useState({ ...columnObj });
+  const [filter, setFilter] = useState({
+    ...columnObj,
+    page: 1,
+    size: 10,
+  });
+  const [motion, setMotion] = useState();
 
   useEffect(() => {
     setMotion(false);
@@ -38,6 +43,7 @@ export default function List() {
       .request({
         method: "GET",
         url: CONCAT_SERVER_URL("/api/v1/posts/admin"),
+        params: filter,
       })
       .then((res) => {
         setData(res.data["data"]);
@@ -48,7 +54,7 @@ export default function List() {
           content: "Connection error.",
         })
       );
-  }, [motion]);
+  }, [motion, filter]);
 
   const handleDeletePost = (event) => {
     const id = event.currentTarget.value;
@@ -134,6 +140,7 @@ export default function List() {
         : [
             searchText[dataIndex] !== "" ? (
               <Highlighter
+                key={dataIndex}
                 highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                 searchWords={[searchText[dataIndex]]}
                 autoEscape
@@ -146,15 +153,25 @@ export default function List() {
   });
 
   const handleSearch = () => {
-    console.log(searchText);
+    setFilter({
+      ...searchText,
+      page: 1,
+      size: 10,
+    });
   };
 
   const handleReset = () => {
     setSearchText({ ...columnObj });
+    setFilter({
+      ...columnObj,
+      page: 1,
+      size: 10,
+    });
   };
 
   const columns = [
     {
+      ...getColumnSearchProps("id"),
       title: "Post",
       dataIndex: "id",
       render: (id, row) => (
@@ -167,9 +184,9 @@ export default function List() {
       title: "Id",
       dataIndex: "id",
       sorter: (a, b) => a.id - b.id,
-      ...getColumnSearchProps("id"),
     },
     {
+      ...getColumnSearchProps("url"),
       title: "Position",
       dataIndex: "url",
       onCell: () => ({
@@ -177,19 +194,18 @@ export default function List() {
           maxWidth: "135px",
         },
       }),
-      ...getColumnSearchProps("url"),
     },
     {
+      ...getColumnSearchProps("user_id"),
       title: "User id",
       dataIndex: "user_id",
       sorter: (a, b) => a.user_id - b.user_id,
-      ...getColumnSearchProps("user_id"),
     },
     {
+      ...getColumnSearchProps("username"),
       title: "Username",
       dataIndex: "username",
       sorter: (a, b) => a.username.localeCompare(b.username),
-      ...getColumnSearchProps("username"),
     },
     {
       title: "Content",
@@ -233,10 +249,10 @@ export default function List() {
       ),
     },
     {
+      ...getColumnSearchProps("tag"),
       title: "Tag",
       dataIndex: "tag",
       sorter: (a, b) => a.tag.localeCompare(b.tag),
-      ...getColumnSearchProps("tag"),
     },
     {
       title: "Publish time",
