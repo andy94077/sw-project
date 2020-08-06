@@ -30,7 +30,7 @@ export default function App() {
 
   useEffect(() => {
     const accessToken = getCookie();
-
+    console.log("check", accessToken);
     setError({ message: "", url: "" });
     setUser({ username: null, userId: null });
     if (location.pathname !== "/" || accessToken !== null) {
@@ -44,6 +44,7 @@ export default function App() {
             setUser({ username: res.data.username, userId: res.data.user_id });
             if (location.pathname === "/") history.push("/dashboard");
           } else {
+            deleteCookie();
             history.push("/");
           }
         })
