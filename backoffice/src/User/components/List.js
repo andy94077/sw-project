@@ -141,7 +141,7 @@ export default function List(props) {
                     ? ""
                     : format(
                         addHours(new Date(item.bucket_time), 8),
-                        "yyyy-MM-DD HH:mm:ss",
+                        "yyyy-MM-dd HH:mm:ss",
                         { timeZone: "Asia/China" }
                       );
                 item.deleted_at =
@@ -174,6 +174,7 @@ export default function List(props) {
       })
       .catch((error) => {
         alert("There are some problems during loading");
+        console.log(error);
       });
   }, [refresh]);
 
@@ -287,6 +288,7 @@ export default function List(props) {
       },
     })
       .then((response) => {
+        //console.log(response.data);
         errorMessageModal("Success !");
       })
       .catch((error) => {
