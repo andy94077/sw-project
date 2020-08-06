@@ -11,6 +11,7 @@ import DropOption from "./DropOption";
 export default function List(props) {
   const [state, setState] = useState({
     loading: false,
+    bucketId: null,
     visible: false,
   });
   const [data, setData] = useState([]);
@@ -102,6 +103,7 @@ export default function List(props) {
       case "Bucket":
         setState({
           ...state,
+          bucketId: id,
           visible: true,
         });
         break;
@@ -178,7 +180,7 @@ export default function List(props) {
   const handleOk = () => {
     setState({ ...state, loading: true });
     setTimeout(() => {
-      setState({ loading: false, visible: false });
+      setState({ ...state, loading: false, visible: false });
     }, 3000);
   };
 
@@ -280,9 +282,26 @@ export default function List(props) {
     };
   };
 
-  const onFinish = (values) => {
-    console.log(values);
+  const onFinish = ({ hour, year, day, month }) => {
     handleOk();
+    axios({
+      method: "post",
+      url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+      data: {
+        id: state.bucketId,
+        hour,
+        day,
+        month,
+        year,
+      },
+    })
+      .then((response) => {
+        errorMessageModal("Success !");
+      })
+      .catch((error) => {
+        errorMessageModal("Oops~ Please try again !");
+      })
+      .finally(() => setRefresh((preRefresh) => !preRefresh));
   };
 
   return (
@@ -326,29 +345,29 @@ export default function List(props) {
           onFinish={onFinish}
         >
           <Form.Item
-            name={["Hour"]}
-            label="Hour"
+            name={["hour"]}
+            label="hour"
             rules={[{ type: "number", min: 0, max: 24 }]}
           >
             <InputNumber />
           </Form.Item>
           <Form.Item
-            name={["Day"]}
-            label="Day"
+            name={["day"]}
+            label="day"
             rules={[{ type: "number", min: 0, max: 31 }]}
           >
             <InputNumber />
           </Form.Item>
           <Form.Item
-            name={["Month"]}
-            label="Month"
+            name={["month"]}
+            label="month"
             rules={[{ type: "number", min: 0, max: 12 }]}
           >
             <InputNumber />
           </Form.Item>
           <Form.Item
-            name={["Year"]}
-            label="Year"
+            name={["year"]}
+            label="year"
             rules={[{ type: "number", min: 0, max: 1000 }]}
           >
             <InputNumber />
