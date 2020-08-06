@@ -39,10 +39,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::apiResource('post', 'PostController');
 
     Route::delete('/user/admin', 'UserController@adminDelete');
-    Route::post('user/admin', 'UserController@adminRecover');
+    Route::post('/user/admin', 'UserController@adminRecover');
     Route::get('/users/admin', 'UserController@adminAll');
-    Route::post('user/bucket', 'UserController@bucket');
-    Route::delete('user/bucket', 'UserController@unBucket');
+    Route::post('/user/bucket', 'UserController@bucket');
+    Route::delete('/user/bucket', 'UserController@unBucket');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
     Route::post('/user/register','UserController@register')->name('user.register');
     Route::post('/user/logIn','UserController@logIn')->name('user.logIn');

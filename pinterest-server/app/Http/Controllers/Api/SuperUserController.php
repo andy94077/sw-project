@@ -6,51 +6,67 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
-use Auth;
-use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\SuperRegisterController;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
+use App\Models\SuperUser;
 use App\Models\Image;
 
 class SuperUserController extends BaseController
 {
     public function logIn(Request $request)
     {
-        if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-            return response()->json(['name' => Auth::superUser()->name, 'Message' => "Login success!", 'token' => Auth::superUser()->remember_token, 'isLogin' => true], 200);
+        if(Auth::guard("super_users")->attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+            return response()->json([
+                'name' => Auth::guard("super_users")->user()->name, 
+                'Message' => "Login success!", 
+                'token' => Auth::guard("super_users")->user()->remember_token, 
+                'isLogin' => true
+            ], 200);
         }
         else {
-            return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
+            return response()->json(['Message' => "Login fails!", 'isLogin' => false], 200);
         }
     }
 
     public function register(Request $request)
     {
-        $isValid = RegisterController::validator($request);
+        $isValid = SuperRegisterController::validator($request);
         $errorMes = $isValid->messages();
         $errorMesContent = $isValid->messages()->messages();
         $isContentInvalid = array('name' => $errorMes->has('name'), 'email' => $errorMes->has('email'), 'password' => $errorMes->has('password'));
         if($isValid -> fails()){
-            return response()->json(['Message' => "Sign up fails!",'isSignUp' => false, "isContentInvalid" => $isContentInvalid, "errorMesContent" => $errorMesContent], 200);
+            return response()->json([
+                'Message' => "Sign up fails!",
+                'isSignUp' => false, 
+                "isContentInvalid" => $isContentInvalid, 
+                "errorMesContent" => $errorMesContent
+            ], 200);
         }
         else{
-            $user = RegisterController::create($request);
-            if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-                return response()->json(['name' => Auth::superUser()->name, 'Message' => "Sign up seccess!",'isSignUp' => true, 'isLogin' => true, 'token' => Auth::superUser()->remember_token], 200);
+            $user = SuperRegisterController::create($request);
+            if(Auth::guard("super_users")->attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+                return response()->json([
+                    'name' => Auth::guard("super_users")->user()->name, 
+                    'Message' => "Sign up seccess!", 
+                    'isSignUp' => true, 
+                    'isLogin' => true, 
+                    'token' => Auth::guard("super_users")->user()->remember_token
+                ], 200);
             }
             else {
-                return response()->json(['Message' => "Sign up seccess but Login fails!",'isSignUp' => false, 'isLogin' => false], 200);
+                return response()->json(['Message' => "Sign up seccess but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
             }
         }
     }
 
     public function logOut()
     {
-        if(Auth::logout()){
-            return response()->json(['Message' => "Logout success!",'isLogout' => true], 200);
+        if(Auth::guard("super_users")->logout()){
+            return response()->json(['Message' => "Logout success!", 'isLogout' => true], 200);
         }
         else{
-            return response()->json(['Message' => "Please try again!",'isLogout' => false], 200);
+            return response()->json(['Message' => "Please try again!", 'isLogout' => false], 200);
         }
     }
 
@@ -83,7 +99,6 @@ class SuperUserController extends BaseController
             return response()->json([
                 'name' => $userInfo->name,
                 'id' => $userInfo->id,
-                'avatar_url' => $userInfo->avatar_url,
                 'isValid' => true
             ], 200);
         }

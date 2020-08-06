@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
-import { Table, Avatar, Modal, Button } from "antd";
+import { Form, InputNumber, Table, Avatar, Modal, Button } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
-import { format } from "date-fns";
+import { format, addHours } from "date-fns";
 import DropOption from "./DropOption";
 
 export default function List(props) {
+  const [state, setState] = useState({
+    loading: false,
+    visible: false,
+  });
+  const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
   const errorMessageModal = (text) => {
     Modal.info({
       title: "",
@@ -35,38 +42,62 @@ export default function List(props) {
           .then((response) => {
             errorMessageModal("Success !");
           })
-          .catch(errorMessageModal("Oops~ Please try again !"));
+          .catch((error) => {
+            errorMessageModal("Oops~ Please try again !");
+          })
+          .finally(() => setRefresh((preRefresh) => !preRefresh));
       },
       onCancel() {},
     });
   };
 
-  const showDeleteModal = () => {
+  const showDeleteModal = (id) => {
     Modal.confirm({
       title: "Do you want to delete this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        axios({}).then().catch();
+        axios({
+          method: "delete",
+          url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+          data: { id },
+        })
+          .then((response) => {
+            errorMessageModal("Success !");
+          })
+          .catch((error) => {
+            errorMessageModal("Oops~ Please try again !");
+          })
+          .finally(() => setRefresh((preRefresh) => !preRefresh));
       },
       onCancel() {},
     });
   };
 
-  const showRecoverModal = () => {
+  const showRecoverModal = (id) => {
     Modal.confirm({
       title: "Do you want to recover this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        axios({}).then().catch();
+        axios({
+          method: "post",
+          url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+          data: { id },
+        })
+          .then((response) => {
+            errorMessageModal("Success !");
+          })
+          .catch((error) => {
+            errorMessageModal("Oops~ Please try again !");
+          })
+          .finally(() => setRefresh((preRefresh) => !preRefresh));
       },
       onCancel() {},
     });
   };
 
   const handleMenuClick = ({ key, id }) => {
-    console.log(key);
     switch (key) {
       case "Bucket":
         setState({
@@ -88,11 +119,6 @@ export default function List(props) {
         break;
     }
   };
-  const [state, setState] = useState({
-    loading: false,
-    visible: false,
-  });
-  const [data, setData] = useState([]);
   useEffect(() => {
     axios({
       method: "GET",
@@ -105,20 +131,39 @@ export default function List(props) {
               response.data.data.map((item) => {
                 item.created_at = format(
                   new Date(item.created_at),
-                  "yyyy-mm-dd hh:mm:ss"
+                  "yyyy-MM-dd HH:mm:ss",
+                  { timeZone: "Asia/China" }
                 );
                 item.bucket_time =
                   item.bucket_time === null
                     ? ""
-                    : format(new Date(item.bucket_time), "yyyy-mm-dd hh:mm:ss");
+                    : format(
+                        addHours(new Date(item.bucket_time), 8),
+                        "yyyy-MM-DD HH:mm:ss",
+                        { timeZone: "Asia/China" }
+                      );
                 item.deleted_at =
                   item.deleted_at === null
                     ? ""
-                    : format(new Date(item.deleted_at), "yyyy-mm-dd hh:mm:ss");
+                    : format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                        timeZone: "Asia/China",
+                      });
                 item.updated_at =
                   item.updated_at === null
                     ? ""
-                    : format(new Date(item.updated_at), "yyyy-mm-dd hh:mm:ss");
+                    : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                        timeZone: "Asia/China",
+                      });
+                item.online_time =
+                  item.online_time === null
+                    ? ""
+                    : format(
+                        addHours(new Date(item.online_time), 8),
+                        "yyyy-MM-dd HH:mm:ss",
+                        {
+                          timeZone: "Asia/China",
+                        }
+                      );
                 return item;
               })
             );
@@ -128,7 +173,7 @@ export default function List(props) {
       .catch((error) => {
         alert("There are some problems during loading");
       });
-  }, []);
+  }, [refresh]);
 
   const handleOk = () => {
     setState({ ...state, loading: true });
@@ -226,6 +271,20 @@ export default function List(props) {
     },
   ];
 
+  const transitBucketTime = (values) => {
+    return {
+      hour: values.Hour,
+      day: values.Day,
+      month: values.Month,
+      year: values.Year,
+    };
+  };
+
+  const onFinish = (values) => {
+    console.log(values);
+    handleOk();
+  };
+
   return (
     <>
       <Table
@@ -239,28 +298,62 @@ export default function List(props) {
       />
       <Modal
         visible={state.visible}
-        title="Title"
-        onOk={handleOk}
+        title="Bucket Form"
+        onOk={onFinish}
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Return
           </Button>,
           <Button
+            form="bucketForm"
             key="submit"
             type="primary"
+            htmlType="submit"
             loading={state.loading}
             onClick={handleOk}
           >
             Submit
           </Button>,
         ]}
+        // okButtonProps={{ disabled: true }}
+        // cancelButtonProps={{ disabled: true }}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <Form
+          id="bucketForm"
+          layout={"horizontal"}
+          name="nest-messages"
+          onFinish={onFinish}
+        >
+          <Form.Item
+            name={["Hour"]}
+            label="Hour"
+            rules={[{ type: "number", min: 0, max: 24 }]}
+          >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item
+            name={["Day"]}
+            label="Day"
+            rules={[{ type: "number", min: 0, max: 31 }]}
+          >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item
+            name={["Month"]}
+            label="Month"
+            rules={[{ type: "number", min: 0, max: 12 }]}
+          >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item
+            name={["Year"]}
+            label="Year"
+            rules={[{ type: "number", min: 0, max: 1000 }]}
+          >
+            <InputNumber />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );

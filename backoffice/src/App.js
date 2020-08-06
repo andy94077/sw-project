@@ -7,17 +7,32 @@ import {
   FileTextOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Switch, Route, useLocation, Link } from "react-router-dom";
+import { Switch, Route, useLocation, useHistory, Link } from "react-router-dom";
 
 import Post from "./Post/Post";
 import User from "./User/User";
+import LoginPage from "./Login/LoginPage";
+import { deleteCookie } from "./cookieHelper";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 export default function App() {
   const [user, setUser] = useState({ username: "admin", userId: null });
+  const history = useHistory();
   const location = useLocation();
 
+  const logOut = () => {
+    deleteCookie();
+    history.push("/");
+  };
+
+  if (location.pathname === "/") {
+    return (
+      <Switch>
+        <Route exact path="/" component={LoginPage} />
+      </Switch>
+    );
+  }
   return (
     <Layout className="base-layout">
       <Header className="header">
@@ -30,7 +45,7 @@ export default function App() {
           triggerSubMenuAction="click"
         >
           <Menu.SubMenu icon={<UserOutlined />} title={user.username}>
-            <Menu.Item>Log out</Menu.Item>
+            <Menu.Item onClick={logOut}>Log out</Menu.Item>
           </Menu.SubMenu>
         </Menu>
       </Header>
@@ -67,7 +82,11 @@ export default function App() {
           </Breadcrumb>
           <Content className="content">
             <Switch>
-              <Route exact path="/" component={() => <div>Dashboard</div>} />
+              <Route
+                exact
+                path="/dashboard"
+                component={() => <div>Dashboard</div>}
+              />
               <Route exact path="/user" component={User} />
               <Route exact path="/post" component={Post} />
             </Switch>
