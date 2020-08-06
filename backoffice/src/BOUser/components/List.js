@@ -1,36 +1,111 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
-import { Table, Avatar } from "antd";
+import { Table, Modal } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
-import { format, addHours } from "date-fns";
+import { format } from "date-fns";
+import DropOption from "./DropOption";
 
 export default function List(props) {
-  const [data, setData] = useState([]);
+  const { refresh, setRefresh } = props;
+  const [data, setData] = useState({
+    info: [],
+    length: null,
+  });
+  // const [refresh, setRefresh] = useState(false);
+
+  const errorMessageModal = (text) => {
+    Modal.info({
+      title: "",
+      content: (
+        <div>
+          <p>{text}</p>
+        </div>
+      ),
+      onOk() {},
+    });
+  };
+
+  const showDeleteModal = (id) => {
+    Modal.confirm({
+      title: "Do you want to delete this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Some descriptions",
+      onOk() {
+        return axios({
+          method: "delete",
+          url: CONCAT_SERVER_URL("/api/v1/superUser/admin"),
+          data: { id },
+        })
+          .then((response) => {
+            errorMessageModal("Success !");
+          })
+          .catch((error) => {
+            errorMessageModal("Oops~ Please try again !");
+          })
+          .finally(() => setRefresh());
+      },
+      onCancel() {},
+    });
+  };
+
+  const showRecoverModal = (id) => {
+    Modal.confirm({
+      title: "Do you want to recover this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Some descriptions",
+      onOk() {
+        return axios({
+          method: "post",
+          url: CONCAT_SERVER_URL("/api/v1/superUser/admin"),
+          data: { id },
+        })
+          .then((response) => {
+            errorMessageModal("Success !");
+          })
+          .catch((error) => {
+            errorMessageModal("Oops~ Please try again !");
+          })
+          .finally(() => setRefresh());
+      },
+      onCancel() {},
+    });
+  };
+
+  const handleMenuClick = ({ key, id }) => {
+    switch (key) {
+      case "Delete":
+        showDeleteModal(id);
+        break;
+      case "Recover":
+        showRecoverModal(id);
+        break;
+
+      default:
+        break;
+    }
+  };
   useEffect(() => {
-    axios({
-      method: "GET",
-      url: CONCAT_SERVER_URL("/api/v1/users/admin"),
-    })
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+        params: {
+          page: "1",
+          size: "15",
+        },
+      })
       .then((response) => {
-        if (response.data.success !== null) {
-          if (response.data.success === true) {
-            setData(
-              response.data.data.map((item) => {
+        console.log(response.data);
+        if (response.data.data !== null) {
+          if (response.data.length !== 0) {
+            setData({
+              info: response.data.data.map((item) => {
                 item.created_at = format(
                   new Date(item.created_at),
                   "yyyy-MM-dd HH:mm:ss",
                   { timeZone: "Asia/China" }
                 );
-                item.bucket_time =
-                  item.bucket_time === null
-                    ? ""
-                    : format(
-                        addHours(new Date(item.bucket_time), 8),
-                        "yyyy-MM-DD HH:mm:ss",
-                        { timeZone: "Asia/China" }
-                      );
                 item.deleted_at =
                   item.deleted_at === null
                     ? ""
@@ -43,38 +118,20 @@ export default function List(props) {
                     : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
                         timeZone: "Asia/China",
                       });
-                item.online_time =
-                  item.online_time === null
-                    ? ""
-                    : format(
-                        addHours(new Date(item.online_time), 8),
-                        "yyyy-MM-dd HH:mm:ss",
-                        {
-                          timeZone: "Asia/China",
-                        }
-                      );
                 return item;
-              })
-            );
+              }),
+              length: response.data.length,
+            });
           }
         }
       })
       .catch((error) => {
         alert("There are some problems during loading");
+        console.log(error);
       });
-  }, []);
+  }, [refresh]);
 
   const columns = [
-    {
-      title: "Avatar",
-      dataIndex: "avatar_url",
-      key: "avatar",
-      width: 80,
-      //fixed: "left",
-      render: (text) => (
-        <Avatar style={{ marginLeft: 8 }} src={CONCAT_SERVER_URL(text)} />
-      ),
-    },
     {
       title: "ID",
       dataIndex: "id",
@@ -96,18 +153,6 @@ export default function List(props) {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: "Online Time",
-      dataIndex: "online_time",
-      key: "online_time",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: "Bucket Time",
-      dataIndex: "bucket_time",
-      key: "bucket_time",
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
@@ -133,26 +178,39 @@ export default function List(props) {
       key: "operation",
       fixed: "right",
       render: (text, record) => {
-        return "HaHaHagergwergwergewrg";
+        return (
+          <DropOption
+            id={record.id}
+            onMenuClick={handleMenuClick}
+            menuOptions={[
+              { key: "Delete", name: "Delete" },
+              { key: "Recover", name: "Recover" },
+            ]}
+          />
+        );
       },
     },
   ];
 
   return (
-    <Table
-      dataSource={data}
-      className={styles.table}
-      bordered
-      scroll={{ x: 1200 }}
-      columns={columns}
-      simple
-      rowKey={(record) => record.id}
-    />
+    <>
+      <Table
+        dataSource={data.info}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+          total: data.length,
+          showTotal: (total) => `Total result: ${total} `,
+        }}
+        className={styles.table}
+        bordered
+        scroll={{ x: 1200 }}
+        columns={columns}
+        simple
+        rowKey={(record) => record.id}
+      />
+    </>
   );
 }
-
-// List.propTypes = {
-//   onDeleteItem: PropTypes.func,
-//   onEditItem: PropTypes.func,
-//   location: PropTypes.object,
-// };

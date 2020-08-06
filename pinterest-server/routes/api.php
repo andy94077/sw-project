@@ -59,6 +59,9 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('user', 'UserController');
 
+    Route::delete('/superUser/admin', 'SuperUserController@adminDelete');
+    Route::post('/superUser/admin', 'SuperUserController@adminRecover');
+    Route::get('/superUser/admin', 'SuperUserController@adminAll');
     Route::post('/superUser/register','SuperUserController@register')->name('superUser.register');
     Route::post('/superUser/logIn','SuperUserController@logIn')->name('superUser.logIn');
     Route::post('/superUser/authentication','SuperUserController@authentication')->name('superUser.authentication');

@@ -5,7 +5,7 @@ import { Modal, Form, Input } from "antd";
 import { CONCAT_SERVER_URL } from "../../constants";
 
 export default function SignUpForm(props) {
-  const { visible, onCancel } = props;
+  const { visible, onCancel, setRefresh } = props;
 
   const initialFormInfo = {
     username: { validateStatus: null, errMsg: "" },
@@ -21,6 +21,7 @@ export default function SignUpForm(props) {
   const closeForm = () => {
     form.resetFields();
     onCancel();
+    setRefresh();
   };
 
   const handleKeyUp = (e) => {
