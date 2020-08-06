@@ -16,8 +16,7 @@ export default function LoginForm() {
   const history = useHistory();
 
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
-    setState({ ...state, isLoading: true });
+    setState({ isLoading: true, validateStatus: null, errMsgs: "" });
     axios
       .post(CONCAT_SERVER_URL("/api/v1/superUser/logIn"), {
         email: values.email,
@@ -25,6 +24,7 @@ export default function LoginForm() {
       })
       .then((res) => {
         if (res.data.isLogin === true) {
+          console.log(res.data.token);
           setCookie("accessToken", res.data.token, 1);
           setState({
             isLoading: false,
@@ -59,10 +59,7 @@ export default function LoginForm() {
       onFinish={onFinish}
       style={{ flex: 1 }}
     >
-      <Form.Item
-        name="email"
-        validateStatus={state.validateStatus}
-      >
+      <Form.Item name="email" validateStatus={state.validateStatus}>
         <Input
           prefix={<UserOutlined className="site-form-item-icon" />}
           placeholder="email"
