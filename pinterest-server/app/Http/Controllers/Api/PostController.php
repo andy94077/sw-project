@@ -131,8 +131,20 @@ class PostController extends BaseController
         if($request['user_id']){
             $query = $query->where('user_id', 'like', "%{$request['user_id']}%");
         }
+        if($request['content']){
+            $query = $query->where('content', 'like', "%{$request['content']}%");
+        }
         if($request['user_name']){
              $query = $query->where('user_name', 'like', "%{$request['user_name']}%");
+        }
+        if($request['deleted_at']){
+             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
+        }
+        if($request['created_at']){
+             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
+        }
+        if($request['updated_at']){
+             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
         }
         $size = $query->count();
         $posts['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
