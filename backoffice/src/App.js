@@ -18,6 +18,7 @@ import Loading from "./components/Loading";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
 import { CONCAT_SERVER_URL } from "./constants";
+import Dashboard from "./User/Dashboard/Dashboard";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -118,7 +119,7 @@ export default function App() {
                 <Route
                   exact
                   path="/dashboard"
-                  component={() => <div>Dashboard</div>}
+                  component={() => <Dashboard />}
                 />
                 <Route exact path="/user" component={User} />
                 <Route exact path="/post" component={Post} />
