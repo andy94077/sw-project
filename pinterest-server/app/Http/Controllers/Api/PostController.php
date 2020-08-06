@@ -136,7 +136,7 @@ class PostController extends BaseController
         }
         $size = $query->count();
         $posts = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
-        $posts['page_size'] = $size;
+        $posts['total'] = $size;
         return $this->sendResponse($posts, 'Posts was successfully got');
     }
 

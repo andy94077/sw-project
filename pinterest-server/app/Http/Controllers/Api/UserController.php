@@ -131,7 +131,7 @@ class UserController extends BaseController
         $query = User::withTrashed();
         $size = $query->count();
         $users = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
-        $users['page_size'] = $size;
+        $users['tatol'] = $size;
         return $this->sendResponse($users, 'Users was successfully got');
     }
 
