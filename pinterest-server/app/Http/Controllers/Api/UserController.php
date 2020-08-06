@@ -129,6 +129,28 @@ class UserController extends BaseController
 
     public function adminAll(Request $request){
         $query = User::withTrashed();
+        if($request['id']){
+            $query = $query->where('id', 'like', "%{$request['id']}%");
+        }
+        if($request['name']){
+            $query = $query->where('name', 'like', "%{$request['mame']}%");
+        }
+        if($request['email']){
+            $query = $query->where('email', 'like', "%{$request['email']}%");
+        }
+        if($request['bucket_time']){
+            $query = $query->where('bucket_time', 'like', "%{$request['bucket_time']}%");
+        }
+        if($request['deleted_at']){
+             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
+        }
+        if($request['created_at']){
+             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
+        }
+        if($request['updated_at']){
+             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
+        }
+
         $size = $query->count();
         $users['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $users['total'] = $size;
