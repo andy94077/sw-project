@@ -170,6 +170,7 @@ export default function ContentCard(props) {
     username,
     refresh,
     timeAgo,
+    isBucket,
   } = props;
   const classes = useStyles();
   const [expand, setExpand] = useState(true);
@@ -181,7 +182,7 @@ export default function ContentCard(props) {
   const [menu, setMenu] = useState(false);
   const [onDelete, setOnDelete] = useState(0);
   const [isConnectionFailed, setIsConnectionFailed] = useState(false);
-  const [errMessage, setErrMessage] = useState("");
+  const [errMessage, setErrMessage] = useState({ title: "", message: "" });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
@@ -200,28 +201,42 @@ export default function ContentCard(props) {
   }
 
   function upload() {
-    setIsUpload(true);
-    Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
-      content: value,
-      user_id: userId,
-      post_id: id,
-      user: true,
-    })
-      .then(() => {
-        refreshComment();
-        setValue("");
-      })
-      .catch((e) => {
-        if (e.message === "Network Error") {
-          setErrMessage("Failed to send comment, pleace retry");
-          setIsConnectionFailed(true);
-          setIsUpload(false);
-        } else if (e.message === "Request failed with status code 404") {
-          setIsConnectionFailed(true);
-          setErrMessage("Post is deleted");
-        }
-        setIsUpload(false);
+    if (isBucket) {
+      setErrMessage({
+        title: "Bucket Error",
+        message: "You cannot send comment when you in the bucket",
       });
+      setIsConnectionFailed(true);
+    } else {
+      setIsUpload(true);
+      Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
+        content: value,
+        user_id: userId,
+        post_id: id,
+        user: true,
+      })
+        .then(() => {
+          refreshComment();
+          setValue("");
+        })
+        .catch((e) => {
+          if (e.message === "Network Error") {
+            setErrMessage({
+              title: "Network Error",
+              message: "Failed to send comment, pleace retry",
+            });
+            setIsConnectionFailed(true);
+            setIsUpload(false);
+          } else if (e.message === "Request failed with status code 404") {
+            setIsConnectionFailed(true);
+            setErrMessage({
+              title: "Error",
+              message: "Post is deleted",
+            });
+          }
+          setIsUpload(false);
+        });
+    }
   }
 
   const handleOnSubmit = (e) => {
@@ -258,7 +273,10 @@ export default function ContentCard(props) {
         console.log(e);
         if (e.message === "Network Error") {
           setIsConnectionFailed(true);
-          setErrMessage("Failed to delete post, pleace retry");
+          setErrMessage({
+            title: "Network Error",
+            message: "Failed to delete post, pleace retry",
+          });
         }
         setOnDelete(0);
       })
@@ -288,7 +306,10 @@ export default function ContentCard(props) {
           refresh();
         })
         .catch(() => {
-          setErrMessage("Failed to edit post, pleace retry");
+          setErrMessage({
+            title: "Network Error",
+            message: "Failed to edit post, pleace retry",
+          });
           setIsConnectionFailed(true);
         })
         .finally(() => {
@@ -478,8 +499,8 @@ export default function ContentCard(props) {
         </div>
         <AlertDialog
           open={isConnectionFailed}
-          alertTitle="Network Error"
-          alertDesciption={errMessage}
+          alertTitle={errMessage.title}
+          alertDesciption={errMessage.message}
           alertButton={
             <>
               <Button

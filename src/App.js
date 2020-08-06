@@ -135,7 +135,8 @@ export default function App() {
                 username={user.username}
                 userId={user.userId}
                 match={props.match}
-                userBucketTime={user.userBucketTime}
+                userBucketTime={addHours(new Date(user.userBucketTime), 8)}
+                isBucket={checkBucket(user.userBucketTime)}
               />
             )}
           />
@@ -147,7 +148,7 @@ export default function App() {
                 username={user.username}
                 userId={user.userId}
                 match={props.match}
-                userBucketTime={user.userBucketTime}
+                userBucketTime={addHours(new Date(user.userBucketTime), 8)}
               />
             )}
           />
