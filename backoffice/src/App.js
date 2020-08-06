@@ -93,11 +93,7 @@ export default function App() {
           <Sider collapsible>
             <Menu
               theme="dark"
-              defaultSelectedKeys={[
-                location.pathname === "/"
-                  ? "dashboard"
-                  : location.pathname.split("/")[1],
-              ]}
+              defaultSelectedKeys={[location.pathname.split("/")[1]]}
               mode="inline"
             >
               <Menu.Item
@@ -116,10 +112,6 @@ export default function App() {
             </Menu>
           </Sider>
           <Layout>
-            <Breadcrumb className="breadcrumb">
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
             <Content className="content">
               <Switch>
                 <Route
