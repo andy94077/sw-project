@@ -24,6 +24,7 @@ export default function Content(props) {
     match: {
       params: { pictureId },
     },
+    isBucket,
   } = props;
   const classes = useStyles();
   const [info, setInfo] = useState({
@@ -87,6 +88,7 @@ export default function Content(props) {
               userId={userId}
               username={username}
               refresh={refresh}
+              isBucket={isBucket}
             />
           </Grid>
           <Grid item xs={12} sm={11} md={10}>
