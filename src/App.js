@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Button } from "@material-ui/core";
+import { addHours, compareAsc, format } from "date-fns";
 
 import {
   // BrowserRouter as Router,
@@ -18,18 +20,34 @@ import { getCookie } from "./cookieHelper";
 import ErrorMsg from "./components/ErrorMsg";
 
 import { CONCAT_SERVER_URL } from "./constants";
+import AlertDialog from "./components/AlertDialog";
 
 export default function App() {
   const [user, setUser] = useState({
     username: null,
     userId: null,
-    userInBucket: null,
     userBucketTime: null,
   });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
   const history = useHistory();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  function handleClose() {
+    setIsDialogOpen(false);
+  }
+
+  function checkBucket(bucketTime) {
+    if (bucketTime) {
+      const bucketDate = addHours(new Date(bucketTime), 8);
+      const now = new Date();
+      if (compareAsc(bucketDate, now) === 1) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   useEffect(() => {
     const accessToken = getCookie();
@@ -52,14 +70,21 @@ export default function App() {
                     console.log(e);
                   });
               }
+              if (
+                preUser.userBucketTime !== res.data.bucket_time &&
+                checkBucket(res.data.bucket_time)
+              ) {
+                setIsDialogOpen(true);
+              }
               return {
                 username: res.data.username,
                 userId: res.data.user_id,
+                userBucketTime: res.data.bucket_time,
               };
             });
             if (location.pathname === "/") history.push("/home");
           } else {
-            setUser({ username: null, userId: null });
+            setUser({ username: null, userId: null, userBucketTime: null });
           }
         })
         .catch(() => {
@@ -70,7 +95,7 @@ export default function App() {
         })
         .finally(() => setIsReady(true));
     } else {
-      setUser({ username: null, userId: null });
+      setUser({ username: null, userId: null, userBucketTime: null });
     }
   }, [location, history]);
 
@@ -110,6 +135,7 @@ export default function App() {
                 username={user.username}
                 userId={user.userId}
                 match={props.match}
+                userBucketTime={user.userBucketTime}
               />
             )}
           />
@@ -121,12 +147,27 @@ export default function App() {
                 username={user.username}
                 userId={user.userId}
                 match={props.match}
+                userBucketTime={user.userBucketTime}
               />
             )}
           />
           <Route exact path="/setting" component={() => <>setting</>} />
           <Route exact path="/logout" component={() => <>logout</>} />
         </Switch>
+        <AlertDialog
+          open={isDialogOpen}
+          alertTitle="You are during bucket"
+          alertDesciption={`End: ${format(
+            addHours(new Date(user.userBucketTime), 8),
+            "yyyy-MM-dd hh:mm:ss"
+          )}`}
+          alertButton={
+            <>
+              <Button onClick={handleClose}>Got it!</Button>
+            </>
+          }
+          onClose={handleClose}
+        />
       </div>
     );
   }
