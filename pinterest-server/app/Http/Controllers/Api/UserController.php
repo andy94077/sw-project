@@ -130,9 +130,9 @@ class UserController extends BaseController
     public function adminAll(Request $request){
         $query = User::withTrashed();
         $size = $query->count();
-        $users = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
-        $users['tatol'] = $size;
-        return $this->sendResponse($users, 'Users was successfully got');
+        $users['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $users['total'] = $size;
+        return response()->json($users, 200);
     }
 
     public function adminDelete(Request $request){
