@@ -104,7 +104,7 @@ class UserController extends BaseController
         if($request['id']){
             $user = User::find($request['id']);
             $date = new DateTime(date("Y-m-d H:i:s"));
-            $h = ($request['h'])?$request['h']:0;
+            $h = ($request['hour'])?$request['hour']:0;
             $d = ($request['day'])?$request['day']:0;
             $y = ($request['year'])?$request['year']:0;
             $m = ($request['month'])?$request['month']:0;

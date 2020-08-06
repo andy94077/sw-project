@@ -83,6 +83,7 @@ export default function CommentBox(props) {
       Axios.delete(CONCAT_SERVER_URL("/api/v1/comment"), {
         data: {
           id: commentId,
+          user: true,
         },
       })
         .then(() => {
@@ -106,6 +107,7 @@ export default function CommentBox(props) {
       Axios.post(CONCAT_SERVER_URL("/api/v1/comment/modification"), {
         id: commentId,
         content: newComment,
+        user: true,
       })
         .then(() => {
           refresh();
@@ -129,9 +131,11 @@ export default function CommentBox(props) {
         </Link>
         <div className={classes.content}>{comment}</div>
       </Paper>
-      <IconButton size="small" onClick={handleClick} aria-controls="m">
-        <MoreVertIcon />
-      </IconButton>
+      {isUser && (
+        <IconButton size="small" onClick={handleClick} aria-controls="m">
+          <MoreVertIcon />
+        </IconButton>
+      )}
       {isUser && (
         <Menu
           id="m"

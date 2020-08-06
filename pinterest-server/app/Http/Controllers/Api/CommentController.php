@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\User;
+use App\Models\Post;
 use stdClass;
 use Illuminate\Database\QueryException;
 
@@ -26,6 +27,10 @@ class CommentController extends BaseController{
     }
     public function upload(Request $request){
         try{
+            if($request['user'] !== null && Post::find($request['post_id']) === null){
+                echo "fuck";
+                return response()->json("Post is deleted", 404);
+            }
             DB::beginTransaction();
             $comment = Comment::create(
                 [
@@ -47,12 +52,18 @@ class CommentController extends BaseController{
 
     public function delete(Request $request){
         $comment = Comment::find($request['id']);
+        if($request['user'] && Post::find($comment->post_id) === null){
+            return response()->json("Post is deleted", 404);
+        }
         $comment->delete();
         return $this->sendResponse($comment, "success");
     }
 
     public function update(Request $request){
         $comment = Comment::find($request['id']);
+        if($request['user'] && Post::find($comment->post_id) === null){
+            return response()->json("Post is deleted", 404);
+        }
         $comment->content = $request['content'];
         $comment->save();
         return $this->sendResponse($comment, 'Comment was successfully updated');
@@ -74,5 +85,9 @@ class CommentController extends BaseController{
         }
         $comments = $query->get();
         return $this->sendResponse($comments, 'Comment was successfully got');
+    }
+
+    public function destroy($id){
+        return $id;
     }
 }

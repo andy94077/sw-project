@@ -20,7 +20,12 @@ import ErrorMsg from "./components/ErrorMsg";
 import { CONCAT_SERVER_URL } from "./constants";
 
 export default function App() {
-  const [user, setUser] = useState({ username: null, userId: null });
+  const [user, setUser] = useState({
+    username: null,
+    userId: null,
+    userInBucket: null,
+    userBucketTime: null,
+  });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
