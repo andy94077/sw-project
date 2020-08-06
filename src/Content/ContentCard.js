@@ -94,13 +94,6 @@ const useStyles = makeStyles((theme) => ({
     transform: "rotate(180deg)",
     marginLeft: "5%",
   },
-  comment: {
-    marginLeft: "10%",
-    display: "flex",
-    margin: "5px",
-    width: "80%",
-    height: "40px",
-  },
   input: {
     resize: "none",
     width: "90%",
@@ -119,6 +112,13 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: "1",
     marginLeft: "5%",
     display: "flex",
+  },
+  comment: {
+    marginLeft: "10%",
+    display: "flex",
+    margin: "5px",
+    width: "80%",
+    height: "40px",
   },
   content: {
     maxHeight: "50%",
@@ -205,6 +205,7 @@ export default function ContentCard(props) {
       content: value,
       user_id: userId,
       post_id: id,
+      user: true,
     })
       .then(() => {
         refreshComment();
@@ -215,6 +216,9 @@ export default function ContentCard(props) {
           setErrMessage("Failed to send comment, pleace retry");
           setIsConnectionFailed(true);
           setIsUpload(false);
+        } else if (e.message === "Request failed with status code 404") {
+          setIsConnectionFailed(true);
+          setErrMessage("Post is deleted");
         }
         setIsUpload(false);
       });
@@ -243,15 +247,19 @@ export default function ContentCard(props) {
 
   function handleDelete() {
     setOnDelete(1);
-    Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), { data: { id } })
+    Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), {
+      data: { id },
+    })
       .then((res) => {
         console.log(res);
         setOnDelete(2);
       })
       .catch((e) => {
         console.log(e);
-        setErrMessage("Failed to delete post, pleace retry");
-        setIsConnectionFailed(true);
+        if (e.message === "Network Error") {
+          setIsConnectionFailed(true);
+          setErrMessage("Failed to delete post, pleace retry");
+        }
         setOnDelete(0);
       })
       .finally(() => {
@@ -273,6 +281,7 @@ export default function ContentCard(props) {
       Axios.post(CONCAT_SERVER_URL("/api/v1/post/modification"), {
         id,
         content: newPost,
+        user: true,
       })
         .then(() => {
           setIsEditDialogOpen(false);
