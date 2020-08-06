@@ -70,6 +70,11 @@
       "eslint --fix",
       "prettier --write",
       "git add"
+    ],
+    "backoffice/src/**/*.js": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
     ]
   }
 }
