@@ -75,4 +75,8 @@ class CommentController extends BaseController{
         $comments = $query->get();
         return $this->sendResponse($comments, 'Comment was successfully got');
     }
+
+    public function destroy($id){
+        return $id;
+    }
 }
