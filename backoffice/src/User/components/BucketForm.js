@@ -17,10 +17,10 @@ export default function BucketForm(props) {
     setRefresh,
   } = props;
 
-  const onFinish = ({ hour, year, day, month }) => {
+  const onFinish = (values) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(({ hour, year, day, month }) => {
         form.resetFields();
         handleOk();
         axios({
