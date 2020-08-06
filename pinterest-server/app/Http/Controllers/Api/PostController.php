@@ -135,9 +135,9 @@ class PostController extends BaseController
              $query = $query->where('user_name', $request['user_name']);
         }
         $size = $query->count();
-        $posts = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $posts['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $posts['total'] = $size;
-        return $this->sendResponse($posts, 'Posts was successfully got');
+        return response()->json($posts);
     }
 
 }
