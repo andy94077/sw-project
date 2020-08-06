@@ -134,8 +134,8 @@ class PostController extends BaseController
         if($request['content']){
             $query = $query->where('content', 'like', "%{$request['content']}%");
         }
-        if($request['user_name']){
-             $query = $query->where('user_name', 'like', "%{$request['user_name']}%");
+        if($request['username']){
+             $query = $query->where('username', 'like', "%{$request['username']}%");
         }
         if($request['deleted_at']){
              $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
