@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
-import { Form, InputNumber, Table, Avatar, Modal, Button } from "antd";
+import { Table, Avatar, Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
 import { format, addHours } from "date-fns";
 import DropOption from "./DropOption";
+import BucketForm from "./BucketForm";
 
 export default function List(props) {
   const [state, setState] = useState({
@@ -35,7 +36,7 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        axios({
+        return axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
           data: { id },
@@ -46,7 +47,8 @@ export default function List(props) {
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
           })
-          .finally(() => setRefresh((preRefresh) => !preRefresh));
+          .finally(() => setRefresh((preRefresh) => !preRefresh))
+          .catch(() => console.log("Oops errors!"));
       },
       onCancel() {},
     });
@@ -58,7 +60,7 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        axios({
+        return axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
           data: { id },
@@ -81,7 +83,7 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
-        axios({
+        return axios({
           method: "post",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
           data: { id },
@@ -180,9 +182,10 @@ export default function List(props) {
 
   const handleOk = () => {
     setState({ ...state, loading: true });
-    setTimeout(() => {
-      setState({ ...state, loading: false, visible: false });
-    }, 3000);
+  };
+
+  const handleLoad = () => {
+    setState({ ...state, loading: false, visible: false });
   };
 
   const handleCancel = () => {
@@ -274,29 +277,6 @@ export default function List(props) {
     },
   ];
 
-  const onFinish = ({ hour, year, day, month }) => {
-    handleOk();
-    axios({
-      method: "post",
-      url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
-      data: {
-        id: state.bucketId,
-        hour,
-        day,
-        month,
-        year,
-      },
-    })
-      .then((response) => {
-        //console.log(response.data);
-        errorMessageModal("Success !");
-      })
-      .catch((error) => {
-        errorMessageModal("Oops~ Please try again !");
-      })
-      .finally(() => setRefresh((preRefresh) => !preRefresh));
-  };
-
   return (
     <>
       <Table
@@ -308,71 +288,16 @@ export default function List(props) {
         simple
         rowKey={(record) => record.id}
       />
-      <Modal
+      <BucketForm
+        id={state.bucketId}
         visible={state.visible}
-        title="Bucket Form"
-        onOk={onFinish}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Return
-          </Button>,
-          <Button
-            form="bucketForm"
-            key="submit"
-            type="primary"
-            htmlType="submit"
-            loading={state.loading}
-            onClick={handleOk}
-          >
-            Submit
-          </Button>,
-        ]}
-        // okButtonProps={{ disabled: true }}
-        // cancelButtonProps={{ disabled: true }}
-      >
-        <Form
-          id="bucketForm"
-          layout={"horizontal"}
-          name="nest-messages"
-          onFinish={onFinish}
-        >
-          <Form.Item
-            name={["hour"]}
-            label="hour"
-            rules={[{ type: "number", min: 0, max: 24 }]}
-          >
-            <InputNumber />
-          </Form.Item>
-          <Form.Item
-            name={["day"]}
-            label="day"
-            rules={[{ type: "number", min: 0, max: 31 }]}
-          >
-            <InputNumber />
-          </Form.Item>
-          <Form.Item
-            name={["month"]}
-            label="month"
-            rules={[{ type: "number", min: 0, max: 12 }]}
-          >
-            <InputNumber />
-          </Form.Item>
-          <Form.Item
-            name={["year"]}
-            label="year"
-            rules={[{ type: "number", min: 0, max: 1000 }]}
-          >
-            <InputNumber />
-          </Form.Item>
-        </Form>
-      </Modal>
+        loading={state.loading}
+        handleOk={handleOk}
+        handleCancel={handleCancel}
+        handleLoad={handleLoad}
+        errorMessageModal={errorMessageModal}
+        setRefresh={setRefresh}
+      />
     </>
   );
 }
-
-// List.propTypes = {
-//   onDeleteItem: PropTypes.func,
-//   onEditItem: PropTypes.func,
-//   location: PropTypes.object,
-// };
