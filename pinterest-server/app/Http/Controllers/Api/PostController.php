@@ -123,16 +123,16 @@ class PostController extends BaseController
     public function adminAll(Request $request){
         $query = Post::withTrashed();
         if($request['id']){
-            $query = $query->where('id', $request['id']);
+            $query = $query->where('id', 'like', "%{$request['id']}%");
         }
         if($request['tag']){
-            $query = $query->where('tag', $request['tag']);
+            $query = $query->where('tag', 'like', "%{$request['tag']}%");
         }
         if($request['user_id']){
-            $query = $query->where('user_id', $request['user_id']);
+            $query = $query->where('user_id', 'like', "%{$request['user_id']}%");
         }
         if($request['user_name']){
-             $query = $query->where('user_name', $request['user_name']);
+             $query = $query->where('user_name', 'like', "%{$request['user_name']}%");
         }
         $size = $query->count();
         $posts['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
