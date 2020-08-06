@@ -273,20 +273,11 @@ export default function List(props) {
     },
   ];
 
-  const transitBucketTime = (values) => {
-    return {
-      hour: values.Hour,
-      day: values.Day,
-      month: values.Month,
-      year: values.Year,
-    };
-  };
-
   const onFinish = ({ hour, year, day, month }) => {
     handleOk();
     axios({
       method: "post",
-      url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+      url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
       data: {
         id: state.bucketId,
         hour,
