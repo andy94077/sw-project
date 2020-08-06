@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
 import {
@@ -13,9 +13,23 @@ import { CONCAT_SERVER_URL } from "../constants";
 export default function List() {
   const [data, setData] = useState([]);
   const [motion, setMotion] = useState(false);
-  const [searchText, setSearchText] = useState(false);
-  const [searchedColumn, setSearchedColumn] = useState(false);
-  const searchInput = useRef();
+  const columnTitle = {
+    id: "Id",
+    url: "Position",
+    user_id: "User id",
+    username: "Username",
+    content: "Content",
+    tag: "Tag",
+  };
+  const columnObj = {
+    id: "",
+    url: "",
+    user_id: "",
+    username: "",
+    content: "",
+    tag: "",
+  };
+  const [searchText, setSearchText] = useState({ ...columnObj });
 
   useEffect(() => {
     setMotion(false);
@@ -28,7 +42,12 @@ export default function List() {
       .then((res) => {
         setData(res.data["data"]);
       })
-      .catch((error) => console.log(error));
+      .catch(() =>
+        Modal.error({
+          title: "Loading failed.",
+          content: "Connection error.",
+        })
+      );
   }, [motion]);
 
   const handleDeletePost = (event) => {
@@ -38,7 +57,6 @@ export default function List() {
       content: "(Image id = " + id + ")",
       onOk() {
         const jsonData = { id };
-        console.log(jsonData);
 
         axios
           .request({
@@ -70,7 +88,6 @@ export default function List() {
       content: "(Image id = " + id + ")",
       onOk() {
         const jsonData = { id };
-        console.log(jsonData);
 
         axios
           .request({
@@ -96,66 +113,44 @@ export default function List() {
   };
 
   const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          placeholder={`Search ${dataIndex}`}
-          ref={searchInput}
-          value={selectedKeys[0]}
-          onChange={(event) =>
-            setSelectedKeys(event.target.value ? [event.target.value] : [])
-          }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        ? record[dataIndex].toString().includes(`${value}`)
-        : "",
-    onFilterDropdownVisibleChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current.select());
-      }
-    },
+    render: (text) =>
+      ["url", "username"].includes(dataIndex)
+        ? [
+            searchText[dataIndex] !== "" ? (
+              <a href={CONCAT_SERVER_URL(text)}>
+                <Highlighter
+                  highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                  searchWords={[searchText[dataIndex]]}
+                  autoEscape
+                  textToHighlight={text}
+                />
+              </a>
+            ) : (
+              <a key={dataIndex} href={CONCAT_SERVER_URL(text)}>
+                {text}
+              </a>
+            ),
+          ]
+        : [
+            searchText[dataIndex] !== "" ? (
+              <Highlighter
+                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                searchWords={[searchText[dataIndex]]}
+                autoEscape
+                textToHighlight={`${text}`}
+              />
+            ) : (
+              text
+            ),
+          ],
   });
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
+  const handleSearch = () => {
+    console.log(searchText);
   };
 
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setSearchText("");
+  const handleReset = () => {
+    setSearchText({ ...columnObj });
   };
 
   const columns = [
@@ -171,51 +166,28 @@ export default function List() {
     {
       title: "Id",
       dataIndex: "id",
-      render: (id) =>
-        searchedColumn === "id" ? (
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[searchText]}
-            autoEscape
-            textToHighlight={`${id}`}
-          />
-        ) : (
-          id
-        ),
       sorter: (a, b) => a.id - b.id,
       ...getColumnSearchProps("id"),
     },
     {
       title: "Position",
       dataIndex: "url",
-      render: (url) => <a href={CONCAT_SERVER_URL(url)}>{url}</a>,
       onCell: () => ({
         style: {
           maxWidth: "135px",
         },
       }),
+      ...getColumnSearchProps("url"),
     },
     {
       title: "User id",
       dataIndex: "user_id",
       sorter: (a, b) => a.user_id - b.user_id,
+      ...getColumnSearchProps("user_id"),
     },
     {
       title: "Username",
       dataIndex: "username",
-      render: (username) =>
-        searchedColumn === "username" ? (
-          <a href={`http://localhost:3000/profile/${username}`}>
-            <Highlighter
-              highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-              searchWords={[searchText]}
-              autoEscape
-              textToHighlight={username}
-            />
-          </a>
-        ) : (
-          <a href={`http://localhost:3000/profile/${username}`}>{username}</a>
-        ),
       sorter: (a, b) => a.username.localeCompare(b.username),
       ...getColumnSearchProps("username"),
     },
@@ -237,7 +209,16 @@ export default function List() {
               overflow: "auto",
             }}
           >
-            {content}
+            {searchText["content"] !== "" ? (
+              <Highlighter
+                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                searchWords={[searchText["content"]]}
+                autoEscape
+                textToHighlight={`${content}`}
+              />
+            ) : (
+              content
+            )}
           </div>
           <Tooltip title="Comments">
             <Button
@@ -255,6 +236,7 @@ export default function List() {
       title: "Tag",
       dataIndex: "tag",
       sorter: (a, b) => a.tag.localeCompare(b.tag),
+      ...getColumnSearchProps("tag"),
     },
     {
       title: "Publish time",
@@ -331,14 +313,52 @@ export default function List() {
     },
   ];
 
+  const searchFields = [];
+  Object.keys(columnObj).forEach(function (key) {
+    searchFields.push(
+      <Input
+        key={key}
+        placeholder={`Search ${columnTitle[key]}`}
+        value={searchText[key]}
+        onChange={(event) =>
+          setSearchText({
+            ...searchText,
+            [key]: event.target.value,
+          })
+        }
+        onPressEnter={handleSearch}
+        style={{ width: 188, margin: 8, display: "inline" }}
+      />
+    );
+  });
+
   return (
-    <Table
-      dataSource={data}
-      bordered
-      scroll={{ x: 1200 }}
-      columns={columns}
-      simple
-      rowKey={(record) => record.id}
-    />
+    <div>
+      <div style={{ padding: 8 }}>
+        {searchFields}
+        <Space>
+          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSearch}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+        </Space>
+      </div>
+      <Table
+        dataSource={data}
+        bordered
+        scroll={{ x: 1200 }}
+        columns={columns}
+        simple
+        rowKey={(record) => record.id}
+      />
+    </div>
   );
 }
