@@ -23,8 +23,14 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/comment/upload', 'CommentController@upload');
     Route::delete('/comment', 'CommentController@delete');
     Route::post('/comment/modification', 'CommentController@update');
-    Route::apiResource('comment', 'CommentController');
+    Route::apiResource('comments', 'CommentController');
 
+
+    Route::get('/users/{:userID}/posts', 'PostController@index');
+
+    Route::get('/my/orders/1/payments/3/verify', 'PostController@index');
+
+    Route::get('/posts', 'PostController@index');
 
     Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts', 'PostController@index');
