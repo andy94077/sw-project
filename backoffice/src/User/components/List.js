@@ -15,7 +15,10 @@ export default function List(props) {
     bucketId: null,
     visible: false,
   });
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({
+    info: [],
+    length: null,
+  });
   const [refresh, setRefresh] = useState(false);
 
   const errorMessageModal = (text) => {
@@ -135,8 +138,8 @@ export default function List(props) {
         console.log(response.data);
         if (response.data.data !== null) {
           if (response.data.length !== 0) {
-            setData(
-              response.data.data.map((item) => {
+            setData({
+              info: response.data.data.map((item) => {
                 item.created_at = format(
                   new Date(item.created_at),
                   "yyyy-MM-dd HH:mm:ss",
@@ -173,8 +176,9 @@ export default function List(props) {
                         }
                       );
                 return item;
-              })
-            );
+              }),
+              length: response.data.length,
+            });
           }
         }
       })
@@ -284,12 +288,14 @@ export default function List(props) {
   return (
     <>
       <Table
-        dataSource={data}
+        dataSource={data.info}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ["10", "20", "30"],
+          total: data.length,
+          showTotal: (total) => `Total result: ${total} `,
         }}
         className={styles.table}
         bordered

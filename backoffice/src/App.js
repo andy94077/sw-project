@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { Layout, Menu } from "antd";
 import "./App.css";
 import {
   PieChartOutlined,
@@ -44,6 +44,7 @@ export default function App() {
             setUser({ username: res.data.username, userId: res.data.user_id });
             if (location.pathname === "/") history.push("/dashboard");
           } else {
+            deleteCookie();
             history.push("/");
           }
         })
