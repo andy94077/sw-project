@@ -129,9 +129,11 @@ export default function CommentBox(props) {
         </Link>
         <div className={classes.content}>{comment}</div>
       </Paper>
-      <IconButton size="small" onClick={handleClick} aria-controls="m">
-        <MoreVertIcon />
-      </IconButton>
+      {isUser && (
+        <IconButton size="small" onClick={handleClick} aria-controls="m">
+          <MoreVertIcon />
+        </IconButton>
+      )}
       {isUser && (
         <Menu
           id="m"
