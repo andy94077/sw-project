@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./LoginForm.css";
 import { Form, Input, Button } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
 import { CONCAT_SERVER_URL } from "../constants";
 import { setCookie } from "../cookieHelper";
@@ -24,7 +24,6 @@ export default function LoginForm() {
       })
       .then((res) => {
         if (res.data.isLogin === true) {
-          console.log(res.data.token);
           setCookie("accessToken", res.data.token, 1);
           setState({
             isLoading: false,
@@ -60,10 +59,7 @@ export default function LoginForm() {
       style={{ flex: 1 }}
     >
       <Form.Item name="email" validateStatus={state.validateStatus}>
-        <Input
-          prefix={<UserOutlined className="site-form-item-icon" />}
-          placeholder="email"
-        />
+        <Input prefix={<MailOutlined />} placeholder="email" />
       </Form.Item>
       <Form.Item
         name="password"
@@ -73,7 +69,7 @@ export default function LoginForm() {
       >
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
-          placeholder="Password"
+          placeholder="password"
         />
       </Form.Item>
 
