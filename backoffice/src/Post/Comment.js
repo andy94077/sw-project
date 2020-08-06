@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import { Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -8,27 +8,22 @@ import {
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { CONCAT_SERVER_URL } from "../constants";
-import Comment from "./Comment";
 
-export default function Post() {
+export default function Comment(props) {
+  const { post_id } = props;
   const [data, setData] = useState([]);
   const columnTitle = {
     id: "Id",
-    url: "Position",
     user_id: "User id",
-    username: "Username",
     content: "Content",
-    tag: "Tag",
   };
   const columnObj = {
     id: "",
-    url: "",
+    post_id,
     user_id: "",
-    username: "",
     content: "",
-    tag: "",
   };
-  const [searchText, setSearchText] = useState({ ...columnObj });
+  const [searchText, setSearchText] = useState(columnObj);
   const [filter, setFilter] = useState({
     ...columnObj,
     page: 1,
@@ -42,7 +37,7 @@ export default function Post() {
     axios
       .request({
         method: "GET",
-        url: CONCAT_SERVER_URL("/api/v1/posts/admin"),
+        url: CONCAT_SERVER_URL("/api/v1/comments/admin"),
         params: filter,
       })
       .then((res) => {
@@ -56,25 +51,25 @@ export default function Post() {
       );
   }, [motion, filter]);
 
-  const handleDeletePost = (event) => {
+  const handleDeleteComment = (event) => {
     const id = event.currentTarget.value;
     Modal.confirm({
-      title: "Are you sure you want to delete this post?",
-      content: "(Image id = " + id + ")",
+      title: "Are you sure you want to delete this comment?",
+      content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
 
         axios
           .request({
             method: "DELETE",
-            url: CONCAT_SERVER_URL("/api/v1/post"),
+            url: CONCAT_SERVER_URL("/api/v1/comment"),
             data: jsonData,
           })
           .then(() => {
             setMotion(true);
             Modal.success({
               title: "Deleted successfully.",
-              content: "(Image id = " + id + ")",
+              content: "(Comment id = " + id + ")",
             });
           })
           .catch(() =>
@@ -87,25 +82,25 @@ export default function Post() {
     });
   };
 
-  const handleRecoverPost = (event) => {
+  const handleRecovercomment = (event) => {
     const id = event.currentTarget.value;
     Modal.confirm({
-      title: "Are you sure you want to recover this post?",
-      content: "(Image id = " + id + ")",
+      title: "Are you sure you want to recover this comment?",
+      content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
 
         axios
           .request({
             method: "POST",
-            url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
+            url: CONCAT_SERVER_URL("/api/v1/comment/recovery"),
             data: jsonData,
           })
           .then(() => {
             setMotion(true);
             Modal.success({
               title: "Recovered successfully.",
-              content: "(Image id = " + id + ")",
+              content: "(Comment id = " + id + ")",
             });
           })
           .catch(() =>
@@ -120,36 +115,17 @@ export default function Post() {
 
   const getRenderProps = (dataIndex) => ({
     render: (text) =>
-      ["url", "username"].includes(dataIndex)
-        ? [
-            searchText[dataIndex] !== "" ? (
-              <a href={CONCAT_SERVER_URL(text)}>
-                <Highlighter
-                  highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                  searchWords={[searchText[dataIndex]]}
-                  autoEscape
-                  textToHighlight={`${text}`}
-                />
-              </a>
-            ) : (
-              <a key={dataIndex} href={CONCAT_SERVER_URL(text)}>
-                {text}
-              </a>
-            ),
-          ]
-        : [
-            searchText[dataIndex] !== "" ? (
-              <Highlighter
-                key={dataIndex}
-                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                searchWords={[searchText[dataIndex]]}
-                autoEscape
-                textToHighlight={`${text}`}
-              />
-            ) : (
-              text
-            ),
-          ],
+      searchText[dataIndex] !== "" ? (
+        <Highlighter
+          key={dataIndex}
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText[dataIndex]]}
+          autoEscape
+          textToHighlight={`${text}`}
+        />
+      ) : (
+        text
+      ),
   });
 
   const handleSearch = () => {
@@ -161,7 +137,7 @@ export default function Post() {
   };
 
   const handleReset = () => {
-    setSearchText({ ...columnObj });
+    setSearchText(columnObj);
     setFilter({
       ...columnObj,
       page: 1,
@@ -171,41 +147,16 @@ export default function Post() {
 
   const columns = [
     {
-      title: "Post",
-      dataIndex: "id",
-      render: (id, row) => (
-        <a href={`http://localhost:3000/picture/${id}`}>
-          <Avatar shape="square" src={CONCAT_SERVER_URL(row.url)} />
-        </a>
-      ),
-    },
-    {
       ...getRenderProps("id"),
       title: "Id",
       dataIndex: "id",
       sorter: (a, b) => a.id - b.id,
     },
     {
-      ...getRenderProps("url"),
-      title: "Position",
-      dataIndex: "url",
-      onCell: () => ({
-        style: {
-          maxWidth: "135px",
-        },
-      }),
-    },
-    {
       ...getRenderProps("user_id"),
       title: "User id",
       dataIndex: "user_id",
       sorter: (a, b) => a.user_id - b.user_id,
-    },
-    {
-      ...getRenderProps("username"),
-      title: "Username",
-      dataIndex: "username",
-      sorter: (a, b) => a.username.localeCompare(b.username),
     },
     {
       title: "Content",
@@ -237,20 +188,9 @@ export default function Post() {
       ),
     },
     {
-      ...getRenderProps("tag"),
-      title: "Tag",
-      dataIndex: "tag",
-      sorter: (a, b) => a.tag.localeCompare(b.tag),
-    },
-    {
       title: "Publish time",
-      dataIndex: "publish_time",
-      onCell: () => ({
-        style: {
-          minWidth: "150px",
-        },
-      }),
-      sorter: (a, b) => a.publish_time.localeCompare(b.publish_time),
+      dataIndex: "created_at",
+      sorter: (a, b) => a.created_at.localeCompare(b.created_at),
     },
     {
       title: "Updated time",
@@ -293,7 +233,7 @@ export default function Post() {
               <Button
                 danger
                 icon={<DeleteOutlined />}
-                onClick={handleDeletePost}
+                onClick={handleDeleteComment}
                 shape="circle"
                 size="small"
                 type="primary"
@@ -304,7 +244,7 @@ export default function Post() {
             <Tooltip title="Recover">
               <Button
                 icon={<UndoOutlined />}
-                onClick={handleRecoverPost}
+                onClick={handleRecovercomment}
                 shape="circle"
                 size="small"
                 type="primary"
@@ -319,21 +259,23 @@ export default function Post() {
 
   const searchFields = [];
   Object.keys(columnObj).forEach(function (key) {
-    searchFields.push(
-      <Input
-        key={key}
-        placeholder={`Search ${columnTitle[key]}`}
-        value={searchText[key]}
-        onChange={(event) =>
-          setSearchText({
-            ...searchText,
-            [key]: event.target.value,
-          })
-        }
-        onPressEnter={handleSearch}
-        style={{ width: 188, margin: 8, display: "inline" }}
-      />
-    );
+    if (key !== "post_id") {
+      searchFields.push(
+        <Input
+          key={key}
+          placeholder={`Search ${columnTitle[key]}`}
+          value={searchText[key]}
+          onChange={(event) =>
+            setSearchText({
+              ...searchText,
+              [key]: event.target.value,
+            })
+          }
+          onPressEnter={handleSearch}
+          style={{ width: 188, margin: 8, display: "inline" }}
+        />
+      );
+    }
   });
 
   return (
@@ -358,21 +300,6 @@ export default function Post() {
       <Table
         dataSource={data}
         bordered
-        expandable={{
-          expandIconColumnIndex: 6,
-          expandedRowRender: (record) => (
-            <div
-              style={{
-                padding: 10,
-                paddingRight: 20,
-                border: "#001529 2px solid",
-                borderRadius: 10,
-              }}
-            >
-              <Comment post_id={record["id"]} />
-            </div>
-          ),
-        }}
         scroll={{ x: 1200 }}
         columns={columns}
         simple

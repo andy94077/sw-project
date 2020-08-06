@@ -78,7 +78,7 @@ class CommentController extends BaseController{
     public function adminAll(Request $request){
         $query = Comment::withTrashed();
         if($request['post_id']){
-            $query = $query->where("post_id", 'like', "%{$request['post_id']}%");
+            $query = $query->where("post_id", $request['post_id']);
         }
         if($request['user_id']){
             $query = $query->where("user_id", 'like', "%{$request['user_id']}%");
