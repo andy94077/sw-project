@@ -101,9 +101,6 @@ class SuperUserController extends BaseController
         if($request['email']){
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
-        if($request['bucket_time']){
-            $query = $query->where('bucket_time', 'like', "%{$request['bucket_time']}%");
-        }
         if($request['deleted_at']){
              $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
         }
