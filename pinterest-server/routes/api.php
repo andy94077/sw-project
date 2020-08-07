@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('Api')->prefix('v1')->group(function () {
+    Route::get('/comments/latest', 'CommentController@getLatest');
     Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
     Route::get('/comments', 'CommentController@index');
@@ -33,6 +34,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::get('/posts', 'PostController@index');
 
+    Route::get('/posts/latest', 'PostController@getLatest');
     Route::get('/posts/info', 'PostController@getPostInfo');
     Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts', 'PostController@index');
