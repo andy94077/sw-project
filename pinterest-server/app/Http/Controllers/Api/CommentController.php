@@ -112,7 +112,7 @@ class CommentController extends BaseController{
     }
 
     public function getLatest(){
-        $comments = Comment::orderBy('updated_at', 'desc')->take(10)->LeftJoin('users', 'users.id', '=', 'comments.user_id')->select('comments.*', 'users.name as username')->get();
+        $comments = Comment::orderBy('updated_at', 'desc')->take(8)->LeftJoin('users', 'users.id', '=', 'comments.user_id')->select('comments.*', 'users.name as username')->get();
         return response()->json($comments);
     }
 }

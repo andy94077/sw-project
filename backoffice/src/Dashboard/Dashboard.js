@@ -27,6 +27,7 @@ export default function Dashboard() {
   }, []);
 
   async function refreshInfo() {
+    setIsListLoading(true);
     const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
@@ -42,6 +43,7 @@ export default function Dashboard() {
   }
 
   async function refreshLatestInfo() {
+    setIsListLoading(true);
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
     Promise.all([post, comment])
@@ -99,36 +101,40 @@ export default function Dashboard() {
       </Card>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <List
-            header="Latest Post Change"
-            bordered
-            dataSource={latestPosts}
-            renderItem={(item) => {
-              return (
+          <Card>
+            <List
+              header="Latest Post Change"
+              bordered
+              dataSource={latestPosts}
+              renderItem={(item) => {
+                return (
+                  <List.Item>
+                    <Typography.Text mark>
+                      [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
+                    </Typography.Text>
+                    {`${item.username} send "${item.content}" at ${item.updated_at}`}
+                  </List.Item>
+                );
+              }}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card>
+            <List
+              header="Latest Comment Change"
+              bordered
+              dataSource={latestComments}
+              renderItem={(item) => (
                 <List.Item>
                   <Typography.Text mark>
                     [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                   </Typography.Text>
                   {`${item.username} send "${item.content}" at ${item.updated_at}`}
                 </List.Item>
-              );
-            }}
-          />
-        </Col>
-        <Col span={12}>
-          <List
-            header="Latest Comment Change"
-            bordered
-            dataSource={latestComments}
-            renderItem={(item) => (
-              <List.Item>
-                <Typography.Text mark>
-                  [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
-                </Typography.Text>
-                {`${item.username} send "${item.content}" at ${item.updated_at}`}
-              </List.Item>
-            )}
-          />
+              )}
+            />
+          </Card>
         </Col>
       </Row>
       <Button

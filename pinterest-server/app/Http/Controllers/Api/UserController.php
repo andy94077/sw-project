@@ -170,7 +170,7 @@ class UserController extends BaseController
     }
 
     public function getUserInfo(){
-        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 HOUR'))->count();
+        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 10 MINUTE'))->count();
         $res['valid'] = User::all()->count();
         $res['new'] = User::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
         return response()->json($res);
