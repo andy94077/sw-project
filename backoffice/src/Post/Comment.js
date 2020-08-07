@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  message,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -29,7 +38,7 @@ export default function Comment(props) {
     page: 1,
     size: 10,
   });
-  const [motion, setMotion] = useState();
+  const [motion, setMotion] = useState(false);
 
   useEffect(() => {
     setMotion(false);
@@ -43,23 +52,19 @@ export default function Comment(props) {
       .then((res) => {
         setData(res.data["data"]);
       })
-      .catch(() =>
-        Modal.error({
-          title: "Loading failed.",
-          content: "Connection error.",
-        })
-      );
+      .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
 
   const handleDeleteComment = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to delete this comment?",
       content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/comment"),
@@ -67,30 +72,23 @@ export default function Comment(props) {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Deleted successfully.",
-              content: "(Comment id = " + id + ")",
-            });
+            message.success(`Deleted successfully! (Comment id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Deleted failed! Connection error."));
       },
     });
   };
 
   const handleRecovercomment = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to recover this comment?",
       content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/comment/recovery"),
@@ -98,28 +96,20 @@ export default function Comment(props) {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Recovered successfully.",
-              content: "(Comment id = " + id + ")",
-            });
+            message.success(`Recovered successfully! (Comment id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Recovered failed! Connection error."));
       },
     });
   };
 
   const getRenderProps = (dataIndex) => ({
     render: (text) =>
-      searchText[dataIndex] !== "" ? (
+      filter[dataIndex] !== "" ? (
         <Highlighter
           key={dataIndex}
           highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText[dataIndex]]}
+          searchWords={[filter[dataIndex]]}
           autoEscape
           textToHighlight={`${text}`}
         />
@@ -174,10 +164,10 @@ export default function Comment(props) {
             overflow: "auto",
           }}
         >
-          {searchText["content"] !== "" ? (
+          {filter["content"] !== "" ? (
             <Highlighter
               highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-              searchWords={[searchText["content"]]}
+              searchWords={[filter["content"]]}
               autoEscape
               textToHighlight={`${content}`}
             />

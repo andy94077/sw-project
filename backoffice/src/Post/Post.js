@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
-import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  message,
+  Avatar,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -34,7 +44,7 @@ export default function Post() {
     page: 1,
     size: 10,
   });
-  const [motion, setMotion] = useState();
+  const [motion, setMotion] = useState(false);
 
   useEffect(() => {
     setMotion(false);
@@ -48,23 +58,19 @@ export default function Post() {
       .then((res) => {
         setData(res.data["data"]);
       })
-      .catch(() =>
-        Modal.error({
-          title: "Loading failed.",
-          content: "Connection error.",
-        })
-      );
+      .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
 
   const handleDeletePost = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to delete this post?",
-      content: `(Image id = ${id})`,
+      content: `(Post id = ${id})`,
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/post"),
@@ -72,30 +78,23 @@ export default function Post() {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Deleted successfully.",
-              content: "(Image id = " + id + ")",
-            });
+            message.success(`Deleted successfully! (Post id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Deleted failed! (Connection error.)"));
       },
     });
   };
 
   const handleRecoverPost = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to recover this post?",
-      content: "(Image id = " + id + ")",
+      content: `(Post id = ${id})`,
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
@@ -103,17 +102,9 @@ export default function Post() {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Recovered successfully.",
-              content: "(Image id = " + id + ")",
-            });
+            message.success(`Recovered successfully! (Post id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Recovered failed! (Connection error.)"));
       },
     });
   };
@@ -122,11 +113,11 @@ export default function Post() {
     render: (text) =>
       ["url", "username"].includes(dataIndex)
         ? [
-            searchText[dataIndex] !== "" ? (
+            filter[dataIndex] !== "" ? (
               <a href={CONCAT_SERVER_URL(text)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                  searchWords={[searchText[dataIndex]]}
+                  searchWords={[filter[dataIndex]]}
                   autoEscape
                   textToHighlight={`${text}`}
                 />
@@ -138,11 +129,11 @@ export default function Post() {
             ),
           ]
         : [
-            searchText[dataIndex] !== "" ? (
+            filter[dataIndex] !== "" ? (
               <Highlighter
                 key={dataIndex}
                 highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                searchWords={[searchText[dataIndex]]}
+                searchWords={[filter[dataIndex]]}
                 autoEscape
                 textToHighlight={`${text}`}
               />
