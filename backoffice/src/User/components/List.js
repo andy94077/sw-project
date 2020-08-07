@@ -45,7 +45,7 @@ export default function List(props) {
   const [filter, setFilter] = useState({
     ...columnObj,
     page: 1,
-    size: 15,
+    size: 10,
   });
 
   const errorMessageModal = (text) => {
@@ -201,7 +201,7 @@ export default function List(props) {
                       );
                 return item;
               }),
-              length: response.data.length,
+              length: response.data.total,
             });
           }
         }
@@ -226,18 +226,16 @@ export default function List(props) {
 
   const handleSearch = () => {
     setFilter({
+      ...filter,
       ...searchText,
-      page: 1,
-      size: 15,
     });
   };
 
   const handleReset = () => {
     setSearchText({ ...columnObj });
     setFilter({
+      ...filter,
       ...columnObj,
-      page: 1,
-      size: 15,
     });
   };
 
@@ -374,6 +372,18 @@ export default function List(props) {
           pageSizeOptions: ["10", "20", "30"],
           total: data.length,
           showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+              console.log(page, pageSize, "Change page");
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+              console.log(page, pageSize, "Change size");
+            }
+          },
+          // onShowSizeChange: (current, pageSize) => {
+          //   console.log(current, pageSize);
+          // },
         }}
         className={styles.table}
         bordered

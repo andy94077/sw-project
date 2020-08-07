@@ -133,7 +133,7 @@ class UserController extends BaseController
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
         if($request['name']){
-            $query = $query->where('name', 'like', "%{$request['mame']}%");
+            $query = $query->where('name', 'like', "%{$request['name']}%");
         }
         if($request['email']){
             $query = $query->where('email', 'like', "%{$request['email']}%");
