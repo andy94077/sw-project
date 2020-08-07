@@ -110,4 +110,9 @@ class CommentController extends BaseController{
         $res['new'] = Comment::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 HOUR'))->count();
         return response()->json($res);
     }
+
+    public function getLatest(){
+        $comments = Comment::orderBy('updated_at', 'desc')->take(8)->LeftJoin('users', 'users.id', '=', 'comments.user_id')->select('comments.*', 'users.name as username')->get();
+        return response()->json($comments);
+    }
 }
