@@ -61,11 +61,12 @@ export default function List(props) {
   };
 
   const showUnbucketModal = (id) => {
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Do you want to unbucket this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
+        modal.update({ cancelButtonProps: { disabled: true } });
         return axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
@@ -77,19 +78,22 @@ export default function List(props) {
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
           })
-          .finally(() => setRefresh((preRefresh) => !preRefresh))
-          .catch(() => console.log("Oops errors!"));
+          .finally(() => {
+            setRefresh((preRefresh) => !preRefresh);
+            handleLoad();
+          });
       },
       onCancel() {},
     });
   };
 
   const showDeleteModal = (id) => {
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Do you want to delete this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
+        modal.update({ cancelButtonProps: { disabled: true } });
         return axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
@@ -108,11 +112,12 @@ export default function List(props) {
   };
 
   const showRecoverModal = (id) => {
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Do you want to recover this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Some descriptions",
       onOk() {
+        modal.update({ cancelButtonProps: { disabled: true } });
         return axios({
           method: "post",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
@@ -208,7 +213,6 @@ export default function List(props) {
       })
       .catch((error) => {
         alert("There are some problems during loading");
-        console.log(error);
       });
   }, [refresh, filter]);
 
@@ -315,9 +319,10 @@ export default function List(props) {
             onMenuClick={handleMenuClick}
             menuOptions={[
               { key: "Bucket", name: "Bucket" },
-              { key: "Unbucket", name: "Unbucket" },
-              { key: "Delete", name: "Delete" },
-              { key: "Recover", name: "Recover" },
+              record.bucket_time ? { key: "Unbucket", name: "Unbucket" } : "",
+              record.deleted_at
+                ? { key: "Recover", name: "Recover" }
+                : { key: "Delete", name: "Delete" },
             ]}
           />
         );
@@ -337,7 +342,6 @@ export default function List(props) {
             ...searchText,
             [key]: event.target.value,
           });
-          console.log(searchText);
         }}
         onPressEnter={handleSearch}
         style={{ width: 188, margin: 8, display: "inline" }}
@@ -376,15 +380,10 @@ export default function List(props) {
           onChange: (page, pageSize) => {
             if (filter.size === pageSize) {
               setFilter({ ...filter, page: page });
-              console.log(page, pageSize, "Change page");
             } else {
               setFilter({ ...filter, page: 1, size: pageSize });
-              console.log(page, pageSize, "Change size");
             }
           },
-          // onShowSizeChange: (current, pageSize) => {
-          //   console.log(current, pageSize);
-          // },
         }}
         className={styles.table}
         bordered
