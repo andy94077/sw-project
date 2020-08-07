@@ -152,4 +152,10 @@ class PostController extends BaseController
         return response()->json($posts);
     }
 
+    public function getPostInfo(){
+        $res['valid'] = Post::all()->count();
+        $res['new'] = Post::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        return response()->json($res);
+    }
+
 }

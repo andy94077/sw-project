@@ -104,4 +104,10 @@ class CommentController extends BaseController{
     public function destroy($id){
         return $id;
     }
+
+    public function getCommentInfo(){
+        $res['valid'] = Comment::all()->count();
+        $res['new'] = Comment::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 HOUR'))->count();
+        return response()->json($res);
+    }
 }

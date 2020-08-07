@@ -175,19 +175,19 @@ export default function List(props) {
                     : format(
                         addHours(new Date(item.bucket_time), 8),
                         "yyyy-MM-dd HH:mm:ss",
-                        { timeZone: "Asia/China" }
+                        { timeZone: "Asia/Taipei" }
                       );
                 item.deleted_at =
                   item.deleted_at === null
                     ? ""
                     : format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/China",
+                        timeZone: "Asia/Taipei",
                       });
                 item.updated_at =
                   item.updated_at === null
                     ? ""
                     : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/China",
+                        timeZone: "Asia/Taipei",
                       });
                 item.online_time =
                   item.online_time === null
@@ -196,7 +196,7 @@ export default function List(props) {
                         addHours(new Date(item.online_time), 8),
                         "yyyy-MM-dd HH:mm:ss",
                         {
-                          timeZone: "Asia/China",
+                          timeZone: "Asia/Taipei",
                         }
                       );
                 return item;

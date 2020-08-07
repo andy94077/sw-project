@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('Api')->prefix('v1')->group(function () {
+    Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
     Route::get('/comments', 'CommentController@index');
     Route::get('/comments/admin', 'CommentController@adminAll');
@@ -32,6 +33,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::get('/posts', 'PostController@index');
 
+    Route::get('/posts/info', 'PostController@getPostInfo');
     Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts', 'PostController@index');
     Route::get('/posts/admin', 'PostController@adminAll');
@@ -44,6 +46,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('post', 'PostController');
 
+    Route::get('users/info', 'UserController@getUserInfo');
     Route::delete('/user/admin', 'UserController@adminDelete');
     Route::post('/user/admin', 'UserController@adminRecover');
     Route::get('/users/admin', 'UserController@adminAll');
