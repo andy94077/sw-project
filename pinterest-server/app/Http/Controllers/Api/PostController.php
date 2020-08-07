@@ -159,7 +159,7 @@ class PostController extends BaseController
     }
 
     public function getLatest(){
-        $posts= Post::orderBy('updated_at', 'desc')->take(10)->get();
+        $posts= Post::orderBy('updated_at', 'desc')->take(8)->get();
         return response()->json($posts);
     }
 
