@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from "react";
+import Highlighter from "react-highlight-words";
 import axios from "axios";
-import { Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  message,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
+import { format } from "date-fns";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function Comment(props) {
   const { post_id } = props;
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState([]);
   const columnTitle = {
     id: "Id",
     user_id: "User id",
@@ -29,10 +40,13 @@ export default function Comment(props) {
     page: 1,
     size: 10,
   });
-  const [motion, setMotion] = useState();
+  const [motion, setMotion] = useState(false);
 
   useEffect(() => {
-    setMotion(false);
+    if (motion) {
+      setMotion(false);
+      return;
+    }
 
     axios
       .request({
@@ -41,25 +55,50 @@ export default function Comment(props) {
         params: filter,
       })
       .then((res) => {
-        setData(res.data["data"]);
+        setData(
+          res.data["data"].map((item) => {
+            item.deleted_at =
+              item.deleted_at === null
+                ? null
+                : String(
+                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.updated_at =
+              item.updated_at === null
+                ? null
+                : String(
+                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.created_at =
+              item.created_at === null
+                ? null
+                : String(
+                    format(new Date(item.created_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            return item;
+          })
+        );
+        setTotal(res.data["total"]);
       })
-      .catch(() =>
-        Modal.error({
-          title: "Loading failed.",
-          content: "Connection error.",
-        })
-      );
+      .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
 
   const handleDeleteComment = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to delete this comment?",
       content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/comment"),
@@ -67,30 +106,23 @@ export default function Comment(props) {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Deleted successfully.",
-              content: "(Comment id = " + id + ")",
-            });
+            message.success(`Deleted successfully! (Comment id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Deleted failed! Connection error."));
       },
     });
   };
 
   const handleRecovercomment = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to recover this comment?",
       content: "(Comment id = " + id + ")",
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/comment/recovery"),
@@ -98,28 +130,20 @@ export default function Comment(props) {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Recovered successfully.",
-              content: "(Comment id = " + id + ")",
-            });
+            message.success(`Recovered successfully! (Comment id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Recovered failed! Connection error."));
       },
     });
   };
 
   const getRenderProps = (dataIndex) => ({
     render: (text) =>
-      searchText[dataIndex] !== "" ? (
+      filter[dataIndex] !== "" ? (
         <Highlighter
           key={dataIndex}
           highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText[dataIndex]]}
+          searchWords={[filter[dataIndex]]}
           autoEscape
           textToHighlight={`${text}`}
         />
@@ -174,10 +198,10 @@ export default function Comment(props) {
             overflow: "auto",
           }}
         >
-          {searchText["content"] !== "" ? (
+          {filter["content"] !== "" ? (
             <Highlighter
               highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-              searchWords={[searchText["content"]]}
+              searchWords={[filter["content"]]}
               autoEscape
               textToHighlight={`${content}`}
             />
@@ -300,7 +324,21 @@ export default function Comment(props) {
       <Table
         dataSource={data}
         bordered
-        scroll={{ x: 1200 }}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+          total,
+          showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+            }
+          },
+        }}
         columns={columns}
         simple
         rowKey={(record) => record.id}

@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
+import Highlighter from "react-highlight-words";
 import axios from "axios";
-import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  message,
+  Avatar,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
+import { format } from "date-fns";
 import { CONCAT_SERVER_URL } from "../constants";
 import Comment from "./Comment";
 
 export default function Post() {
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState([]);
   const columnTitle = {
     id: "Id",
     url: "Position",
@@ -28,13 +40,13 @@ export default function Post() {
     content: "",
     tag: "",
   };
-  const [searchText, setSearchText] = useState({ ...columnObj });
+  const [searchText, setSearchText] = useState(columnObj);
   const [filter, setFilter] = useState({
     ...columnObj,
     page: 1,
     size: 10,
   });
-  const [motion, setMotion] = useState();
+  const [motion, setMotion] = useState(false);
 
   useEffect(() => {
     setMotion(false);
@@ -46,25 +58,42 @@ export default function Post() {
         params: filter,
       })
       .then((res) => {
-        setData(res.data["data"]);
+        setData(
+          res.data["data"].map((item) => {
+            item.deleted_at =
+              item.deleted_at === null
+                ? null
+                : String(
+                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.updated_at =
+              item.updated_at === null
+                ? null
+                : String(
+                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            return item;
+          })
+        );
+        setTotal(res.data["total"]);
       })
-      .catch(() =>
-        Modal.error({
-          title: "Loading failed.",
-          content: "Connection error.",
-        })
-      );
+      .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
 
   const handleDeletePost = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to delete this post?",
-      content: "(Image id = " + id + ")",
+      content: `(Post id = ${id})`,
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/post"),
@@ -72,30 +101,23 @@ export default function Post() {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Deleted successfully.",
-              content: "(Image id = " + id + ")",
-            });
+            message.success(`Deleted successfully! (Post id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Deleted failed! (Connection error.)"));
       },
     });
   };
 
   const handleRecoverPost = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Are you sure you want to recover this post?",
-      content: "(Image id = " + id + ")",
+      content: `(Post id = ${id})`,
       onOk() {
         const jsonData = { id };
+        modal.update({ cancelButtonProps: { disabled: true } });
 
-        axios
+        return axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
@@ -103,17 +125,9 @@ export default function Post() {
           })
           .then(() => {
             setMotion(true);
-            Modal.success({
-              title: "Recovered successfully.",
-              content: "(Image id = " + id + ")",
-            });
+            message.success(`Recovered successfully! (Post id = ${id})`);
           })
-          .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
-          );
+          .catch(() => message.error("Recovered failed! (Connection error.)"));
       },
     });
   };
@@ -122,11 +136,11 @@ export default function Post() {
     render: (text) =>
       ["url", "username"].includes(dataIndex)
         ? [
-            searchText[dataIndex] !== "" ? (
+            filter[dataIndex] !== "" ? (
               <a href={CONCAT_SERVER_URL(text)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                  searchWords={[searchText[dataIndex]]}
+                  searchWords={[filter[dataIndex]]}
                   autoEscape
                   textToHighlight={`${text}`}
                 />
@@ -138,11 +152,11 @@ export default function Post() {
             ),
           ]
         : [
-            searchText[dataIndex] !== "" ? (
+            filter[dataIndex] !== "" ? (
               <Highlighter
                 key={dataIndex}
                 highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                searchWords={[searchText[dataIndex]]}
+                searchWords={[filter[dataIndex]]}
                 autoEscape
                 textToHighlight={`${text}`}
               />
@@ -151,6 +165,13 @@ export default function Post() {
             ),
           ],
   });
+
+  const handleSetSearchText = (key) => (event) => {
+    setSearchText({
+      ...searchText,
+      [key]: event.target.value,
+    });
+  };
 
   const handleSearch = () => {
     setFilter({
@@ -161,7 +182,7 @@ export default function Post() {
   };
 
   const handleReset = () => {
-    setSearchText({ ...columnObj });
+    setSearchText(columnObj);
     setFilter({
       ...columnObj,
       page: 1,
@@ -265,7 +286,7 @@ export default function Post() {
       sorter: (a, b) => {
         const A = a.deleted_at === null ? "null" : a.deleted_at;
         const B = b.deleted_at === null ? "null" : b.deleted_at;
-        A.localeCompare(B);
+        return A.localeCompare(B);
       },
     },
     {
@@ -322,14 +343,9 @@ export default function Post() {
       key={key}
       placeholder={`Search ${columnTitle[key]}`}
       value={searchText[key]}
-      onChange={(event) =>
-        setSearchText({
-          ...searchText,
-          [key]: event.target.value,
-        })
-      }
+      onChange={handleSetSearchText(key)}
       onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, display: "inline" }}
+      style={{ width: 188, margin: 8 }}
     />
   ));
 
@@ -355,6 +371,21 @@ export default function Post() {
       <Table
         dataSource={data}
         bordered
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+          total,
+          showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+            }
+          },
+        }}
         expandable={{
           expandIconColumnIndex: 6,
           expandedRowRender: (record) => (
@@ -370,10 +401,9 @@ export default function Post() {
             </div>
           ),
         }}
-        scroll={{ x: 1200 }}
         columns={columns}
-        simple
         rowKey={(record) => record.id}
+        scroll={{ x: 1200 }}
       />
     </div>
   );

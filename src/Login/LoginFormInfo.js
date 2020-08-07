@@ -170,7 +170,7 @@ export default function LoginFormInfo() {
           </Button>
         )}
         <a href="/home" className={classes.visitorHref}>
-          ----以訪客身份登入----
+          <h1 style={{ fontSize: "20px" }}>---- I am a Guest ----</h1>
         </a>
       </form>
     </div>
