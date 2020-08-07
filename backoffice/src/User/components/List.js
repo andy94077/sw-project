@@ -272,19 +272,19 @@ export default function List(props) {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.email.localeCompare(b.email),
     },
     {
       title: "Online Time",
       dataIndex: "online_time",
       key: "online_time",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.online_time.localeCompare(b.online_time),
     },
     {
       title: "Bucket Time",
       dataIndex: "bucket_time",
       key: "bucket_time",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.bucket_time.localeCompare(b.bucket_time),
     },
     {
       title: "created_at",
@@ -296,13 +296,13 @@ export default function List(props) {
       title: "deleted_at",
       dataIndex: "deleted_at",
       key: "deleted_at",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
     },
     {
       title: "updated_at",
       dataIndex: "updated_at",
       key: "updated_at",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.updated_at.localeCompare(b.updated_at),
     },
     {
       title: "Operation",
