@@ -104,13 +104,13 @@ class UserController extends BaseController
     public function bucket(Request $request){
         if($request['id']){
             $user = User::find($request['id']);
-            $date = new DateTime(date("Y-m-d H:i:s"));
+            $date = new DateTime(null);
             $h = ($request['hour'])?$request['hour']:0;
             $d = ($request['day'])?$request['day']:0;
             $y = ($request['year'])?$request['year']:0;
             $m = ($request['month'])?$request['month']:0;
             $date->add(new DateInterval("P{$y}Y{$m}M{$d}DT{$h}H0M0S"));
-            $user->bucket_time = $date->format('Y-m-d H:i:s');
+            $user->bucket_time = $date->format('Y-m-d\TH:i:s');
             $user->save();
             return response()->json( $user, 200);
         }
@@ -167,5 +167,12 @@ class UserController extends BaseController
         $user = User::withTrashed()->find($request['id']);
         $user->restore();
         return $this->sendResponse($user, "success");
+    }
+
+    public function getUserInfo(){
+        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 HOUR'))->count();
+        $res['valid'] = User::all()->count();
+        $res['new'] = User::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        return response()->json($res);
     }
 }

@@ -19,8 +19,9 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('avatar_url');
-            $table->timestamp('online_time')->default(date("Y-m-d H:i:s"));
-            $table->timestamp('bucket_time')->nullable()->default(null);
+            $date = new DateTime(null);
+            $table->timestampTz('online_time')->nullable()->default($date->format('Y-m-d\TH:i:s'));
+            $table->timestampTz('bucket_time')->nullable()->default(null);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
