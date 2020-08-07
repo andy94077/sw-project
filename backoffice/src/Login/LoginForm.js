@@ -4,7 +4,7 @@ import "./LoginForm.css";
 import { Form, Input, Button } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL, CONCAT_BACKOFFICE_URL } from "../constants";
 import { setCookie } from "../cookieHelper";
 
 export default function LoginForm() {
@@ -30,7 +30,7 @@ export default function LoginForm() {
             validateStatus: "success",
             errMsgs: "",
           });
-          history.push("/dashboard");
+          history.push(CONCAT_BACKOFFICE_URL("/dashboard"));
         } else {
           setState({
             isLoading: false,
