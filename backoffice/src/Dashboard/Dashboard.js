@@ -1,26 +1,32 @@
 import React, { useState } from "react";
-import { Row, Col, Statistic, Button } from "antd";
+import { Row, Col, Statistic, Button, Typography, List } from "antd";
 import Axios from "axios";
 import { CONCAT_SERVER_URL } from "../constants";
 import { useEffect } from "react";
+import { Card } from "@material-ui/core";
 
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
   const [postInfo, setPostInfo] = useState({ valid: 0, new: 0 });
   const [commentUnfo, setCommentInfo] = useState({ valid: 0, new: 0 });
-  const [isLoading, setIsLoading] = useState(false);
+  const [latestPosts, setLatestPosts] = useState([]);
+  const [latestComments, setLatestComments] = useState([]);
+  const [isCardLoading, setIsCardLoading] = useState(true);
+  const [isListLoading, setIsListLoading] = useState(true);
 
   useEffect(() => {
-    refresh();
+    refreshInfo();
+    refreshLatestInfo();
     const timer = setInterval(() => {
-      refresh();
-    }, 300000);
+      refreshInfo();
+      refreshLatestInfo();
+    }, 30000);
     return () => {
       clearInterval(timer);
     };
   }, []);
 
-  async function refresh() {
+  async function refreshInfo() {
     const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
@@ -31,44 +37,106 @@ export default function Dashboard() {
         setPostInfo(res[2].data);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsCardLoading(false);
       });
   }
+
+  async function refreshLatestInfo() {
+    const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
+    const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
+    Promise.all([post, comment])
+      .then((res) => {
+        setLatestPosts(res[0].data);
+        setLatestComments(res[1].data);
+      })
+      .finally(() => {
+        setIsListLoading(false);
+      });
+  }
+
   return (
     <>
-      <Row gutter={16}>
-        <Col span={8}>
-          <Statistic title="Valid Users" value={userInfo.valid} />
-        </Col>
-        <Col span={8}>
-          <Statistic title="Online Users" value={userInfo.online} />
-        </Col>
-        <Col span={8}>
-          <Statistic title="New Users(in 1 day)" value={userInfo.new} />
-        </Col>
-      </Row>
-      <Row gutter={16}>
+      <Card>
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Statistic title="Valid Users" value={userInfo.valid} />
+          </Col>
+          <Col span={8}>
+            <Statistic title="Online Users" value={userInfo.online} />
+          </Col>
+          <Col span={8}>
+            <Statistic title="New Users(in 1 day)" value={userInfo.new} />
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Statistic title="Valid Posts" value={postInfo.valid} />
+          </Col>
+          <Col span={12}>
+            <Statistic title="New Posts(in 1 day)" value={postInfo.new} />
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Statistic title="Valid Comments" value={commentUnfo.valid} />
+          </Col>
+          <Col span={12}>
+            <Statistic
+              title="New Comments(in 1 hour)"
+              value={commentUnfo.new}
+            />
+          </Col>
+        </Row>
+        <Button
+          onClick={() => {
+            setIsCardLoading(true);
+            refreshInfo();
+          }}
+          loading={isCardLoading}
+        >
+          refresh
+        </Button>
+      </Card>
+      <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Statistic title="Valid Posts" value={postInfo.valid} />
+          <List
+            header="Latest Post Change"
+            bordered
+            dataSource={latestPosts}
+            renderItem={(item) => {
+              return (
+                <List.Item>
+                  <Typography.Text mark>
+                    [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
+                  </Typography.Text>
+                  {`${item.username} send "${item.content}" at ${item.updated_at}`}
+                </List.Item>
+              );
+            }}
+          />
         </Col>
         <Col span={12}>
-          <Statistic title="New Posts(in 1 day)" value={postInfo.new} />
-        </Col>
-      </Row>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Statistic title="Valid Comments" value={commentUnfo.valid} />
-        </Col>
-        <Col span={12}>
-          <Statistic title="New Comments(in 1 hour)" value={commentUnfo.new} />
+          <List
+            header="Latest Comment Change"
+            bordered
+            dataSource={latestComments}
+            renderItem={(item) => (
+              <List.Item>
+                <Typography.Text mark>
+                  [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
+                </Typography.Text>
+                {`${item.username} send "${item.content}" at ${item.updated_at}`}
+              </List.Item>
+            )}
+          />
         </Col>
       </Row>
       <Button
         onClick={() => {
-          setIsLoading(true);
-          refresh();
+          setIsListLoading(true);
+          refreshLatestInfo();
         }}
-        loading={isLoading}
+        loading={isListLoading}
       >
         refresh
       </Button>
