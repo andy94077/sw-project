@@ -122,28 +122,28 @@ class PostController extends BaseController
 
     public function adminAll(Request $request){
         $query = Post::withTrashed();
-        if($request['id']){
+        if($request['id']!== null){
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
-        if($request['tag']){
+        if($request['tag']!== null){
             $query = $query->where('tag', 'like', "%{$request['tag']}%");
         }
-        if($request['user_id']){
+        if($request['user_id']!== null){
             $query = $query->where('user_id', 'like', "%{$request['user_id']}%");
         }
-        if($request['content']){
+        if($request['content']!== null){
             $query = $query->where('content', 'like', "%{$request['content']}%");
         }
-        if($request['username']){
+        if($request['username']!== null){
              $query = $query->where('username', 'like', "%{$request['username']}%");
         }
-        if($request['deleted_at']){
+        if($request['deleted_at']!== null){
              $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
         }
-        if($request['created_at']){
+        if($request['created_at']!== null){
              $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
         }
-        if($request['updated_at']){
+        if($request['updated_at']!== null){
              $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
         }
         $size = $query->count();
