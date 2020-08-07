@@ -41,14 +41,15 @@ export default function Content(props) {
       params: { id: pictureId },
     })
       .then((res) => {
+        console.log(res);
         if (res.data.length === 0) {
           throw new Error("Post not found");
         }
         setInfo({
-          authorName: res.data[0].user_name,
-          src: CONCAT_SERVER_URL(res.data[0].url),
-          content: res.data[0].content,
-          timeAgo: formatDistanceToNow(new Date(res.data[0].created_at)),
+          authorName: res.data.username,
+          src: CONCAT_SERVER_URL(res.data.url),
+          content: res.data.content,
+          timeAgo: formatDistanceToNow(new Date(res.data.created_at)),
         });
         setPageState("Done");
       })
