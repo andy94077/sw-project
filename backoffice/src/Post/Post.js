@@ -317,24 +317,21 @@ export default function Post() {
     },
   ];
 
-  const searchFields = [];
-  Object.keys(columnObj).forEach(function (key) {
-    searchFields.push(
-      <Input
-        key={key}
-        placeholder={`Search ${columnTitle[key]}`}
-        value={searchText[key]}
-        onChange={(event) =>
-          setSearchText({
-            ...searchText,
-            [key]: event.target.value,
-          })
-        }
-        onPressEnter={handleSearch}
-        style={{ width: 188, margin: 8, display: "inline" }}
-      />
-    );
-  });
+  const searchFields = Object.keys(columnObj).map((key) => (
+    <Input
+      key={key}
+      placeholder={`Search ${columnTitle[key]}`}
+      value={searchText[key]}
+      onChange={(event) =>
+        setSearchText({
+          ...searchText,
+          [key]: event.target.value,
+        })
+      }
+      onPressEnter={handleSearch}
+      style={{ width: 188, margin: 8, display: "inline" }}
+    />
+  ));
 
   return (
     <div>
