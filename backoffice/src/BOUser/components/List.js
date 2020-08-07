@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { Table, Modal, Space, Button, Input, Tooltip } from "antd";
 import {
@@ -7,21 +7,19 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
 import { format } from "date-fns";
-import DropOption from "./DropOption";
 
 export default function List(props) {
   const { refresh, setRefresh } = props;
   const initialSearchText = {
     id: "",
-    url: "",
-    user_id: "",
-    username: "",
-    content: "",
-    tag: "",
+    name: "",
+    email: "",
+    deleted_at: "",
+    created_at: "",
+    updated_at: "",
   };
   const [searchText, setSearchText] = useState(initialSearchText);
   const [filter, setFilter] = useState({
@@ -37,58 +35,119 @@ export default function List(props) {
 
   const columnTitle = {
     id: "Id",
-    url: "Position",
-    user_id: "User id",
-    username: "Username",
-    content: "Content",
-    tag: "Tag",
+    name: "Name",
+    email: "Email",
+    deleted_at: "Delete Time",
+    created_at: "Create Time",
+    updated_at: "Updated Time",
+  };
+
+  const tableColumns = useMemo(
+    () => [
+      {
+        title: "ID",
+        dataIndex: "id",
+        key: "id",
+        width: 70,
+        sorter: (a, b) => Number(a.id > b.id),
+      },
+      {
+        title: "Name",
+        dataIndex: "name",
+        key: "name",
+        width: 120,
+        sorter: (a, b) => a.name.localeCompare(b.name),
+      },
+      {
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
+        sorter: (a, b) => a.email.localeCompare(b.email),
+      },
+      {
+        title: "created_at",
+        dataIndex: "created_at",
+        key: "created_at",
+        sorter: (a, b) => a.created_at.localeCompare(b.created_at),
+        timeFormat: "yyyy-MM-dd HH:mm:ss",
+        timeZone: "Asia/China",
+      },
+      {
+        title: "deleted_at",
+        dataIndex: "deleted_at",
+        key: "deleted_at",
+        sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
+        timeFormat: "yyyy-MM-dd HH:mm:ss",
+        timeZone: "Asia/China",
+      },
+      {
+        title: "updated_at",
+        dataIndex: "updated_at",
+        key: "updated_at",
+        sorter: (a, b) => a.updated_at.localeCompare(b.updated_at),
+        timeFormat: "yyyy-MM-dd HH:mm:ss",
+        timeZone: "Asia/China",
+      },
+    ],
+    []
+  );
+
+  const handleDeleteUser = (event) => {
+    const id = event.currentTarget.value;
+    Modal.confirm({
+      title: "Do you want to delete this user?",
+      content: `(User id = ${id})`,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        return axios
+          .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+            data: { id },
+          })
+          .then(() =>
+            Modal.success({
+              title: "Deleted successfully.",
+              content: `(User id = ${id})`,
+            })
+          )
+          .catch(() =>
+            Modal.error({
+              title: "Deleted failed.",
+              content: "Connection error.",
+            })
+          )
+          .finally(setRefresh);
+      },
+    });
+  };
+
+  const handleRecoverUser = (event) => {
+    const id = event.currentTarget.value;
+    Modal.confirm({
+      title: "Do you want to recover this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: `(User id = ${id})`,
+      onOk() {
+        return axios
+          .post(CONCAT_SERVER_URL("/api/v1/superUser/admin"), { id })
+          .then(() =>
+            Modal.success({
+              title: "Recovered successfully.",
+              content: `(User id = ${id})`,
+            })
+          )
+          .catch(() =>
+            Modal.error({
+              title: "Recovered failed.",
+              content: "Connection error.",
+            })
+          )
+          .finally(setRefresh);
+      },
+    });
   };
 
   const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: 70,
-      sorter: (a, b) => a.id - b.id,
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      width: 120,
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: "created_at",
-      dataIndex: "created_at",
-      key: "created_at",
-      sorter: (a, b) => a.created_at.localeCompare(b.created_at),
-      timeFormat: "yyyy-MM-dd HH:mm:ss",
-      timeZone: "Asia/China",
-    },
-    {
-      title: "deleted_at",
-      dataIndex: "deleted_at",
-      key: "deleted_at",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      timeFormat: "yyyy-MM-dd HH:mm:ss",
-      timeZone: "Asia/China",
-    },
-    {
-      title: "updated_at",
-      dataIndex: "updated_at",
-      key: "updated_at",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      timeFormat: "yyyy-MM-dd HH:mm:ss",
-      timeZone: "Asia/China",
-    },
+    ...tableColumns,
     {
       title: "Options",
       onHeaderCell: () => ({
@@ -151,7 +210,7 @@ export default function List(props) {
               info: res.data.data.map((item) => ({
                 ...item,
                 ...Object.fromEntries(
-                  columns
+                  tableColumns
                     .filter(
                       (col) =>
                         col.hasOwnProperty("timeFormat") &&
@@ -176,63 +235,7 @@ export default function List(props) {
         alert("There are some problems during loading");
         console.log(error);
       });
-  }, [refresh, filter, columns]);
-
-  const handleDeleteUser = (event) => {
-    const id = event.currentTarget.value;
-    Modal.confirm({
-      title: "Do you want to delete this user?",
-      content: `(User id = ${id})`,
-      icon: <ExclamationCircleOutlined />,
-      onOk() {
-        return axios
-          .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
-            data: { id },
-          })
-          .then(() =>
-            Modal.success({
-              title: "Deleted successfully.",
-              content: `(User id = ${id})`,
-            })
-          )
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          )
-          .finally(setRefresh);
-      },
-      // onCancel() {},
-    });
-  };
-
-  const handleRecoverUser = (event) => {
-    const id = event.currentTarget.value;
-    Modal.confirm({
-      title: "Do you want to recover this user?",
-      icon: <ExclamationCircleOutlined />,
-      content: `(User id = ${id})`,
-      onOk() {
-        return axios
-          .post(CONCAT_SERVER_URL("/api/v1/superUser/admin"), { id })
-          .then(() =>
-            Modal.success({
-              title: "Recovered successfully.",
-              content: `(User id = ${id})`,
-            })
-          )
-          .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
-          )
-          .finally(setRefresh);
-      },
-      // onCancel() {},
-    });
-  };
+  }, [refresh, filter, tableColumns]);
 
   const handleSearch = () => {
     setFilter({
