@@ -6,7 +6,7 @@ import PhotoGrid from "../components/PhotoGrid";
 export default function Homepage(props) {
   const {
     match: {
-      params: { tag },
+      params: { tag = "cat" },
     },
   } = props;
 

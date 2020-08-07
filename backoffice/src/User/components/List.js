@@ -228,6 +228,7 @@ export default function List(props) {
     setFilter({
       ...filter,
       ...searchText,
+      page: 1,
     });
   };
 
