@@ -76,7 +76,12 @@ export default function List(props) {
         title: "deleted_at",
         dataIndex: "deleted_at",
         key: "deleted_at",
-        sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
+        sorter: (a, b) =>
+          a.deleted_at === null
+            ? 1
+            : b.deleted_at === null
+            ? -1
+            : Number(a.deleted_at > b.deleted_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
         timeZone: "Asia/China",
       },
@@ -94,11 +99,12 @@ export default function List(props) {
 
   const handleDeleteUser = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Do you want to delete this user?",
       content: `(User id = ${id})`,
       icon: <ExclamationCircleOutlined />,
       onOk() {
+        modal.update({ cancelButtonProps: { disabled: true } });
         return axios
           .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
             data: { id },
@@ -122,11 +128,12 @@ export default function List(props) {
 
   const handleRecoverUser = (event) => {
     const id = event.currentTarget.value;
-    Modal.confirm({
+    const modal = Modal.confirm({
       title: "Do you want to recover this user?",
       icon: <ExclamationCircleOutlined />,
       content: `(User id = ${id})`,
       onOk() {
+        modal.update({ cancelButtonProps: { disabled: true } });
         return axios
           .post(CONCAT_SERVER_URL("/api/v1/superUser/admin"), { id })
           .then(() =>
@@ -203,7 +210,6 @@ export default function List(props) {
         params: filter,
       })
       .then((res) => {
-        console.log(res.data);
         if (res.data.data !== null) {
           if (res.data.length !== 0) {
             setData({
@@ -296,6 +302,13 @@ export default function List(props) {
           pageSizeOptions: ["10", "20", "30"],
           total: data.length,
           showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+            }
+          },
         }}
         className={styles.table}
         bordered
