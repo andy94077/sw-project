@@ -19,5 +19,13 @@ class SuperUsersTableSeeder extends Seeder
             'password' => Hash::make("admin"),
             'created_at' => date("Y-m-d H:i:s"),
         ]);
+        for ($i = 1; $i <= 5; $i++) { 
+            DB::table('super_users')->insert([
+                'name' => "user".$i,
+                'email' => "user".$i."@funpodium.net",
+                'password' => Hash::make("user".$i."user".$i),
+                'created_at' => date("Y-m-d H:i:s"),
+            ]);      
+        }
     }
 }

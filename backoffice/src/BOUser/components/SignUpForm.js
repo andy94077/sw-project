@@ -20,8 +20,8 @@ export default function SignUpForm(props) {
   const [form] = Form.useForm();
   const closeForm = () => {
     form.resetFields();
+    setState({ isLoading: false, formInfo: initialFormInfo });
     onCancel();
-    setRefresh();
   };
 
   const handleKeyUp = (e) => {
@@ -69,6 +69,7 @@ export default function SignUpForm(props) {
               password: { validateStatus: "success", errMsg: "" },
             },
           });
+          setRefresh();
           closeForm();
         } else {
           setState({
@@ -114,8 +115,11 @@ export default function SignUpForm(props) {
       cancelText="Cancel"
       onCancel={closeForm}
       onOk={onOk}
+      cancelButtonProps={{ disabled: state.isLoading }}
+      closable={!state.isLoading}
+      maskClosable={!state.isLoading}
     >
-      <Form form={form} layout="vertical" name="form_in_modal">
+      <Form form={form} layout="vertical" preserve={false}>
         <Form.Item
           className="signup-form-input"
           name="username"
