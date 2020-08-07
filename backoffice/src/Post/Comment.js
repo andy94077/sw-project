@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Highlighter from "react-highlight-words";
 import axios from "axios";
 import {
   message,
@@ -15,12 +16,13 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
+import { format } from "date-fns";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function Comment(props) {
   const { post_id } = props;
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState([]);
   const columnTitle = {
     id: "Id",
     user_id: "User id",
@@ -41,7 +43,10 @@ export default function Comment(props) {
   const [motion, setMotion] = useState(false);
 
   useEffect(() => {
-    setMotion(false);
+    if (motion) {
+      setMotion(false);
+      return;
+    }
 
     axios
       .request({
@@ -50,7 +55,36 @@ export default function Comment(props) {
         params: filter,
       })
       .then((res) => {
-        setData(res.data["data"]);
+        setData(
+          res.data["data"].map((item) => {
+            item.deleted_at =
+              item.deleted_at === null
+                ? null
+                : String(
+                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.updated_at =
+              item.updated_at === null
+                ? null
+                : String(
+                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.created_at =
+              item.created_at === null
+                ? null
+                : String(
+                    format(new Date(item.created_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            return item;
+          })
+        );
+        setTotal(res.data["total"]);
       })
       .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
@@ -290,6 +324,21 @@ export default function Comment(props) {
       <Table
         dataSource={data}
         bordered
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+          total,
+          showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+            }
+          },
+        }}
         columns={columns}
         simple
         rowKey={(record) => record.id}

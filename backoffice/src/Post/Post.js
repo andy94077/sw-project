@@ -17,11 +17,13 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
+import { format } from "date-fns";
 import { CONCAT_SERVER_URL } from "../constants";
 import Comment from "./Comment";
 
 export default function Post() {
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState([]);
   const columnTitle = {
     id: "Id",
     url: "Position",
@@ -56,7 +58,28 @@ export default function Post() {
         params: filter,
       })
       .then((res) => {
-        setData(res.data["data"]);
+        setData(
+          res.data["data"].map((item) => {
+            item.deleted_at =
+              item.deleted_at === null
+                ? null
+                : String(
+                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            item.updated_at =
+              item.updated_at === null
+                ? null
+                : String(
+                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    })
+                  );
+            return item;
+          })
+        );
+        setTotal(res.data["total"]);
       })
       .catch(() => message.error("Loading failed! (Connection error.)"));
   }, [motion, filter]);
@@ -263,7 +286,7 @@ export default function Post() {
       sorter: (a, b) => {
         const A = a.deleted_at === null ? "null" : a.deleted_at;
         const B = b.deleted_at === null ? "null" : b.deleted_at;
-        A.localeCompare(B);
+        return A.localeCompare(B);
       },
     },
     {
@@ -348,6 +371,21 @@ export default function Post() {
       <Table
         dataSource={data}
         bordered
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: ["10", "20", "30"],
+          total,
+          showTotal: (total) => `Total result: ${total} `,
+          onChange: (page, pageSize) => {
+            if (filter.size === pageSize) {
+              setFilter({ ...filter, page: page });
+            } else {
+              setFilter({ ...filter, page: 1, size: pageSize });
+            }
+          },
+        }}
         expandable={{
           expandIconColumnIndex: 6,
           expandedRowRender: (record) => (
