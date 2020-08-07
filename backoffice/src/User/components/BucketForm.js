@@ -54,9 +54,12 @@ export default function BucketForm(props) {
       destroyOnClose={true}
       onOk={onFinish}
       onCancel={handleCancel}
+      closable={!loading}
+      maskClosable={!loading}
       okText="Submit"
       cancelText="Return"
       confirmLoading={loading}
+      cancelButtonProps={{ disabled: loading }}
     >
       <Form
         id="bucketForm"
