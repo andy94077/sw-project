@@ -128,6 +128,9 @@ class PostController extends BaseController
         if($request['tag']){
             $query = $query->where('tag', 'like', "%{$request['tag']}%");
         }
+        if($request['url']){
+            $query = $query->where('url', 'like', "%{$request['url']}%");
+        }
         if($request['user_id']){
             $query = $query->where('user_id', 'like', "%{$request['user_id']}%");
         }

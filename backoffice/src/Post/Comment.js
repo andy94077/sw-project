@@ -300,7 +300,6 @@ export default function Comment(props) {
       <Table
         dataSource={data}
         bordered
-        scroll={{ x: 1200 }}
         columns={columns}
         simple
         rowKey={(record) => record.id}

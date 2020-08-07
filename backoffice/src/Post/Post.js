@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Highlighter from "react-highlight-words";
 import axios from "axios";
 import { Avatar, Button, Input, Modal, Space, Table, Tag, Tooltip } from "antd";
 import {
@@ -6,7 +7,6 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import { CONCAT_SERVER_URL } from "../constants";
 import Comment from "./Comment";
 
@@ -28,7 +28,7 @@ export default function Post() {
     content: "",
     tag: "",
   };
-  const [searchText, setSearchText] = useState({ ...columnObj });
+  const [searchText, setSearchText] = useState(columnObj);
   const [filter, setFilter] = useState({
     ...columnObj,
     page: 1,
@@ -60,7 +60,7 @@ export default function Post() {
     const id = event.currentTarget.value;
     Modal.confirm({
       title: "Are you sure you want to delete this post?",
-      content: "(Image id = " + id + ")",
+      content: `(Image id = ${id})`,
       onOk() {
         const jsonData = { id };
 
@@ -152,6 +152,13 @@ export default function Post() {
           ],
   });
 
+  const handleSetSearchText = (key) => (event) => {
+    setSearchText({
+      ...searchText,
+      [key]: event.target.value,
+    });
+  };
+
   const handleSearch = () => {
     setFilter({
       ...searchText,
@@ -161,7 +168,7 @@ export default function Post() {
   };
 
   const handleReset = () => {
-    setSearchText({ ...columnObj });
+    setSearchText(columnObj);
     setFilter({
       ...columnObj,
       page: 1,
@@ -322,14 +329,9 @@ export default function Post() {
       key={key}
       placeholder={`Search ${columnTitle[key]}`}
       value={searchText[key]}
-      onChange={(event) =>
-        setSearchText({
-          ...searchText,
-          [key]: event.target.value,
-        })
-      }
+      onChange={handleSetSearchText(key)}
       onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, display: "inline" }}
+      style={{ width: 188, margin: 8 }}
     />
   ));
 
@@ -370,10 +372,9 @@ export default function Post() {
             </div>
           ),
         }}
-        scroll={{ x: 1200 }}
         columns={columns}
-        simple
         rowKey={(record) => record.id}
+        scroll={{ x: 1200 }}
       />
     </div>
   );
