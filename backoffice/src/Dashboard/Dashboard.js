@@ -60,29 +60,36 @@ export default function Dashboard() {
     <>
       <Card>
         <Row gutter={[16, 16]}>
-          <Col span={8}>
+          <Col span={2}></Col>
+          <Col span={6}>
             <Statistic title="Valid Users" value={userInfo.valid} />
           </Col>
-          <Col span={8}>
+          <Col span={2}></Col>
+          <Col span={6}>
             <Statistic title="Online Users" value={userInfo.online} />
           </Col>
-          <Col span={8}>
+          <Col span={2}></Col>
+          <Col span={6}>
             <Statistic title="New Users(in 1 day)" value={userInfo.new} />
           </Col>
         </Row>
         <Row gutter={[16, 16]}>
-          <Col span={12}>
+          <Col span={3}></Col>
+          <Col span={9}>
             <Statistic title="Valid Posts" value={postInfo.valid} />
           </Col>
-          <Col span={12}>
+          <Col span={3}></Col>
+          <Col span={9}>
             <Statistic title="New Posts(in 1 day)" value={postInfo.new} />
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={3}></Col>
+          <Col span={9}>
             <Statistic title="Valid Comments" value={commentUnfo.valid} />
           </Col>
-          <Col span={12}>
+          <Col span={3}></Col>
+          <Col span={9}>
             <Statistic
               title="New Comments(in 1 hour)"
               value={commentUnfo.new}
@@ -130,7 +137,7 @@ export default function Dashboard() {
                   <Typography.Text mark>
                     [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                   </Typography.Text>
-                  {`${item.username} send "${item.content}" at ${item.updated_at}`}
+                  {`${item.username} send "${item.content}" on post${item.post_id} at ${item.updated_at}`}
                 </List.Item>
               )}
             />
