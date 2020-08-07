@@ -18,7 +18,7 @@ import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
-import { CONCAT_SERVER_URL } from "./constants";
+import { CONCAT_SERVER_URL, CONCAT_BACKOFFICE_URL } from "./constants";
 import Dashboard from "./Dashboard/Dashboard";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -34,7 +34,10 @@ export default function App() {
     const accessToken = getCookie();
     setError({ message: "", url: "" });
     setUser({ username: null, userId: null });
-    if (location.pathname !== "/" || accessToken !== null) {
+    if (
+      location.pathname !== CONCAT_BACKOFFICE_URL("/") ||
+      accessToken !== null
+    ) {
       setIsReady(false);
       axios
         .post(CONCAT_SERVER_URL("/api/v1/superUser/authentication"), {
@@ -43,10 +46,11 @@ export default function App() {
         .then((res) => {
           if (res.data.isValid === true) {
             setUser({ username: res.data.username, userId: res.data.user_id });
-            if (location.pathname === "/") history.push("/dashboard");
+            if (location.pathname === CONCAT_BACKOFFICE_URL("/"))
+              history.push(CONCAT_BACKOFFICE_URL("/dashboard"));
           } else {
             deleteCookie();
-            history.push("/");
+            history.push(CONCAT_BACKOFFICE_URL("/"));
           }
         })
         .catch(() => {
@@ -61,17 +65,21 @@ export default function App() {
 
   const logOut = () => {
     deleteCookie();
-    history.push("/");
+    history.push(CONCAT_BACKOFFICE_URL("/"));
   };
 
   if (isReady) {
     if (error.message !== "") {
       return <ErrorMsg message={error.message} imgUrl={error.url} />;
     }
-    if (location.pathname === "/") {
+    if (location.pathname === CONCAT_BACKOFFICE_URL("/")) {
       return (
         <Switch>
-          <Route exact path="/" component={LoginPage} />
+          <Route
+            exact
+            path={CONCAT_BACKOFFICE_URL("/")}
+            component={LoginPage}
+          />
         </Switch>
       );
     }
@@ -95,7 +103,7 @@ export default function App() {
           <Sider collapsible>
             <Menu
               theme="dark"
-              defaultSelectedKeys={[location.pathname.split("/")[1]]}
+              defaultSelectedKeys={[location.pathname.split("/").slice(-1)[0]]}
               mode="inline"
             >
               <Menu.Item
@@ -103,16 +111,16 @@ export default function App() {
                 icon={<PieChartOutlined />}
                 className="first-menu-item"
               >
-                <Link to="/">Dashboard</Link>
+                <Link to={CONCAT_BACKOFFICE_URL("/")}>Dashboard</Link>
               </Menu.Item>
               <Menu.Item key="user" icon={<TeamOutlined />}>
-                <Link to="/user">Users</Link>
+                <Link to={CONCAT_BACKOFFICE_URL("/user")}>Users</Link>
               </Menu.Item>
               <Menu.Item key="post" icon={<FileTextOutlined />}>
-                <Link to="/post">Posts</Link>
+                <Link to={CONCAT_BACKOFFICE_URL("/post")}>Posts</Link>
               </Menu.Item>
               <Menu.Item key="BOUser" icon={<TeamOutlined />}>
-                <Link to="/BOUser">BO Users</Link>
+                <Link to={CONCAT_BACKOFFICE_URL("/BOUser")}>BO Users</Link>
               </Menu.Item>
             </Menu>
           </Sider>
@@ -121,12 +129,24 @@ export default function App() {
               <Switch>
                 <Route
                   exact
-                  path="/dashboard"
-                  component={() => <Dashboard />}
+                  path={CONCAT_BACKOFFICE_URL("/dashboard")}
+                  component={Dashboard}
                 />
-                <Route exact path="/user" component={User} />
-                <Route exact path="/post" component={Post} />
-                <Route exact path="/BOUser" component={BOUser} />
+                <Route
+                  exact
+                  path={CONCAT_BACKOFFICE_URL("/user")}
+                  component={User}
+                />
+                <Route
+                  exact
+                  path={CONCAT_BACKOFFICE_URL("/post")}
+                  component={Post}
+                />
+                <Route
+                  exact
+                  path={CONCAT_BACKOFFICE_URL("/BOUser")}
+                  component={BOUser}
+                />
               </Switch>
             </Content>
             <Footer className="footer">
