@@ -129,25 +129,25 @@ class UserController extends BaseController
 
     public function adminAll(Request $request){
         $query = User::withTrashed();
-        if($request['id']){
+        if($request['id']!== null){
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
-        if($request['name']){
+        if($request['name']!== null){
             $query = $query->where('name', 'like', "%{$request['name']}%");
         }
-        if($request['email']){
+        if($request['email']!== null){
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
-        if($request['bucket_time']){
+        if($request['bucket_time']!== null){
             $query = $query->where('bucket_time', 'like', "%{$request['bucket_time']}%");
         }
-        if($request['deleted_at']){
+        if($request['deleted_at']!== null){
              $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
         }
-        if($request['created_at']){
+        if($request['created_at']!== null){
              $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
         }
-        if($request['updated_at']){
+        if($request['updated_at']!== null){
              $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
         }
 

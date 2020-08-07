@@ -27,7 +27,7 @@ export default function Dashboard() {
   }, []);
 
   async function refreshInfo() {
-    setIsListLoading(true);
+    setIsCardLoading(true);
     const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
