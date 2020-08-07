@@ -43,7 +43,10 @@ export default function Comment(props) {
   const [motion, setMotion] = useState(false);
 
   useEffect(() => {
-    setMotion(false);
+    if (motion) {
+      setMotion(false);
+      return;
+    }
 
     axios
       .request({
