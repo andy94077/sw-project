@@ -21,7 +21,7 @@ class UserController extends BaseController
     public function logIn(Request $request)
     {
         if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true], 200);
+            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true, 'api_token' => Auth::user()->api_token], 200);
         }
         else {
             return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
@@ -74,6 +74,7 @@ class UserController extends BaseController
                 'user_id' => $userInfo->id,
                 'isValid' => true,
                 'bucket_time' => $userInfo->bucket_time,
+                'api_token' => $userInfo->api_token,
             ], 200);
         }
     }

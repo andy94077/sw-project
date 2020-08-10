@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 
 class RegisterController extends Controller
 {
@@ -86,6 +88,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'avatar_url' => "/img/avatar.jpeg",
+            'api_token' => hash('sha256', Str::random(80)),
         ]);
     }
     /**

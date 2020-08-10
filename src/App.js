@@ -27,6 +27,7 @@ export default function App() {
     username: null,
     userId: null,
     userBucketTime: null,
+    api_token: null,
   });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
@@ -61,6 +62,7 @@ export default function App() {
         .then((res) => {
           if (res.data.isValid === true) {
             setUser((preUser) => {
+              console.log(res.data);
               if (preUser.userId !== res.data.user_id) {
                 axios
                   .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
@@ -80,11 +82,17 @@ export default function App() {
                 username: res.data.username,
                 userId: res.data.user_id,
                 userBucketTime: res.data.bucket_time,
+                api_token: res.data.api_token,
               };
             });
             if (location.pathname === "/") history.push("/home");
           } else {
-            setUser({ username: null, userId: null, userBucketTime: null });
+            setUser({
+              username: null,
+              userId: null,
+              userBucketTime: null,
+              api_token: null,
+            });
           }
         })
         .catch(() => {
@@ -137,6 +145,7 @@ export default function App() {
                 match={props.match}
                 userBucketTime={addHours(new Date(user.userBucketTime), 8)}
                 isBucket={checkBucket(user.userBucketTime)}
+                apiToken={user.api_token}
               />
             )}
           />

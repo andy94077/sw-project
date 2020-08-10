@@ -50,6 +50,7 @@ export default function CommentBox(props) {
     refresh,
     canEdit,
     isUser,
+    userId,
   } = props;
   const [menu, setMenu] = useState(null);
   const [onDelete, setOnDelete] = useState(false);
@@ -108,14 +109,27 @@ export default function CommentBox(props) {
         id: commentId,
         content: newComment,
         user: true,
+        user_id: userId,
       })
         .then(() => {
           refresh();
           setIsEditDialogOpen(false);
         })
-        .catch(() => {
-          setErrMessage("Failed to edit the comment, please retry");
-          setIsConnectionFailed(true);
+        .catch((e) => {
+          console.log(e);
+          if (e.message === "Request failed with status code 403") {
+            setIsConnectionFailed(true);
+            setErrMessage({
+              title: "Bucket Error",
+              message: "You cannot edit comment when you in the bucket",
+            });
+          } else {
+            setErrMessage({
+              title: "Network error",
+              message: "Failed to edit the comment, please retry",
+            });
+            setIsConnectionFailed(true);
+          }
         })
         .finally(() => {
           setOnEdit(false);
@@ -167,8 +181,8 @@ export default function CommentBox(props) {
       )}
       <AlertDialog
         open={isConnectionFailed}
-        alertTitle="Network Error"
-        alertDesciption={errMessage}
+        alertTitle={errMessage.title}
+        alertDesciption={errMessage.message}
         alertButton={
           <>
             <Button

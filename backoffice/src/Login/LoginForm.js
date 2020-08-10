@@ -24,7 +24,7 @@ export default function LoginForm() {
       })
       .then((res) => {
         if (res.data.isLogin === true) {
-          setCookie("accessToken", res.data.token, 1);
+          setCookie("backofficeAccessToken", res.data.token, 1);
           setState({
             isLoading: false,
             validateStatus: "success",

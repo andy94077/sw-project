@@ -233,6 +233,12 @@ export default function ContentCard(props) {
               title: "Error",
               message: "Post is deleted",
             });
+          } else if (e.message === "Request failed with status code 403") {
+            setIsConnectionFailed(true);
+            setErrMessage({
+              title: "Bucket Error",
+              message: "You cannot send comment when you in the bucket",
+            });
           }
           setIsUpload(false);
         });
@@ -466,6 +472,7 @@ export default function ContentCard(props) {
                   canEdit={username === i.user_name}
                   refresh={refreshComment}
                   isUser={username !== null}
+                  userId={userId}
                 />
               ))}
             </ScrollToBottom>

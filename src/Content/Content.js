@@ -25,6 +25,7 @@ export default function Content(props) {
       params: { pictureId },
     },
     isBucket,
+    apiToken,
   } = props;
   const classes = useStyles();
   const [info, setInfo] = useState({
@@ -39,9 +40,12 @@ export default function Content(props) {
     setPageState("Loading");
     Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+      },
     })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.data.length === 0) {
           throw new Error("Post not found");
         }
