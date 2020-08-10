@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Row, Col, Statistic, Button, Typography, List } from "antd";
+import { Row, Col, Card, Statistic, Button, Typography, List } from "antd";
 import Axios from "axios";
 import { CONCAT_SERVER_URL } from "../constants";
 import { useEffect } from "react";
-import { Card } from "@material-ui/core";
 import { format } from "date-fns";
 
 export default function Dashboard() {
@@ -61,55 +60,89 @@ export default function Dashboard() {
     <>
       <Card>
         <Row gutter={[16, 16]}>
-          <Col span={2}></Col>
-          <Col span={6}>
-            <Statistic title="Valid Users" value={userInfo.valid} />
+          <Col span={8}>
+            <Card hoverable>
+              <Statistic
+                title="Valid Users"
+                value={userInfo.valid}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
-          <Col span={2}></Col>
-          <Col span={6}>
-            <Statistic title="Online Users" value={userInfo.online} />
+          <Col span={8}>
+            <Card hoverable>
+              <Statistic
+                title="Online Users"
+                value={userInfo.online}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
-          <Col span={2}></Col>
-          <Col span={6}>
-            <Statistic title="New Users(in 1 day)" value={userInfo.new} />
+          <Col span={8}>
+            <Card hoverable>
+              <Statistic
+                title="New Users(in 1 day)"
+                value={userInfo.new}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
         </Row>
         <Row gutter={[16, 16]}>
-          <Col span={3}></Col>
-          <Col span={9}>
-            <Statistic title="Valid Posts" value={postInfo.valid} />
+          <Col span={12}>
+            <Card hoverable>
+              <Statistic
+                title="Valid Posts"
+                value={postInfo.valid}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
-          <Col span={3}></Col>
-          <Col span={9}>
-            <Statistic title="New Posts(in 1 day)" value={postInfo.new} />
+          <Col span={12}>
+            <Card hoverable>
+              <Statistic
+                title="New Posts(in 1 day)"
+                value={postInfo.new}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={3}></Col>
-          <Col span={9}>
-            <Statistic title="Valid Comments" value={commentUnfo.valid} />
+          <Col span={12}>
+            <Card hoverable>
+              <Statistic
+                title="Valid Comments"
+                value={commentUnfo.valid}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
-          <Col span={3}></Col>
-          <Col span={9}>
-            <Statistic
-              title="New Comments(in 1 hour)"
-              value={commentUnfo.new}
-            />
+          <Col span={12}>
+            <Card hoverable>
+              <Statistic
+                title="New Comments(in 1 hour)"
+                value={commentUnfo.new}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
           </Col>
         </Row>
-        <Button
-          onClick={() => {
-            setIsCardLoading(true);
-            refreshInfo();
-          }}
-          loading={isCardLoading}
-        >
-          refresh
-        </Button>
       </Card>
+      <Button
+        onClick={() => {
+          setIsCardLoading(true);
+          setIsListLoading(true);
+          refreshInfo();
+          refreshLatestInfo();
+        }}
+        loading={isCardLoading || isListLoading}
+      >
+        refresh
+      </Button>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Card>
+          <Card hoverable>
             <List
               header="Latest Post Change"
               bordered
@@ -120,10 +153,7 @@ export default function Dashboard() {
                     <Typography.Text mark>
                       [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                     </Typography.Text>
-                    {`${item.username} send "${item.content}" at ${format(
-                      new Date(item.updated_at),
-                      "yyyy-MM-dd HH:mm:ss"
-                    )}`}
+                    {`${item.username} send "${item.content}" at ${item.updated_at}`}
                   </List.Item>
                 );
               }}
@@ -131,7 +161,7 @@ export default function Dashboard() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card>
+          <Card hoverable>
             <List
               header="Latest Comment Change"
               bordered
@@ -141,9 +171,7 @@ export default function Dashboard() {
                   <Typography.Text mark>
                     [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                   </Typography.Text>
-                  {`${item.username} send "${item.content}" on post${
-                    item.post_id
-                  } at ${format(
+                  {`${item.username} send "${item.content}" at ${format(
                     new Date(item.updated_at),
                     "yyyy-MM-dd HH:mm:ss"
                   )}`}
@@ -153,15 +181,6 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
-      <Button
-        onClick={() => {
-          setIsListLoading(true);
-          refreshLatestInfo();
-        }}
-        loading={isListLoading}
-      >
-        refresh
-      </Button>
     </>
   );
 }
