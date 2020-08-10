@@ -9,7 +9,6 @@ import {
   Modal,
   Space,
   Table,
-  Tag,
   Tooltip,
 } from "antd";
 import {
@@ -47,9 +46,11 @@ export default function Post() {
     size: 10,
   });
   const [motion, setMotion] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setMotion(false);
+    setLoading(true);
 
     axios
       .request({
@@ -60,28 +61,24 @@ export default function Post() {
       .then((res) => {
         setData(
           res.data["data"].map((item) => {
-            item.deleted_at =
-              item.deleted_at === null
-                ? null
-                : String(
-                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
-                      timeZone: "Asia/Taipei",
-                    })
-                  );
-            item.updated_at =
-              item.updated_at === null
-                ? null
-                : String(
-                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
-                      timeZone: "Asia/Taipei",
-                    })
-                  );
+            ["created_at", "updated_at", "deleted_at"].map((time) => {
+              item[time] =
+                item[time] === null
+                  ? null
+                  : String(
+                      format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
+                        timeZone: "Asia/Taipei",
+                      })
+                    );
+              return time;
+            });
             return item;
           })
         );
         setTotal(res.data["total"]);
       })
-      .catch(() => message.error("Loading failed! (Connection error.)"));
+      .catch(() => message.error("Loading failed! (Connection error.)"))
+      .finally(() => setLoading(false));
   }, [motion, filter]);
 
   const handleDeletePost = (event) => {
@@ -92,8 +89,9 @@ export default function Post() {
       onOk() {
         const jsonData = { id };
         modal.update({ cancelButtonProps: { disabled: true } });
+        setLoading(true);
 
-        return axios
+        axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/post"),
@@ -116,8 +114,9 @@ export default function Post() {
       onOk() {
         const jsonData = { id };
         modal.update({ cancelButtonProps: { disabled: true } });
+        setLoading(true);
 
-        return axios
+        axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
@@ -132,12 +131,13 @@ export default function Post() {
     });
   };
 
-  const getRenderProps = (dataIndex) => ({
+  const getLinkRenderProps = (dataIndex) => ({
+    // for "url" & "username"
     render: (text) =>
-      ["url", "username"].includes(dataIndex)
+      dataIndex === "url"
         ? [
-            filter[dataIndex] !== "" ? (
-              <a href={CONCAT_SERVER_URL(text)}>
+            loading === false ? (
+              <a key={dataIndex} href={CONCAT_SERVER_URL(text)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                   searchWords={[filter[dataIndex]]}
@@ -152,18 +152,37 @@ export default function Post() {
             ),
           ]
         : [
-            filter[dataIndex] !== "" ? (
-              <Highlighter
-                key={dataIndex}
-                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                searchWords={[filter[dataIndex]]}
-                autoEscape
-                textToHighlight={`${text}`}
-              />
+            loading === false ? (
+              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+                <Highlighter
+                  highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                  searchWords={[filter[dataIndex]]}
+                  autoEscape
+                  textToHighlight={text}
+                />
+              </a>
             ) : (
-              text
+              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+                {text}
+              </a>
             ),
           ],
+  });
+
+  const getRenderProps = (dataIndex) => ({
+    render: (text) => [
+      loading === false ? (
+        <Highlighter
+          key={dataIndex}
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[filter[dataIndex]]}
+          autoEscape
+          textToHighlight={`${text}`}
+        />
+      ) : (
+        text
+      ),
+    ],
   });
 
   const handleSetSearchText = (key) => (event) => {
@@ -207,7 +226,7 @@ export default function Post() {
       sorter: (a, b) => a.id - b.id,
     },
     {
-      ...getRenderProps("url"),
+      ...getLinkRenderProps("url"),
       title: "Position",
       dataIndex: "url",
       onCell: () => ({
@@ -223,7 +242,7 @@ export default function Post() {
       sorter: (a, b) => a.user_id - b.user_id,
     },
     {
-      ...getRenderProps("username"),
+      ...getLinkRenderProps("username"),
       title: "Username",
       dataIndex: "username",
       sorter: (a, b) => a.username.localeCompare(b.username),
@@ -244,10 +263,10 @@ export default function Post() {
             overflow: "auto",
           }}
         >
-          {searchText["content"] !== "" ? (
+          {loading === false ? (
             <Highlighter
               highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-              searchWords={[searchText["content"]]}
+              searchWords={[filter["content"]]}
               autoEscape
               textToHighlight={`${content}`}
             />
@@ -265,7 +284,7 @@ export default function Post() {
     },
     {
       title: "Publish time",
-      dataIndex: "publish_time",
+      dataIndex: "created_at",
       onCell: () => ({
         style: {
           minWidth: "150px",
@@ -281,8 +300,8 @@ export default function Post() {
     {
       title: "Deleted time",
       dataIndex: "deleted_at",
-      render: (deleted_at) =>
-        deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
+      // render: (deleted_at) =>
+      //   deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
       sorter: (a, b) => {
         const A = a.deleted_at === null ? "null" : a.deleted_at;
         const B = b.deleted_at === null ? "null" : b.deleted_at;
@@ -345,7 +364,7 @@ export default function Post() {
       value={searchText[key]}
       onChange={handleSetSearchText(key)}
       onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8 }}
+      style={{ width: 188, margin: 8, borderRadius: 15 }}
     />
   ));
 
@@ -353,8 +372,12 @@ export default function Post() {
     <div>
       <div style={{ padding: 8 }}>
         {searchFields}
-        <Space>
-          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+        <Space style={{ margin: 8 }}>
+          <Button
+            onClick={handleReset}
+            size="small"
+            style={{ width: 90, height: 30, borderRadius: 15, marginRight: 10 }}
+          >
             Reset
           </Button>
           <Button
@@ -362,7 +385,7 @@ export default function Post() {
             onClick={handleSearch}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
+            style={{ width: 90, height: 30, borderRadius: 15 }}
           >
             Search
           </Button>
@@ -371,6 +394,7 @@ export default function Post() {
       <Table
         dataSource={data}
         bordered
+        loading={loading}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
