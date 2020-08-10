@@ -11,6 +11,8 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Image;
 use stdClass;
+use DateTime;
+use DateTimeZone;
 
 // for delete images
 function removeDirectory($path)
@@ -153,6 +155,10 @@ class PostController extends BaseController
     }
 
     public function getPostInfo(){
+        $date = new DateTime(null, new DateTimeZone('America/New_York'));
+        $res['t'] = $date;
+        $ndate = new DateTime(null);
+        $res['n'] = $ndate;
         $res['valid'] = Post::all()->count();
         $res['new'] = Post::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
         return response()->json($res);

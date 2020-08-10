@@ -3,6 +3,7 @@ import { Row, Col, Card, Statistic, Button, Typography, List } from "antd";
 import Axios from "axios";
 import { CONCAT_SERVER_URL } from "../constants";
 import { useEffect } from "react";
+import { format } from "date-fns";
 
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
@@ -127,65 +128,58 @@ export default function Dashboard() {
             </Card>
           </Col>
         </Row>
-        <Button
-          onClick={() => {
-            setIsCardLoading(true);
-            refreshInfo();
-          }}
-          loading={isCardLoading}
-        >
-          refresh
-        </Button>
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
-            <Card hoverable>
-              <List
-                header="Latest Post Change"
-                bordered
-                dataSource={latestPosts}
-                renderItem={(item) => {
-                  return (
-                    <List.Item>
-                      <Typography.Text mark>
-                        [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
-                      </Typography.Text>
-                      {`${item.username} send "${item.content}" at ${item.updated_at}`}
-                    </List.Item>
-                  );
-                }}
-              />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card hoverable>
-              <List
-                header="Latest Comment Change"
-                bordered
-                dataSource={latestComments}
-                renderItem={(item) => (
+      </Card>
+      <Button
+        onClick={() => {
+          setIsCardLoading(true);
+          setIsListLoading(true);
+          refreshInfo();
+          refreshLatestInfo();
+        }}
+        loading={isCardLoading || isListLoading}
+      >
+        refresh
+      </Button>
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
+          <Card hoverable>
+            <List
+              header="Latest Post Change"
+              bordered
+              dataSource={latestPosts}
+              renderItem={(item) => {
+                return (
                   <List.Item>
                     <Typography.Text mark>
                       [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                     </Typography.Text>
-                    {`${item.username} send "${item.content}" on post${item.post_id} at ${item.updated_at}`}
+                    {`${item.username} send "${item.content}" at ${item.updated_at}`}
                   </List.Item>
-                )}
-              />
-            </Card>
-          </Col>
-        </Row>
-      </Card>
-      <Row>
-        <Button
-          style={{ margin: "auto" }}
-          onClick={() => {
-            setIsListLoading(true);
-            refreshLatestInfo();
-          }}
-          loading={isListLoading}
-        >
-          refresh
-        </Button>
+                );
+              }}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card hoverable>
+            <List
+              header="Latest Comment Change"
+              bordered
+              dataSource={latestComments}
+              renderItem={(item) => (
+                <List.Item>
+                  <Typography.Text mark>
+                    [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
+                  </Typography.Text>
+                  {`${item.username} send "${item.content}" at ${format(
+                    new Date(item.updated_at),
+                    "yyyy-MM-dd HH:mm:ss"
+                  )}`}
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
       </Row>
     </>
   );
