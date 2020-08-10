@@ -89,7 +89,12 @@ export default function List(props) {
         title: "updated_at",
         dataIndex: "updated_at",
         key: "updated_at",
-        sorter: (a, b) => a.updated_at.localeCompare(b.updated_at),
+        sorter: (a, b) =>
+          a.updated_at === null
+            ? 1
+            : b.updated_at === null
+            ? -1
+            : Number(a.updated_at > b.updated_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
         timeZone: "Asia/China",
       },
