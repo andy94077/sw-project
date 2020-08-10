@@ -18,6 +18,7 @@ export default function BOUser(props) {
           type="primary"
           icon={<UserAddOutlined />}
           onClick={handleVisible(true)}
+          style={{ borderRadius: "20px" }}
         >
           New Admin User
         </Button>
