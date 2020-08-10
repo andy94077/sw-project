@@ -158,13 +158,20 @@ export default function List(props) {
         break;
     }
   };
+
+  function handleTime(time) {
+    if (time != null) {
+      time = time.substring(0, 10) + "T" + time.substring(11) + ".000000Z";
+    }
+    return time;
+  }
+
   useEffect(() => {
     axios
       .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
         params: filter,
       })
       .then((response) => {
-        console.log(response.data);
         if (response.data.data !== null) {
           if (response.data.length !== 0) {
             setData({
@@ -174,11 +181,12 @@ export default function List(props) {
                   "yyyy-MM-dd HH:mm:ss",
                   { timeZone: "Asia/China" }
                 );
+                item.bucket_time = handleTime(item.bucket_time);
                 item.bucket_time =
                   item.bucket_time === null
                     ? ""
                     : format(
-                        addHours(new Date(item.bucket_time), 8),
+                        new Date(item.bucket_time),
                         "yyyy-MM-dd HH:mm:ss",
                         { timeZone: "Asia/Taipei" }
                       );
@@ -194,11 +202,12 @@ export default function List(props) {
                     : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
                         timeZone: "Asia/Taipei",
                       });
+                item.online_time = handleTime(item.online_time);
                 item.online_time =
                   item.online_time === null
                     ? ""
                     : format(
-                        addHours(new Date(item.online_time), 8),
+                        new Date(item.online_time),
                         "yyyy-MM-dd HH:mm:ss",
                         {
                           timeZone: "Asia/Taipei",
