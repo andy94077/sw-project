@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { Table, Modal, Space, Button, Input, Tooltip } from "antd";
+import { Table, Modal, Space, Button, Input, Tooltip, message } from "antd";
 import {
   ExclamationCircleOutlined,
   DeleteOutlined,
@@ -21,6 +21,7 @@ export default function List(props) {
     created_at: "",
     updated_at: "",
   };
+  const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState(initialSearchText);
   const [filter, setFilter] = useState({
     ...initialSearchText,
@@ -110,22 +111,15 @@ export default function List(props) {
       icon: <ExclamationCircleOutlined />,
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
-        return axios
+        setIsLoading(true);
+        axios
           .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
             data: { id },
           })
           .then(() =>
-            Modal.success({
-              title: "Deleted successfully.",
-              content: `(User id = ${id})`,
-            })
+            message.success(`Deleted successfully. (User id = ${id})`)
           )
-          .catch(() =>
-            Modal.error({
-              title: "Deleted failed.",
-              content: "Connection error.",
-            })
-          )
+          .catch(() => message.error(`Deleted failed. Please try again later.`))
           .finally(setRefresh);
       },
     });
@@ -139,19 +133,14 @@ export default function List(props) {
       content: `(User id = ${id})`,
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
-        return axios
+        setIsLoading(true);
+        axios
           .post(CONCAT_SERVER_URL("/api/v1/superUser/admin"), { id })
           .then(() =>
-            Modal.success({
-              title: "Recovered successfully.",
-              content: `(User id = ${id})`,
-            })
+            message.success(`Recovered successfully. (User id = ${id})`)
           )
           .catch(() =>
-            Modal.error({
-              title: "Recovered failed.",
-              content: "Connection error.",
-            })
+            message.error(`Recovered failed. Please try again later.`)
           )
           .finally(setRefresh);
       },
@@ -210,6 +199,7 @@ export default function List(props) {
   ];
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
         params: filter,
@@ -245,7 +235,8 @@ export default function List(props) {
       .catch((error) => {
         alert("There are some problems during loading");
         console.log(error);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, [refresh, filter, tableColumns]);
 
   const handleSearch = () => {
@@ -275,7 +266,7 @@ export default function List(props) {
       value={searchText[key]}
       onChange={handleSearchTextChange(key)}
       onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, display: "inline" }}
+      style={{ width: 188, margin: 8, display: "inline", borderRadius: "15px" }}
     />
   ));
 
@@ -283,8 +274,17 @@ export default function List(props) {
     <div>
       <div style={{ padding: 8 }}>
         {searchFields}
-        <Space>
-          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+        <Space style={{ margin: "8px" }}>
+          <Button
+            onClick={handleReset}
+            size="small"
+            style={{
+              width: 90,
+              height: "30px",
+              borderRadius: "15px",
+              marginRight: "10px",
+            }}
+          >
             Reset
           </Button>
           <Button
@@ -292,7 +292,7 @@ export default function List(props) {
             onClick={handleSearch}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
+            style={{ width: 90, height: "30px", borderRadius: "15px" }}
           >
             Search
           </Button>
@@ -319,7 +319,7 @@ export default function List(props) {
         bordered
         scroll={{ x: 1200 }}
         columns={columns}
-        simple
+        loading={isLoading}
         rowKey={(record) => record.id}
       />
     </div>
