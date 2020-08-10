@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->timestampTz('online_time')->nullable()->default($date->format('Y-m-d\TH:i:s'));
             $table->timestampTz('bucket_time')->nullable()->default(null);
             $table->rememberToken();
+            $table->string('api_token')->nullable()->nullable()->default(null);
             $table->softDeletes();
             $table->timestamps();
         });

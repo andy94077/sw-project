@@ -22,7 +22,7 @@ class UsersTableSeeder extends Seeder
                     'password' => Hash::make("user{$i}"),
                     'avatar_url' => "/img/avatar.jpeg",
                     'created_at' => date("Y-m-d H:i:s"),
-                    //'user_id' => $i,
+                    'api_token' => hash('sha256', Str::random(80)),
                 ]
             );
         }
