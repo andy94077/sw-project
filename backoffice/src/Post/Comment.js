@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
-import {
-  message,
-  Button,
-  Input,
-  Modal,
-  Space,
-  Table,
-  Tag,
-  Tooltip,
-} from "antd";
+import { message, Button, Input, Modal, Space, Table, Tooltip } from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -41,12 +32,11 @@ export default function Comment(props) {
     size: 10,
   });
   const [motion, setMotion] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (motion) {
-      setMotion(false);
-      return;
-    }
+    setMotion(false);
+    setLoading(true);
 
     axios
       .request({
@@ -86,7 +76,8 @@ export default function Comment(props) {
         );
         setTotal(res.data["total"]);
       })
-      .catch(() => message.error("Loading failed! (Connection error.)"));
+      .catch(() => message.error("Loading failed! (Connection error.)"))
+      .finally(() => setLoading(false));
   }, [motion, filter]);
 
   const handleDeleteComment = (event) => {
@@ -97,8 +88,9 @@ export default function Comment(props) {
       onOk() {
         const jsonData = { id };
         modal.update({ cancelButtonProps: { disabled: true } });
+        setLoading(true);
 
-        return axios
+        axios
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/comment"),
@@ -121,8 +113,9 @@ export default function Comment(props) {
       onOk() {
         const jsonData = { id };
         modal.update({ cancelButtonProps: { disabled: true } });
+        setLoading(true);
 
-        return axios
+        axios
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/comment/recovery"),
@@ -139,7 +132,7 @@ export default function Comment(props) {
 
   const getRenderProps = (dataIndex) => ({
     render: (text) =>
-      filter[dataIndex] !== "" ? (
+      loading === false ? (
         <Highlighter
           key={dataIndex}
           highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -198,7 +191,7 @@ export default function Comment(props) {
             overflow: "auto",
           }}
         >
-          {filter["content"] !== "" ? (
+          {loading === false ? (
             <Highlighter
               highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
               searchWords={[filter["content"]]}
@@ -224,8 +217,8 @@ export default function Comment(props) {
     {
       title: "Deleted time",
       dataIndex: "deleted_at",
-      render: (deleted_at) =>
-        deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
+      // render: (deleted_at) =>
+      //   deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
       sorter: (a, b) => {
         const A = a.deleted_at === null ? "null" : a.deleted_at;
         const B = b.deleted_at === null ? "null" : b.deleted_at;
@@ -324,6 +317,7 @@ export default function Comment(props) {
       <Table
         dataSource={data}
         bordered
+        loading={loading}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
@@ -340,7 +334,6 @@ export default function Comment(props) {
           },
         }}
         columns={columns}
-        simple
         rowKey={(record) => record.id}
       />
     </div>
