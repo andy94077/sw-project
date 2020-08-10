@@ -39,7 +39,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts', 'PostController@index');
     Route::get('/posts/admin', 'PostController@adminAll');
-    Route::middleware('auth:api')->get('/post/id', 'PostController@getPictureFromId');
+    Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
     Route::delete('/post', 'PostController@delete');
     Route::post('/post/modification', 'PostController@update');
