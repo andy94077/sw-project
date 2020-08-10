@@ -22,9 +22,9 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments', 'CommentController@index');
     Route::get('/comments/admin', 'CommentController@adminAll');
     Route::get('/comment/post', 'CommentController@showByPost');
-    Route::post('/comment/upload', 'CommentController@upload');
+    Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket']);
     Route::delete('/comment', 'CommentController@delete');
-    Route::post('/comment/modification', 'CommentController@update');
+    Route::post('/comment/modification', 'CommentController@update')->middleware(['bucket']);;
     Route::apiResource('comments', 'CommentController');
 
 
