@@ -4,6 +4,7 @@ import Axios from "axios";
 import { CONCAT_SERVER_URL } from "../constants";
 import { useEffect } from "react";
 import { Card } from "@material-ui/core";
+import { format } from "date-fns";
 
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
@@ -119,7 +120,10 @@ export default function Dashboard() {
                     <Typography.Text mark>
                       [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                     </Typography.Text>
-                    {`${item.username} send "${item.content}" at ${item.updated_at}`}
+                    {`${item.username} send "${item.content}" at ${format(
+                      new Date(item.updated_at),
+                      "yyyy-MM-dd HH:mm:ss"
+                    )}`}
                   </List.Item>
                 );
               }}
@@ -137,7 +141,12 @@ export default function Dashboard() {
                   <Typography.Text mark>
                     [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                   </Typography.Text>
-                  {`${item.username} send "${item.content}" on post${item.post_id} at ${item.updated_at}`}
+                  {`${item.username} send "${item.content}" on post${
+                    item.post_id
+                  } at ${format(
+                    new Date(item.updated_at),
+                    "yyyy-MM-dd HH:mm:ss"
+                  )}`}
                 </List.Item>
               )}
             />
