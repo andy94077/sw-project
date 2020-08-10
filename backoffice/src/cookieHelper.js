@@ -4,11 +4,11 @@ export function setCookie(name, value, days) {
   document.cookie = `${name}=${value};path=/;expires=${d.toGMTString()}`;
 }
 
-export function getCookie(name = "accessToken") {
+export function getCookie(name = "BackOfficeAccessToken") {
   const v = document.cookie.match(`(^|;) ?${name}=([^;]*)(;|$)`);
   return v ? v[2] : null;
 }
 
-export function deleteCookie(name = "accessToken") {
+export function deleteCookie(name = "BackOfficeAccessToken") {
   setCookie(name, "", -1);
 }
