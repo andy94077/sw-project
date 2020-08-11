@@ -45,7 +45,6 @@ export default function Content(props) {
       },
     })
       .then((res) => {
-        // console.log(res);
         if (res.data.length === 0) {
           throw new Error("Post not found");
         }
