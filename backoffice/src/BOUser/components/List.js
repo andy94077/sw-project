@@ -77,12 +77,7 @@ export default function List(props) {
         title: "Delete Time",
         dataIndex: "deleted_at",
         key: "deleted_at",
-        sorter: (a, b) =>
-          a.deleted_at === null
-            ? 1
-            : b.deleted_at === null
-            ? -1
-            : a.deleted_at.localeCompare(b.deleted_at),
+        sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
         timeZone: "Asia/Taipei",
       },
@@ -90,12 +85,7 @@ export default function List(props) {
         title: "Update Time",
         dataIndex: "updated_at",
         key: "updated_at",
-        sorter: (a, b) =>
-          a.updated_at === null
-            ? 1
-            : b.updated_at === null
-            ? -1
-            : a.updated_at.localeCompare(b.updated_at),
+        sorter: (a, b) => a.updated_at.localeCompare(b.updated_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
         timeZone: "Asia/Taipei",
       },
@@ -169,7 +159,7 @@ export default function List(props) {
       }),
       render: (_, row) => (
         <div style={{ textAlign: "center" }}>
-          {row.deleted_at === null ? (
+          {row.deleted_at === "" ? (
             <Tooltip title="Delete">
               <Button
                 danger
@@ -210,7 +200,7 @@ export default function List(props) {
               .map((col) => [
                 col.dataIndex,
                 filter[col.dataIndex].map((item) =>
-                  item === "" ? "" : item.format()
+                  item === "" || item === null ? "" : item.format()
                 ),
               ])
           ),
@@ -228,7 +218,7 @@ export default function List(props) {
                     .map(({ dataIndex, timeFormat, timeZone }) => [
                       dataIndex,
                       item[dataIndex] === null
-                        ? null
+                        ? ""
                         : format(new Date(item[dataIndex]), timeFormat, {
                             timeZone,
                           }),
@@ -281,6 +271,7 @@ export default function List(props) {
         showTime
         onOk={(value) => console.log(value)}
         style={{
+          width: 250,
           margin: 8,
           borderRadius: "15px",
         }}
