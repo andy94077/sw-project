@@ -14,6 +14,7 @@ use App\Models\Image;
 use stdClass;
 use DateTime;
 use DateInterval;
+use date;
 
 class UserController extends BaseController
 {
@@ -97,7 +98,7 @@ class UserController extends BaseController
 
     public function count(Request $request){
         $user = User::find($request['id']);
-        $user->online_time = date("Y-m-d H:i:s");
+        $user->online_time = date('c');
         $user->save();
         return response()->json("", 200);
     }
@@ -155,6 +156,7 @@ class UserController extends BaseController
         $size = $query->count();
         $users['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $users['total'] = $size;
+        //echo date('c', $users['data'][0]['online_time']);
         return response()->json($users, 200);
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTime;
 
 class User extends Authenticatable
 {
@@ -54,5 +55,17 @@ class User extends Authenticatable
     public function users()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id');
+    }
+
+    public function getBucketTimeAttribute($value){
+        if($value != null)
+            return (new DateTime($value))->format('c');
+        return null;
+    }
+
+    public function getOnlineTimeAttribute($value){
+        if($value != null)
+            return (new DateTime($value))->format('c');
+        return null;
     }
 }

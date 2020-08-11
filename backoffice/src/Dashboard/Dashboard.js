@@ -155,7 +155,10 @@ export default function Dashboard() {
                     <Typography.Text mark>
                       [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                     </Typography.Text>
-                    {`${item.username} send "${item.content}" at ${item.updated_at}`}
+                    {`${item.username} send "${item.content}" at ${format(
+                      new Date(item.updated_at),
+                      "yyyy-MM-dd HH:mm:ss"
+                    )}`}
                   </List.Item>
                 );
               }}
