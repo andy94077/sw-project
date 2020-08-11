@@ -160,13 +160,6 @@ export default function List(props) {
     }
   };
 
-  function handleTime(time) {
-    if (time != null) {
-      time = time.substring(0, 10) + "T" + time.substring(11) + ".000000Z";
-    }
-    return time;
-  }
-
   useEffect(() => {
     setTableLoading(true);
     axios
@@ -174,6 +167,7 @@ export default function List(props) {
         params: filter,
       })
       .then((response) => {
+        console.log(response.data.data);
         if (response.data.data !== null) {
           if (response.data.length !== 0) {
             setData({
@@ -181,9 +175,8 @@ export default function List(props) {
                 item.created_at = format(
                   new Date(item.created_at),
                   "yyyy-MM-dd HH:mm:ss",
-                  { timeZone: "Asia/China" }
+                  { timeZone: "Asia/Taipei" }
                 );
-                item.bucket_time = handleTime(item.bucket_time);
                 item.bucket_time =
                   item.bucket_time === null
                     ? ""
@@ -204,7 +197,6 @@ export default function List(props) {
                     : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
                         timeZone: "Asia/Taipei",
                       });
-                item.online_time = handleTime(item.online_time);
                 item.online_time =
                   item.online_time === null
                     ? ""
