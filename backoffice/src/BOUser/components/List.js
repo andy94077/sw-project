@@ -301,7 +301,7 @@ export default function List(props) {
       />
     )
   );
-  console.log(searchText);
+
   return (
     <div>
       <div style={{ padding: 8 }}>
