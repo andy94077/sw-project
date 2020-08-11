@@ -4,9 +4,9 @@ import { Dropdown, Button, Menu } from "antd";
 
 export default function DropOption(props) {
   const { id, onMenuClick, menuOptions, buttonStyle } = props;
-  const menu = menuOptions.map((item) => (
-    <Menu.Item key={item.key}>{item.name}</Menu.Item>
-  ));
+  const menu = menuOptions.map((item) => {
+    return <Menu.Item key={item.key}>{item.name}</Menu.Item>;
+  });
   return (
     <Dropdown
       overlay={

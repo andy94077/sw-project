@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, InputNumber, Modal } from "antd";
+import { message, Form, InputNumber, Modal } from "antd";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 
@@ -12,7 +12,7 @@ export default function BucketForm(props) {
     loading,
     handleOk,
     handleCancel,
-    handleLoad,
+    handleTableLoading,
     errorMessageModal,
     setRefresh,
   } = props;
@@ -21,6 +21,7 @@ export default function BucketForm(props) {
     form
       .validateFields()
       .then(({ hour, year, day, month }) => {
+        handleTableLoading(true);
         form.resetFields();
         handleOk();
         axios({
@@ -35,8 +36,7 @@ export default function BucketForm(props) {
           },
         })
           .then((response) => {
-            handleLoad();
-            errorMessageModal("Success !");
+            message.success(`Bucket successfully! (User id = ${id})`);
           })
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
@@ -58,8 +58,6 @@ export default function BucketForm(props) {
       maskClosable={!loading}
       okText="Submit"
       cancelText="Return"
-      confirmLoading={loading}
-      cancelButtonProps={{ disabled: loading }}
     >
       <Form
         id="bucketForm"

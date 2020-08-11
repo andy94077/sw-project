@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
 import { SearchOutlined } from "@ant-design/icons";
-import { Avatar, Button, Input, Modal, Space, Table } from "antd";
+import { message, Avatar, Button, Input, Modal, Space, Table } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
 import styles from "./List.less";
-import { format, addHours } from "date-fns";
+import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
 
@@ -16,6 +16,7 @@ export default function List(props) {
     bucketId: null,
     visible: false,
   });
+  const [tableLoading, setTableLoading] = useState(false);
   const [data, setData] = useState({
     info: [],
     length: null,
@@ -67,21 +68,19 @@ export default function List(props) {
       content: "Some descriptions",
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
-        return axios({
+        setTableLoading(true);
+        axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
           data: { id },
         })
           .then((response) => {
-            errorMessageModal("Success !");
+            message.success(`Unbucket successfully! (User id = ${id})`);
           })
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
           })
-          .finally(() => {
-            setRefresh((preRefresh) => !preRefresh);
-            handleLoad();
-          });
+          .finally(() => setRefresh((preRefresh) => !preRefresh));
       },
       onCancel() {},
     });
@@ -94,13 +93,14 @@ export default function List(props) {
       content: "Some descriptions",
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
-        return axios({
+        setTableLoading(true);
+        axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
           data: { id },
         })
           .then((response) => {
-            errorMessageModal("Success !");
+            message.success(`Deleted successfully! (User id = ${id})`);
           })
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
@@ -118,13 +118,14 @@ export default function List(props) {
       content: "Some descriptions",
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
-        return axios({
+        setTableLoading(true);
+        axios({
           method: "post",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
           data: { id },
         })
           .then((response) => {
-            errorMessageModal("Success !");
+            message.success(`Recover successfully! (User id = ${id})`);
           })
           .catch((error) => {
             errorMessageModal("Oops~ Please try again !");
@@ -167,6 +168,7 @@ export default function List(props) {
   }
 
   useEffect(() => {
+    setTableLoading(true);
     axios
       .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
         params: filter,
@@ -222,14 +224,11 @@ export default function List(props) {
       })
       .catch((error) => {
         alert("There are some problems during loading");
-      });
+      })
+      .finally(() => setTableLoading(false));
   }, [refresh, filter]);
 
   const handleOk = () => {
-    setState({ ...state, loading: true });
-  };
-
-  const handleLoad = () => {
     setState({ ...state, loading: false, visible: false });
   };
 
@@ -328,7 +327,9 @@ export default function List(props) {
             onMenuClick={handleMenuClick}
             menuOptions={[
               { key: "Bucket", name: "Bucket" },
-              record.bucket_time ? { key: "Unbucket", name: "Unbucket" } : "",
+              record.bucket_time
+                ? { key: "Unbucket", name: "Unbucket" }
+                : { key: "noOption", name: "" },
               record.deleted_at
                 ? { key: "Recover", name: "Recover" }
                 : { key: "Delete", name: "Delete" },
@@ -339,31 +340,34 @@ export default function List(props) {
     },
   ];
 
-  const searchFields = [];
-  Object.keys(columnObj).forEach(function (key) {
-    searchFields.push(
-      <Input
-        key={key}
-        placeholder={`Search ${columnTitle[key]}`}
-        value={searchText[key]}
-        onChange={(event) => {
-          setSearchText({
-            ...searchText,
-            [key]: event.target.value,
-          });
-        }}
-        onPressEnter={handleSearch}
-        style={{ width: 188, margin: 8, display: "inline" }}
-      />
-    );
-  });
+  const handleSearchTextChange = (key) => (event) =>
+    setSearchText({ ...searchText, [key]: event.target.value });
+  const searchFields = Object.keys(columnObj).map((key) => (
+    <Input
+      key={key}
+      placeholder={`Search ${columnTitle[key]}`}
+      value={searchText[key]}
+      onChange={handleSearchTextChange(key)}
+      onPressEnter={handleSearch}
+      style={{ width: 188, margin: 8, display: "inline", borderRadius: "15px" }}
+    />
+  ));
 
   return (
     <>
       <div style={{ padding: 8 }}>
         {searchFields}
         <Space>
-          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+          <Button
+            onClick={handleReset}
+            size="small"
+            style={{
+              width: 90,
+              height: "30px",
+              borderRadius: "15px",
+              marginRight: "10px",
+            }}
+          >
             Reset
           </Button>
           <Button
@@ -371,7 +375,11 @@ export default function List(props) {
             onClick={handleSearch}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
+            style={{
+              width: 90,
+              height: "30px",
+              borderRadius: "15px",
+            }}
           >
             Search
           </Button>
@@ -379,6 +387,7 @@ export default function List(props) {
       </div>
       <Table
         dataSource={data.info}
+        loading={tableLoading}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
@@ -407,7 +416,7 @@ export default function List(props) {
         loading={state.loading}
         handleOk={handleOk}
         handleCancel={handleCancel}
-        handleLoad={handleLoad}
+        handleTableLoading={setTableLoading}
         errorMessageModal={errorMessageModal}
         setRefresh={setRefresh}
       />
