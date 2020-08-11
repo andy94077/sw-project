@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
 import { addHours, compareAsc, format } from "date-fns";
+import { useDispatch } from "react-redux";
 
 import {
   // BrowserRouter as Router,
@@ -18,6 +19,7 @@ import Profile from "./Profile/Profile";
 import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
 import ErrorMsg from "./components/ErrorMsg";
+import { setData } from "./redux/userSlice";
 
 import { CONCAT_SERVER_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
@@ -34,6 +36,7 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const dispatch = useDispatch();
 
   function handleClose() {
     setIsDialogOpen(false);
@@ -61,6 +64,14 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
+            dispatch(
+              setData({
+                username: res.data.username,
+                user_id: res.data.user_id,
+                bucket_time: res.data.user_time,
+                api_token: res.data.api_token,
+              })
+            );
             setUser((preUser) => {
               if (preUser.userId !== res.data.user_id) {
                 axios
@@ -119,7 +130,6 @@ export default function App() {
       }
     }, 600000);
     return () => {
-      console.log("over");
       clearInterval(timer);
     };
   }, []);
