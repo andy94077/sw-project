@@ -39,6 +39,10 @@ const useStyles = makeStyles(() => ({
     padding: "0",
     lineHeight: "20px",
   },
+  TextField: {
+    marginLeft: "5%",
+    marginRight: "5%",
+  },
 }));
 
 export default function CommentBox(props) {
@@ -90,9 +94,11 @@ export default function CommentBox(props) {
         .then(() => {
           refresh();
         })
-        .catch((e) => {
-          console.log(e);
-          setErrMessage("Failed to delete the comment, please retry");
+        .catch(() => {
+          setErrMessage({
+            title: "Network error",
+            message: "Failed to delete the comment, please retry",
+          });
           setIsConnectionFailed(true);
         })
         .finally(() => {
@@ -116,7 +122,6 @@ export default function CommentBox(props) {
           setIsEditDialogOpen(false);
         })
         .catch((e) => {
-          console.log(e);
           if (e.message === "Request failed with status code 403") {
             setIsConnectionFailed(true);
             setErrMessage({
@@ -210,6 +215,9 @@ export default function CommentBox(props) {
         onClose={handleEditDialogClose}
         moreComponent={
           <TextField
+            className={classes.TextField}
+            multiline
+            rowsMax={4}
             value={newComment}
             onChange={(e) => {
               setNewComment(e.target.value);
