@@ -92,7 +92,6 @@ class SuperUserController extends BaseController
 
     public function adminAll(Request $request)
     {
-        // var_dump($request['updated_at']);
         $query = SuperUser::withTrashed();
         if ($request['id']) {
             $query = $query->where('id', 'like', "%{$request['id']}%");
@@ -103,14 +102,29 @@ class SuperUserController extends BaseController
         if ($request['email']) {
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
-        if ($request['deleted_at'] !== [null, null]) {
+
+        if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] !== null) {
             $query = $query->whereBetween('deleted_at', $request['deleted_at']);
+        } else if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] === null) {
+            $query = $query->where('deleted_at', '>=', $request['deleted_at'][0]);
+        } else if ($request['deleted_at'][0] === null && $request['deleted_at'][1] !== null) {
+            $query = $query->where('deleted_at', '<=', $request['deleted_at'][1]);
         }
-        if ($request['created_at'] !== [null, null]) {
+
+        if ($request['created_at'][0] !== null && $request['created_at'][1] !== null) {
             $query = $query->whereBetween('created_at', $request['created_at']);
+        } else if ($request['created_at'][0] !== null && $request['created_at'][1] === null) {
+            $query = $query->where('created_at', '>=', $request['created_at'][0]);
+        } else if ($request['created_at'][0] === null && $request['created_at'][1] !== null) {
+            $query = $query->where('created_at', '<=', $request['created_at'][1]);
         }
-        if ($request['updated_at'] !== [null, null]) {
+
+        if ($request['updated_at'][0] !== null && $request['updated_at'][1] !== null) {
             $query = $query->whereBetween('updated_at', $request['updated_at']);
+        } else if ($request['updated_at'][0] !== null && $request['updated_at'][1] === null) {
+            $query = $query->where('updated_at', '>=', $request['updated_at'][0]);
+        } else if ($request['updated_at'][0] === null && $request['updated_at'][1] !== null) {
+            $query = $query->where('updated_at', '<=', $request['updated_at'][1]);
         }
 
         $size = $query->count();
