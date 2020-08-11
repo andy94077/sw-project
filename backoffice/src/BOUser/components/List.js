@@ -200,7 +200,7 @@ export default function List(props) {
               .map((col) => [
                 col.dataIndex,
                 filter[col.dataIndex].map((item) =>
-                  item === "" ? "" : item.format()
+                  item === "" || item === null ? "" : item.format()
                 ),
               ])
           ),

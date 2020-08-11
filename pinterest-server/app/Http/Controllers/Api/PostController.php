@@ -139,15 +139,31 @@ class PostController extends BaseController
         if($request['username']!== null){
              $query = $query->where('username', 'like', "%{$request['username']}%");
         }
-        if($request['deleted_at']!== null){
-             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
+        
+        if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] !== null) {
+            $query = $query->whereBetween('deleted_at', $request['deleted_at']);
+        } else if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] === null) {
+            $query = $query->where('deleted_at', '>=', $request['deleted_at'][0]);
+        } else if ($request['deleted_at'][0] === null && $request['deleted_at'][1] !== null) {
+            $query = $query->where('deleted_at', '<=', $request['deleted_at'][1]);
         }
-        if($request['created_at']!== null){
-             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
+
+        if ($request['created_at'][0] !== null && $request['created_at'][1] !== null) {
+            $query = $query->whereBetween('created_at', $request['created_at']);
+        } else if ($request['created_at'][0] !== null && $request['created_at'][1] === null) {
+            $query = $query->where('created_at', '>=', $request['created_at'][0]);
+        } else if ($request['created_at'][0] === null && $request['created_at'][1] !== null) {
+            $query = $query->where('created_at', '<=', $request['created_at'][1]);
         }
-        if($request['updated_at']!== null){
-             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
+
+        if ($request['updated_at'][0] !== null && $request['updated_at'][1] !== null) {
+            $query = $query->whereBetween('updated_at', $request['updated_at']);
+        } else if ($request['updated_at'][0] !== null && $request['updated_at'][1] === null) {
+            $query = $query->where('updated_at', '>=', $request['updated_at'][0]);
+        } else if ($request['updated_at'][0] === null && $request['updated_at'][1] !== null) {
+            $query = $query->where('updated_at', '<=', $request['updated_at'][1]);
         }
+
         $size = $query->count();
         $posts['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $posts['total'] = $size;

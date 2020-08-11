@@ -175,20 +175,19 @@ export default function List(props) {
       .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
         params: {
           ...filter,
-          online_time: filter.online_time.map((item) =>
-            item === "" ? "" : item.format()
-          ),
-          bucket_time: filter.bucket_time.map((item) =>
-            item === "" ? "" : item.format()
-          ),
-          created_at: filter.created_at.map((item) =>
-            item === "" ? "" : item.format()
-          ),
-          deleted_at: filter.deleted_at.map((item) =>
-            item === "" ? "" : item.format()
-          ),
-          updated_at: filter.updated_at.map((item) =>
-            item === "" ? "" : item.format()
+          ...Object.fromEntries(
+            [
+              "online_time",
+              "bucket_time",
+              "created_at",
+              "updated_at",
+              "deleted_at",
+            ].map((time) => [
+              time,
+              filter[time].map((item) =>
+                item === "" || item === null ? "" : item.format()
+              ),
+            ])
           ),
         },
       })
@@ -198,41 +197,21 @@ export default function List(props) {
           if (response.data.length !== 0) {
             setData({
               info: response.data.data.map((item) => {
-                item.online_time =
-                  item.online_time === null
-                    ? ""
-                    : format(
-                        new Date(item.online_time),
-                        "yyyy-MM-dd HH:mm:ss",
-                        {
+                [
+                  "online_time",
+                  "bucket_time",
+                  "created_at",
+                  "updated_at",
+                  "deleted_at",
+                ].map((time) => {
+                  item[time] =
+                    item[time] === null
+                      ? ""
+                      : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
                           timeZone: "Asia/Taipei",
-                        }
-                      );
-                item.bucket_time =
-                  item.bucket_time === null
-                    ? ""
-                    : format(
-                        new Date(item.bucket_time),
-                        "yyyy-MM-dd HH:mm:ss",
-                        { timeZone: "Asia/Taipei" }
-                      );
-                item.created_at = format(
-                  new Date(item.created_at),
-                  "yyyy-MM-dd HH:mm:ss",
-                  { timeZone: "Asia/Taipei" }
-                );
-                item.deleted_at =
-                  item.deleted_at === null
-                    ? ""
-                    : format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/Taipei",
-                      });
-                item.updated_at =
-                  item.updated_at === null
-                    ? ""
-                    : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/Taipei",
-                      });
+                        });
+                  return time;
+                });
                 return item;
               }),
               length: response.data.total,
@@ -359,6 +338,7 @@ export default function List(props) {
 
   const handleSearchTextChange = (key) => (event) =>
     setSearchText({ ...searchText, [key]: event.target.value });
+
   const handleSearchDateChange = (key) => (value) =>
     setSearchText({ ...searchText, [key]: value });
 
