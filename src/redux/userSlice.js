@@ -10,23 +10,15 @@ export const userSlice = createSlice({
   },
   reducers: {
     setData: (state, action) => {
-      // eslint-disable-next-line no-param-reassign
       state.username = action.payload.username;
-      // eslint-disable-next-line no-param-reassign
       state.userId = action.payload.user_id;
-      // eslint-disable-next-line no-param-reassign
       state.userBucketTime = action.payload.bucket_time;
-      // eslint-disable-next-line no-param-reassign
       state.api_token = action.payload.api_token;
     },
     removeData: (state) => {
-      // eslint-disable-next-line no-param-reassign
       state.username = null;
-      // eslint-disable-next-line no-param-reassign
       state.userId = null;
-      // eslint-disable-next-line no-param-reassign
       state.userBucketTime = null;
-      // eslint-disable-next-line no-param-reassign
       state.api_token = null;
     },
   },
