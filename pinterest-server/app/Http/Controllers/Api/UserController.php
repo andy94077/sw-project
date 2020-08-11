@@ -90,12 +90,14 @@ class UserController extends BaseController
         }
     }
 
-    public function count(Request $request)
-    {
-        $user = User::find($request['id']);
-        $user->online_time = date('Y-m-d H:i:s');
-        $user->save();
-        return response()->json("", 200);
+    public function count(Request $request){
+        if($request['id'] != null){
+            $user = User::find($request['id']);
+            $user->online_time = date('Y-m-d H:i:s');
+            $user->save();
+            return response()->json($user, 200);
+        }
+        return response()->json("Id not found", 404);
     }
 
     public function bucket(Request $request)
