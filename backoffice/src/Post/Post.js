@@ -10,6 +10,7 @@ import {
   Space,
   Table,
   Tooltip,
+  DatePicker,
 } from "antd";
 import {
   DeleteOutlined,
@@ -30,6 +31,9 @@ export default function Post() {
     username: "Username",
     content: "Content",
     tag: "Tag",
+    created_at: "Publish Time",
+    updated_at: "Update Time",
+    deleted_at: "Delete Time",
   };
   const columnObj = {
     id: "",
@@ -38,6 +42,9 @@ export default function Post() {
     username: "",
     content: "",
     tag: "",
+    created_at: ["", ""],
+    updated_at: ["", ""],
+    deleted_at: ["", ""],
   };
   const [searchText, setSearchText] = useState(columnObj);
   const [filter, setFilter] = useState({
@@ -56,7 +63,17 @@ export default function Post() {
       .request({
         method: "GET",
         url: CONCAT_SERVER_URL("/api/v1/posts/admin"),
-        params: filter,
+        params: {
+          ...filter,
+          ...Object.fromEntries(
+            ["created_at", "updated_at", "deleted_at"].map((time) => [
+              time,
+              filter[time].map((item) =>
+                item === "" || item === null ? "" : item.format()
+              ),
+            ])
+          ),
+        },
       })
       .then((res) => {
         setData(
@@ -64,12 +81,10 @@ export default function Post() {
             ["created_at", "updated_at", "deleted_at"].map((time) => {
               item[time] =
                 item[time] === null
-                  ? null
-                  : String(
-                      format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/Taipei",
-                      })
-                    );
+                  ? ""
+                  : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
+                      timeZone: "Asia/Taipei",
+                    });
               return time;
             });
             return item;
@@ -185,12 +200,11 @@ export default function Post() {
     ],
   });
 
-  const handleSetSearchText = (key) => (event) => {
-    setSearchText({
-      ...searchText,
-      [key]: event.target.value,
-    });
-  };
+  const handleSetSearchText = (key) => (event) =>
+    setSearchText({ ...searchText, [key]: event.target.value });
+
+  const handleSearchDateChange = (key) => (value) =>
+    setSearchText({ ...searchText, [key]: value });
 
   const handleSearch = () => {
     setFilter({
@@ -302,11 +316,7 @@ export default function Post() {
       dataIndex: "deleted_at",
       // render: (deleted_at) =>
       //   deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
-      sorter: (a, b) => {
-        const A = a.deleted_at === null ? "null" : a.deleted_at;
-        const B = b.deleted_at === null ? "null" : b.deleted_at;
-        return A.localeCompare(B);
-      },
+      sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
     },
     {
       title: "Options",
@@ -328,7 +338,7 @@ export default function Post() {
       }),
       render: (_, row) => (
         <div style={{ textAlign: "center" }}>
-          {row.deleted_at === null ? (
+          {row.deleted_at === "" ? (
             <Tooltip title="Delete">
               <Button
                 danger
@@ -357,16 +367,33 @@ export default function Post() {
     },
   ];
 
-  const searchFields = Object.keys(columnObj).map((key) => (
-    <Input
-      key={key}
-      placeholder={`Search ${columnTitle[key]}`}
-      value={searchText[key]}
-      onChange={handleSetSearchText(key)}
-      onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, borderRadius: 15 }}
-    />
-  ));
+  const searchFields = Object.keys(columnObj).map((key) =>
+    columnObj[key] instanceof Array ? (
+      <DatePicker.RangePicker
+        key={key}
+        placeholder={["Search", columnTitle[key]]}
+        allowEmpty={[true, true]}
+        value={searchText[key]}
+        onChange={handleSearchDateChange(key)}
+        showTime
+        onOk={(value) => console.log(value)}
+        style={{
+          width: 250,
+          margin: 8,
+          borderRadius: "15px",
+        }}
+      />
+    ) : (
+      <Input
+        key={key}
+        placeholder={`Search ${columnTitle[key]}`}
+        value={searchText[key]}
+        onChange={handleSetSearchText(key)}
+        onPressEnter={handleSearch}
+        style={{ width: 188, margin: 8, borderRadius: 15 }}
+      />
+    )
+  );
 
   return (
     <div>
