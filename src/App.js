@@ -62,7 +62,6 @@ export default function App() {
         .then((res) => {
           if (res.data.isValid === true) {
             setUser((preUser) => {
-              console.log(res.data);
               if (preUser.userId !== res.data.user_id) {
                 axios
                   .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
@@ -120,6 +119,7 @@ export default function App() {
       }
     }, 600000);
     return () => {
+      console.log("over");
       clearInterval(timer);
     };
   }, []);
