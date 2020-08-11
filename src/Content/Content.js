@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 
 import { Grid } from "@material-ui/core";
 
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, addHours, compareAsc } from "date-fns";
 import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Loading from "../components/Loading";
 import ErrorGrid from "../components/ErrorGrid";
 import { CONCAT_SERVER_URL } from "../constants";
+import { selectUser } from "../redux/userSlice";
 
 const useStyles = makeStyles(() => ({
   gird: {
@@ -17,15 +19,22 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+function checkBucket(bucketTime) {
+  if (bucketTime) {
+    const bucketDate = addHours(new Date(bucketTime), 8);
+    const now = new Date();
+    if (compareAsc(bucketDate, now) === 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export default function Content(props) {
   const {
-    userId,
-    username,
     match: {
       params: { pictureId },
     },
-    isBucket,
-    apiToken,
   } = props;
   const classes = useStyles();
   const [info, setInfo] = useState({
@@ -35,14 +44,13 @@ export default function Content(props) {
     timeAgo: "",
   });
   const [pageState, setPageState] = useState("Loading");
+  const { username, userId, bucketTime } = useSelector(selectUser);
 
+  const isBucket = checkBucket(bucketTime);
   async function refresh() {
     setPageState("Loading");
     Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-      },
     })
       .then((res) => {
         if (res.data.length === 0) {
