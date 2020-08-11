@@ -42,7 +42,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
     Route::delete('/post', 'PostController@delete');
-    Route::post('/post/modification', 'PostController@update');
+    Route::post('/post/modification', 'PostController@update')->middleware(['bucket']);
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');

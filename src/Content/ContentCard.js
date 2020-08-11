@@ -158,6 +158,10 @@ const useStyles = makeStyles((theme) => ({
   user: {
     flexGrow: "1",
   },
+  TextField: {
+    marginLeft: "5%",
+    marginRight: "5%",
+  },
 }));
 
 export default function ContentCard(props) {
@@ -271,12 +275,10 @@ export default function ContentCard(props) {
     Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), {
       data: { id },
     })
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         setOnDelete(2);
       })
       .catch((e) => {
-        console.log(e);
         if (e.message === "Network Error") {
           setIsConnectionFailed(true);
           setErrMessage({
@@ -306,6 +308,7 @@ export default function ContentCard(props) {
         id,
         content: newPost,
         user: true,
+        user_id: userId,
       })
         .then(() => {
           setIsEditDialogOpen(false);
@@ -412,6 +415,9 @@ export default function ContentCard(props) {
                     onClose={handleEditDialogClose}
                     moreComponent={
                       <TextField
+                        className={classes.TextField}
+                        multiline
+                        rowsMax={4}
                         value={newPost}
                         onChange={(e) => {
                           setNewPost(e.target.value);
