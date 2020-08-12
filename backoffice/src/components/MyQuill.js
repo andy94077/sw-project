@@ -5,13 +5,11 @@ import { Card, Button } from "antd";
 
 import "./MyQuill.css";
 
-export default function MyQuill() {
-  const [value, setValue] = useState("");
-
+export default function MyQuill(props) {
+  const { value, setValue } = props;
   return (
     <Card>
       <ReactQuill theme="snow" value={value} onChange={setValue} />
-      <Button>submit</Button>
     </Card>
   );
 }
