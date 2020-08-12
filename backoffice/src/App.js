@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Switch, Route, useLocation, useHistory } from "react-router-dom";
-import { DatePicker } from "antd";
 
 import Post from "./Post/Post";
 import User from "./User/User";
@@ -14,6 +13,7 @@ import Bar from "./Bar/Bar";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
 import { CONCAT_SERVER_URL } from "./constants";
+import Announcement from "./Announcement/Announcement";
 
 export default function App() {
   const [user, setUser] = useState({ username: null, userId: null });
@@ -71,6 +71,7 @@ export default function App() {
             <Route exact path={"/user"} component={User} />
             <Route exact path={"/post"} component={Post} />
             <Route exact path={"/BOUser"} component={BOUser} />
+            <Route exact path={"/Announcement"} component={Announcement} />
           </Switch>
         }
       />
