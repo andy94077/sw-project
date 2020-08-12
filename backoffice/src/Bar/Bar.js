@@ -62,6 +62,9 @@ export default function Bar(props) {
             <Menu.Item key="BOUser" icon={<TeamOutlined />}>
               <Link to="/BOUser">BO Users</Link>
             </Menu.Item>
+            <Menu.Item key="Announcement" icon={<TeamOutlined />}>
+              <Link to="/Announcement">Announcement</Link>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout>
