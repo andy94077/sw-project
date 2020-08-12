@@ -13,6 +13,7 @@ use App\Models\Image;
 use stdClass;
 use DateTime;
 use DateTimeZone;
+use Carbon\Carbon;
 
 // for delete images
 function removeDirectory($path)
@@ -160,7 +161,7 @@ class PostController extends BaseController
         $ndate = new DateTime(null);
         $res['n'] = $ndate;
         $res['valid'] = Post::all()->count();
-        $res['new'] = Post::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        $res['new'] = Post::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 
