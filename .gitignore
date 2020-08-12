@@ -40,3 +40,4 @@ pinterest-server/yarn-error.log
 
 ubuntu@172.31.34.200
 pinterest-server/laravel-echo-server.lock
+pinterest-server/dump.rdb
