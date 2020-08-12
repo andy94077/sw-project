@@ -11,7 +11,7 @@ import {
   CardMedia,
   CardContent,
   Card,
-  CardActionArea,
+  CardHeader,
   IconButton,
   Menu,
   MenuItem,
@@ -151,16 +151,22 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     flexGrow: "1",
   },
-  cardAction: {
-    display: "flex",
-    flexDirection: "row",
+  cardHeader: {
+    padding: 0,
+  },
+  action: {
+    margin: 0,
+  },
+  subheader: {
+    fontWeight: 500,
+    fontSize: "0.875em",
   },
   user: {
     flexGrow: "1",
   },
   TextField: {
-    marginLeft: "5%",
     marginRight: "5%",
+    width: "90%",
   },
 }));
 
@@ -348,95 +354,93 @@ export default function ContentCard(props) {
         />
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <CardActionArea className={classes.cardAction}>
-              <Link to={`/profile/${author}`} className={classes.user}>
-                <Typography
-                  component="h5"
-                  variant="h5"
-                  className={classes.author}
-                >
+            <CardHeader
+              classes={{
+                root: classes.cardHeader,
+                action: classes.action,
+                subheader: classes.subheader,
+              }}
+              title={
+                <Link to={`/profile/${author}`} className={classes.user}>
                   {author}
-                </Typography>
-              </Link>
-              {author === username && (
-                <>
-                  <IconButton
-                    size="small"
-                    onClick={handleClick}
-                    aria-controls="m"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    id="m"
-                    anchorEl={menu}
-                    keepMounted
-                    open={Boolean(menu)}
-                    onClose={handleClose}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsDialogOpen(true);
-                      }}
+                </Link>
+              }
+              subheader={timeAgo}
+              action={
+                author === username && (
+                  <>
+                    <IconButton
+                      size="small"
+                      onClick={handleClick}
+                      aria-controls="m"
                     >
-                      delete
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsEditDialogOpen(true);
-                      }}
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      id="m"
+                      anchorEl={menu}
+                      keepMounted
+                      open={Boolean(menu)}
+                      onClose={handleClose}
                     >
-                      Edit
-                    </MenuItem>
-                  </Menu>
-                  <AlertDialog
-                    open={isDialogOpen}
-                    alertTitle="Warning"
-                    alertDesciption="You are trying to delete a post"
-                    alertButton={
-                      <>
-                        <Button onClick={handleDelete}>Yes</Button>
-                        <Button onClick={handleDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleDialogClose}
-                  />
-                  <AlertDialog
-                    open={isEditDialogOpen}
-                    alertTitle="Edit Commit"
-                    alertButton={
-                      <>
-                        <Button onClick={handleEdit}>Yes</Button>
-                        <Button onClick={handleEditDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleEditDialogClose}
-                    moreComponent={
-                      <TextField
-                        className={classes.TextField}
-                        multiline
-                        rowsMax={4}
-                        value={newPost}
-                        onChange={(e) => {
-                          setNewPost(e.target.value);
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsDialogOpen(true);
                         }}
-                      />
-                    }
-                  />
-                </>
-              )}
-            </CardActionArea>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              display="block"
-              component="div"
-              className={classes.time}
-            >
-              {timeAgo}
-            </Typography>
+                      >
+                        delete
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        Edit
+                      </MenuItem>
+                    </Menu>
+                    <AlertDialog
+                      open={isDialogOpen}
+                      alertTitle="Warning"
+                      alertDesciption="Do you really want to delete this post?"
+                      alertButton={
+                        <>
+                          <Button onClick={handleDelete}>Yes</Button>
+                          <Button onClick={handleDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleDialogClose}
+                    />
+                    <AlertDialog
+                      open={isEditDialogOpen}
+                      alertTitle="Edit Post"
+                      alertButton={
+                        <>
+                          <Button onClick={handleEdit}>Yes</Button>
+                          <Button onClick={handleEditDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleEditDialogClose}
+                      moreComponent={
+                        <TextField
+                          className={classes.TextField}
+                          autoFocus
+                          variant="outlined"
+                          multiline
+                          rowsMax={4}
+                          value={newPost}
+                          onChange={(e) => {
+                            setNewPost(e.target.value);
+                          }}
+                        />
+                      }
+                    />
+                  </>
+                )
+              }
+            />
+
             <Typography
               variant="subtitle1"
               color="textSecondary"

@@ -9,8 +9,6 @@ import "../css/AlertDialog.css";
 
 const useStyles = makeStyles(() => ({
   frame: {
-    height: "25%",
-    minHeight: "200px",
     width: "40%",
     borderRadius: "25px",
     padding: "5px",
@@ -40,11 +38,13 @@ export default function AlertDialog(props) {
       >
         <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {alertDesciption}
-          </DialogContentText>
+          {alertDesciption !== undefined && alertDesciption !== "" && (
+            <DialogContentText id="alert-dialog-description">
+              {alertDesciption}
+            </DialogContentText>
+          )}
+          {moreComponent}
         </DialogContent>
-        {moreComponent}
         <DialogActions>{alertButton}</DialogActions>
       </Dialog>
     </div>
