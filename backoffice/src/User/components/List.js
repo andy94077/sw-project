@@ -202,15 +202,15 @@ export default function List(props) {
                   "created_at",
                   "updated_at",
                   "deleted_at",
-                ].map((time) => {
-                  item[time] =
-                    item[time] === null
-                      ? ""
-                      : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
-                          timeZone: "Asia/Taipei",
-                        });
-                  return time;
-                });
+                ].map(
+                  (time) =>
+                    (item[time] =
+                      item[time] === null
+                        ? ""
+                        : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
+                            timeZone: "Asia/Taipei",
+                          }))
+                );
                 return item;
               }),
               length: response.data.total,
