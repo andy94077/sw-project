@@ -7,11 +7,10 @@ import {
   TextareaAutosize,
   Button,
   Fab,
-  Typography,
   CardMedia,
   CardContent,
   Card,
-  CardActionArea,
+  CardHeader,
   IconButton,
   Menu,
   MenuItem,
@@ -151,16 +150,22 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     flexGrow: "1",
   },
-  cardAction: {
-    display: "flex",
-    flexDirection: "row",
+  cardHeader: {
+    padding: 0,
+  },
+  action: {
+    margin: 0,
+  },
+  subheader: {
+    fontWeight: 500,
+    fontSize: "0.875em",
   },
   user: {
     flexGrow: "1",
   },
-  TextField: {
-    marginLeft: "5%",
+  myQuill: {
     marginRight: "5%",
+    width: "90%",
   },
 }));
 
@@ -348,87 +353,86 @@ export default function ContentCard(props) {
         />
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <CardActionArea className={classes.cardAction}>
-              <Link to={`/profile/${author}`} className={classes.user}>
-                <Typography
-                  component="h5"
-                  variant="h5"
-                  className={classes.author}
-                >
+            <CardHeader
+              classes={{
+                root: classes.cardHeader,
+                action: classes.action,
+                subheader: classes.subheader,
+              }}
+              title={
+                <Link to={`/profile/${author}`} className={classes.user}>
                   {author}
-                </Typography>
-              </Link>
-              {author === username && (
-                <>
-                  <IconButton
-                    size="small"
-                    onClick={handleClick}
-                    aria-controls="m"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    id="m"
-                    anchorEl={menu}
-                    keepMounted
-                    open={Boolean(menu)}
-                    onClose={handleClose}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsDialogOpen(true);
-                      }}
+                </Link>
+              }
+              subheader={timeAgo}
+              action={
+                author === username && (
+                  <>
+                    <IconButton
+                      size="small"
+                      onClick={handleClick}
+                      aria-controls="m"
                     >
-                      delete
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsEditDialogOpen(true);
-                      }}
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      id="m"
+                      anchorEl={menu}
+                      keepMounted
+                      open={Boolean(menu)}
+                      onClose={handleClose}
                     >
-                      Edit
-                    </MenuItem>
-                  </Menu>
-                  <AlertDialog
-                    open={isDialogOpen}
-                    alertTitle="Warning"
-                    alertDesciption="You are trying to delete a post"
-                    alertButton={
-                      <>
-                        <Button onClick={handleDelete}>Yes</Button>
-                        <Button onClick={handleDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleDialogClose}
-                  />
-                  <AlertDialog
-                    open={isEditDialogOpen}
-                    alertTitle="Edit Post"
-                    alertButton={
-                      <>
-                        <Button onClick={handleEdit}>Yes</Button>
-                        <Button onClick={handleEditDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleEditDialogClose}
-                    moreComponent={
-                      <MyQuill value={newPost} setValue={setNewPost} />
-                    }
-                  />
-                </>
-              )}
-            </CardActionArea>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              display="block"
-              component="div"
-              className={classes.time}
-            >
-              {timeAgo}
-            </Typography>
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsDialogOpen(true);
+                        }}
+                      >
+                        delete
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        Edit
+                      </MenuItem>
+                    </Menu>
+                    <AlertDialog
+                      open={isDialogOpen}
+                      alertTitle="Warning"
+                      alertDesciption="Do you really want to delete this post?"
+                      alertButton={
+                        <>
+                          <Button onClick={handleDelete}>Yes</Button>
+                          <Button onClick={handleDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleDialogClose}
+                    />
+                    <AlertDialog
+                      open={isEditDialogOpen}
+                      alertTitle="Edit Post"
+                      alertButton={
+                        <>
+                          <Button onClick={handleEdit}>Yes</Button>
+                          <Button onClick={handleEditDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleEditDialogClose}
+                      moreComponent={
+                        <MyQuill
+                          className={classes.myQuill}
+                          value={newPost}
+                          setValue={setNewPost}
+                        />
+                      }
+                    />
+                  </>
+                )
+              }
+            />
             <div
               className={classes.text}
               dangerouslySetInnerHTML={{ __html: content }}
