@@ -9,7 +9,6 @@ import "../css/AlertDialog.css";
 
 const useStyles = makeStyles(() => ({
   frame: {
-    height: "25%",
     minHeight: "200px",
     width: "40%",
     borderRadius: "25px",

@@ -15,7 +15,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  TextField,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
@@ -27,6 +26,7 @@ import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
+import MyQuill from "../components/MyQuill";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -405,7 +405,7 @@ export default function ContentCard(props) {
                   />
                   <AlertDialog
                     open={isEditDialogOpen}
-                    alertTitle="Edit Commit"
+                    alertTitle="Edit Post"
                     alertButton={
                       <>
                         <Button onClick={handleEdit}>Yes</Button>
@@ -414,15 +414,7 @@ export default function ContentCard(props) {
                     }
                     onClose={handleEditDialogClose}
                     moreComponent={
-                      <TextField
-                        className={classes.TextField}
-                        multiline
-                        rowsMax={4}
-                        value={newPost}
-                        onChange={(e) => {
-                          setNewPost(e.target.value);
-                        }}
-                      />
+                      <MyQuill value={newPost} setValue={setNewPost} />
                     }
                   />
                 </>
@@ -437,15 +429,10 @@ export default function ContentCard(props) {
             >
               {timeAgo}
             </Typography>
-            <Typography
-              variant="subtitle1"
-              color="textSecondary"
-              display="block"
-              component="div"
+            <div
               className={classes.text}
-            >
-              {content}
-            </Typography>
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           </CardContent>
           <Fab
             component="span"
