@@ -6,8 +6,6 @@ import { useEffect } from "react";
 import { format } from "date-fns";
 import "./Dashboard.css";
 
-import MyQuill from "../components/MyQuill";
-
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
   const [postInfo, setPostInfo] = useState({ valid: 0, new: 0 });
@@ -237,7 +235,6 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
-      <MyQuill />
     </div>
   );
 }
