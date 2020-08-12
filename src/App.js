@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
-import { addHours, compareAsc, format } from "date-fns";
-import { useDispatch } from "react-redux";
+import { addHours, format } from "date-fns";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   // BrowserRouter as Router,
@@ -22,24 +22,19 @@ import Profile from "./Profile/Profile";
 import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
 import ErrorMsg from "./components/ErrorMsg";
-import { setData } from "./redux/userSlice";
+import { setData, selectUser } from "./redux/userSlice";
 
 import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
 
 export default function App() {
-  const [user, setUser] = useState({
-    username: null,
-    userId: null,
-    userBucketTime: null,
-    api_token: null,
-  });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
 
   function handleClose() {
     setIsDialogOpen(false);
@@ -85,41 +80,21 @@ export default function App() {
               setData({
                 username: res.data.username,
                 user_id: res.data.user_id,
-                bucket_time: res.data.user_time,
+                bucket_time: res.data.bucket_time,
                 api_token: res.data.api_token,
               })
             );
-            setUser((preUser) => {
-              if (preUser.userId !== res.data.user_id) {
-                axios
-                  .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
-                    id: res.data.user_id,
-                  })
-                  .catch((e) => {
-                    console.log(e);
-                  });
-              }
-              if (
-                preUser.userBucketTime !== res.data.bucket_time &&
-                checkBucket(res.data.bucket_time)
-              ) {
-                setIsDialogOpen(true);
-              }
-              return {
-                username: res.data.username,
-                userId: res.data.user_id,
-                userBucketTime: res.data.bucket_time,
-                api_token: res.data.api_token,
-              };
-            });
+
             if (location.pathname === "/") history.push("/home");
           } else {
-            setUser({
-              username: null,
-              userId: null,
-              userBucketTime: null,
-              api_token: null,
-            });
+            dispatch(
+              setData({
+                username: null,
+                user_id: null,
+                bucket_time: null,
+                api_token: null,
+              })
+            );
           }
         })
         .catch(() => {
@@ -130,7 +105,14 @@ export default function App() {
         })
         .finally(() => setIsReady(true));
     } else {
-      setUser({ username: null, userId: null, userBucketTime: null });
+      dispatch(
+        setData({
+          username: null,
+          user_id: null,
+          bucket_time: null,
+          api_token: null,
+        })
+      );
     }
   }, [location, history]);
 
@@ -165,29 +147,12 @@ export default function App() {
           <Route
             exact
             path="/picture/:pictureId"
-            render={(props) => (
-              <Content
-                username={user.username}
-                userId={user.userId}
-                match={props.match}
-                userBucketTime={addHours(new Date(user.userBucketTime), 8)}
-                isBucket={checkBucket(user.userBucketTime)}
-                apiToken={user.api_token}
-              />
-            )}
+            render={(props) => <Content match={props.match} />}
           />
           <Route
             exact
             path="/profile/:name"
-            render={(props) => (
-              <Profile
-                username={user.username}
-                userId={user.userId}
-                match={props.match}
-                userBucketTime={addHours(new Date(user.userBucketTime), 8)}
-                isBucket={checkBucket(user.userBucketTime)}
-              />
-            )}
+            render={(props) => <Profile match={props.match} />}
           />
           <Route exact path="/setting" component={() => <>setting</>} />
           <Route exact path="/logout" component={() => <>logout</>} />
@@ -196,7 +161,7 @@ export default function App() {
           open={isDialogOpen}
           alertTitle="You are during bucket"
           alertDesciption={`End: ${format(
-            addHours(new Date(user.userBucketTime), 8),
+            addHours(new Date(user.BucketTime), 8),
             "yyyy-MM-dd hh:mm:ss"
           )}`}
           alertButton={

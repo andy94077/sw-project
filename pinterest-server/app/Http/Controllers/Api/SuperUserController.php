@@ -90,40 +90,44 @@ class SuperUserController extends BaseController
         }
     }
 
-    public function adminAll(Request $request){
+    public function adminAll(Request $request)
+    {
         $query = SuperUser::withTrashed();
-        if($request['id']){
+        if ($request['id']) {
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
-        if($request['name']){
+        if ($request['name']) {
             $query = $query->where('name', 'like', "%{$request['name']}%");
         }
-        if($request['email']){
+        if ($request['email']) {
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
-        if($request['deleted_at']){
-             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
-        }
-        if($request['created_at']){
-             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
-        }
-        if($request['updated_at']){
-             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
-        }
 
+        foreach (array('deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
+        }
+        
         $size = $query->count();
-        $users['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
         return response()->json($users, 200);
     }
 
-    public function adminDelete(Request $request){
+    public function adminDelete(Request $request)
+    {
         $user = SuperUser::find($request['id']);
         $user->delete();
         return $this->sendResponse($user, "success");
     }
 
-    public function adminRecover(Request $request){
+    public function adminRecover(Request $request)
+    {
         $user = SuperUser::withTrashed()->find($request['id']);
         $user->restore();
         return $this->sendResponse($user, "success");

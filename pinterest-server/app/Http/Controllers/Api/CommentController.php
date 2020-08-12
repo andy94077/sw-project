@@ -89,15 +89,17 @@ class CommentController extends BaseController{
         if($request['content']!== null){
             $query = $query->where("content", 'like', "%{$request['content']}%");
         }
-        if($request['deleted_at']!== null){
-             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
+        
+        foreach (array('deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
         }
-        if($request['created_at']!== null){
-             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
-        }
-        if($request['updated_at']!== null){
-             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
-        }
+
         $size = $query->count();
         $comments['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $comments['total'] = $size;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
+import { addHours, compareAsc } from "date-fns";
 import { Button } from "@material-ui/core";
 import Loading from "../components/Loading";
 import Errormsg from "../components/ErrorMsg";
@@ -8,6 +10,7 @@ import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
 import { CONCAT_SERVER_URL } from "../constants";
+import { selectUser } from "../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   central: {
@@ -55,14 +58,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function checkBucket(bucketTime) {
+  if (bucketTime) {
+    const bucketDate = addHours(new Date(bucketTime), 8);
+    const now = new Date();
+    if (compareAsc(bucketDate, now) === 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export default function Profile(props) {
   const {
-    username,
-    userId,
     match: {
       params: { name },
     },
-    isBucket,
   } = props;
 
   // const userId = 1;
@@ -81,6 +92,8 @@ export default function Profile(props) {
   const [isReady, setIsReady] = useState("Loading");
   const [isMyself, setIsMyself] = useState(false);
   const [id, setId] = useState(0);
+  const { username, userId, bucketTime } = useSelector(selectUser);
+  const isBucket = checkBucket(bucketTime);
 
   useEffect(() => {
     setIsReady("Loading");

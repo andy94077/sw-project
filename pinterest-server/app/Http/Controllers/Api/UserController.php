@@ -15,17 +15,17 @@ use stdClass;
 use DateTime;
 use DateInterval;
 use date;
+use Carbon\Carbon;
 
 class UserController extends BaseController
 {
 
     public function logIn(Request $request)
     {
-        if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
+        if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
             return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true, 'api_token' => Auth::user()->api_token], 200);
-        }
-        else {
-            return response()->json(['Message' => "Login fails!",'isLogin' => false], 200);
+        } else {
+            return response()->json(['Message' => "Login fails!", 'isLogin' => false], 200);
         }
     }
 
@@ -35,41 +35,37 @@ class UserController extends BaseController
         $errorMes = $isValid->messages();
         $errorMesContent = $isValid->messages()->messages();
         $isContentInvalid = array('name' => $errorMes->has('name'), 'email' => $errorMes->has('email'), 'password' => $errorMes->has('password'));
-        if($isValid -> fails()){
-            return response()->json(['Message' => "Sign up fails!",'isSignUp' => false, "isContentInvalid" => $isContentInvalid, "errorMesContent" => $errorMesContent], 200);
-        }
-        else{
+        if ($isValid->fails()) {
+            return response()->json(['Message' => "Sign up fails!", 'isSignUp' => false, "isContentInvalid" => $isContentInvalid, "errorMesContent" => $errorMesContent], 200);
+        } else {
             $user = RegisterController::create($request);
-            if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)){
-                return response()->json(['name' => Auth::user()->name, 'Message' => "Sign up seccess!",'isSignUp' => true, 'isLogin' => true, 'token' => Auth::user()->remember_token], 200);
-            }
-            else {
-                return response()->json(['Message' => "Sign up seccess but Login fails!",'isSignUp' => false, 'isLogin' => false], 200);
+            if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
+                return response()->json(['name' => Auth::user()->name, 'Message' => "Sign up seccess!", 'isSignUp' => true, 'isLogin' => true, 'token' => Auth::user()->remember_token], 200);
+            } else {
+                return response()->json(['Message' => "Sign up seccess but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
             }
         }
     }
 
     public function logOut()
     {
-        if(Auth::logout()){
-            return response()->json(['Message' => "Logout success!",'isLogout' => true], 200);
-        }
-        else{
-            return response()->json(['Message' => "Please try again!",'isLogout' => false], 200);
+        if (Auth::logout()) {
+            return response()->json(['Message' => "Logout success!", 'isLogout' => true], 200);
+        } else {
+            return response()->json(['Message' => "Please try again!", 'isLogout' => false], 200);
         }
     }
 
     public function authentication(Request $request)
     {
         $userToken = $request['accessToken'];
-        if($userToken === null || $userToken === ''){
+        if ($userToken === null || $userToken === '') {
             return response()->json(['isValid' => false], 200);
         }
         $userInfo = User::where('remember_token', $userToken)->first();
-        if($userInfo === null){
+        if ($userInfo === null) {
             return response()->json(['isValid' => false], 200);
-        }
-        else{
+        } else {
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
@@ -79,14 +75,13 @@ class UserController extends BaseController
             ], 200);
         }
     }
-    
+
     public function userExist(Request $request)
     {
         $userInfo = User::where('name', $request['name'])->first();
-        if($userInfo === null){
+        if ($userInfo === null) {
             return response()->json(['isValid' => false], 200);
-        }
-        else{
+        } else {
             return response()->json([
                 'name' => $userInfo->name,
                 'id' => $userInfo->id,
@@ -97,85 +92,91 @@ class UserController extends BaseController
     }
 
     public function count(Request $request){
-        $user = User::find($request['id']);
-        $user->online_time = date('Y-m-d H:i:s');
-        $user->save();
-        return response()->json("", 200);
+        if($request['id'] != null){
+            $user = User::find($request['id']);
+            $user->online_time = Carbon::now();
+            $user->save();
+            return response()->json($user, 200);
+        }
+        return response()->json("Id not found", 404);
     }
 
-    public function bucket(Request $request){
-        if($request['id']){
+    public function bucket(Request $request)
+    {
+        if ($request['id']) {
             $user = User::find($request['id']);
             $date = new DateTime(null);
-            $h = ($request['hour'])?$request['hour']:0;
-            $d = ($request['day'])?$request['day']:0;
-            $y = ($request['year'])?$request['year']:0;
-            $m = ($request['month'])?$request['month']:0;
+            $h = ($request['hour']) ? $request['hour'] : 0;
+            $d = ($request['day']) ? $request['day'] : 0;
+            $y = ($request['year']) ? $request['year'] : 0;
+            $m = ($request['month']) ? $request['month'] : 0;
             $date->add(new DateInterval("P{$y}Y{$m}M{$d}DT{$h}H0M0S"));
             $user->bucket_time = $date->format('Y-m-d\TH:i:s');
             $user->save();
-            return response()->json( $user, 200);
+            return response()->json($user, 200);
         }
         return $this->sendError("id not found", 404);
     }
 
-    public function unBucket(Request $request){
-        if($request['id']){
+    public function unBucket(Request $request)
+    {
+        if ($request['id']) {
             $user = User::find($request['id']);
             $user->bucket_time = null;
             $user->save();
-            return response()->json( $user, 200);
+            return response()->json($user, 200);
         }
         return $this->sendError("id not found", 404);
     }
 
-    public function adminAll(Request $request){
+    public function adminAll(Request $request)
+    {
         $query = User::withTrashed();
-        if($request['id']!== null){
+        if ($request['id'] !== null) {
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
-        if($request['name']!== null){
+        if ($request['name'] !== null) {
             $query = $query->where('name', 'like', "%{$request['name']}%");
         }
-        if($request['email']!== null){
+        if ($request['email'] !== null) {
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
-        if($request['bucket_time']!== null){
-            $query = $query->where('bucket_time', 'like', "%{$request['bucket_time']}%");
-        }
-        if($request['deleted_at']!== null){
-             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
-        }
-        if($request['created_at']!== null){
-             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
-        }
-        if($request['updated_at']!== null){
-             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
-        }
 
+        foreach (array('online_time', 'bucket_time', 'deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
+        }
+        
         $size = $query->count();
-        $users['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
+        $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
-        //echo date('c', $users['data'][0]['online_time']);
+
         return response()->json($users, 200);
     }
 
-    public function adminDelete(Request $request){
+    public function adminDelete(Request $request)
+    {
         $user = User::find($request['id']);
         $user->delete();
         return $this->sendResponse($user, "success");
     }
 
-    public function adminRecover(Request $request){
+    public function adminRecover(Request $request)
+    {
         $user = User::withTrashed()->find($request['id']);
         $user->restore();
         return $this->sendResponse($user, "success");
     }
 
     public function getUserInfo(){
-        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 10 MINUTE'))->count();
+        $res['online'] = User::where('online_time', '>=',Carbon::parse('-10 minutes'))->count();
         $res['valid'] = User::all()->count();
-        $res['new'] = User::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        $res['new'] = User::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 }

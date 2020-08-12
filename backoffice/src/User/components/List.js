@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
 import { SearchOutlined } from "@ant-design/icons";
-import { message, Avatar, Button, Input, Modal, Space, Table } from "antd";
+import {
+  message,
+  Avatar,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  DatePicker,
+} from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
-import styles from "./List.less";
 import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
@@ -28,19 +36,19 @@ export default function List(props) {
     email: "Email",
     online_time: "Online Time",
     bucket_time: "Bucket Time",
-    created_at: "created_at",
-    deleted_at: "deleted_at",
-    updated_at: "updated_at",
+    created_at: "Create Time",
+    deleted_at: "Delete Time",
+    updated_at: "Update Time",
   };
   const columnObj = {
     id: "",
     name: "",
     email: "",
-    online_time: "",
-    bucket_time: "",
-    created_at: "",
-    deleted_at: "",
-    updated_at: "",
+    online_time: ["", ""],
+    bucket_time: ["", ""],
+    created_at: ["", ""],
+    deleted_at: ["", ""],
+    updated_at: ["", ""],
   };
   const [searchText, setSearchText] = useState({ ...columnObj });
   const [filter, setFilter] = useState({
@@ -164,7 +172,23 @@ export default function List(props) {
     setTableLoading(true);
     axios
       .get(CONCAT_SERVER_URL("/api/v1/users/admin"), {
-        params: filter,
+        params: {
+          ...filter,
+          ...Object.fromEntries(
+            [
+              "online_time",
+              "bucket_time",
+              "created_at",
+              "updated_at",
+              "deleted_at",
+            ].map((time) => [
+              time,
+              filter[time].map((item) =>
+                item === "" || item === null ? "" : item.format()
+              ),
+            ])
+          ),
+        },
       })
       .then((response) => {
         console.log(response.data.data);
@@ -172,41 +196,21 @@ export default function List(props) {
           if (response.data.length !== 0) {
             setData({
               info: response.data.data.map((item) => {
-                item.created_at = format(
-                  new Date(item.created_at),
-                  "yyyy-MM-dd HH:mm:ss",
-                  { timeZone: "Asia/Taipei" }
+                [
+                  "online_time",
+                  "bucket_time",
+                  "created_at",
+                  "updated_at",
+                  "deleted_at",
+                ].map(
+                  (time) =>
+                    (item[time] =
+                      item[time] === null
+                        ? ""
+                        : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
+                            timeZone: "Asia/Taipei",
+                          }))
                 );
-                item.bucket_time =
-                  item.bucket_time === null
-                    ? ""
-                    : format(
-                        new Date(item.bucket_time),
-                        "yyyy-MM-dd HH:mm:ss",
-                        { timeZone: "Asia/Taipei" }
-                      );
-                item.deleted_at =
-                  item.deleted_at === null
-                    ? ""
-                    : format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/Taipei",
-                      });
-                item.updated_at =
-                  item.updated_at === null
-                    ? ""
-                    : format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
-                        timeZone: "Asia/Taipei",
-                      });
-                item.online_time =
-                  item.online_time === null
-                    ? ""
-                    : format(
-                        new Date(item.online_time),
-                        "yyyy-MM-dd HH:mm:ss",
-                        {
-                          timeZone: "Asia/Taipei",
-                        }
-                      );
                 return item;
               }),
               length: response.data.total,
@@ -250,7 +254,6 @@ export default function List(props) {
       dataIndex: "avatar_url",
       key: "avatar",
       width: 80,
-      //fixed: "left",
       render: (text) => (
         <Avatar style={{ marginLeft: 8 }} src={CONCAT_SERVER_URL(text)} />
       ),
@@ -334,16 +337,42 @@ export default function List(props) {
 
   const handleSearchTextChange = (key) => (event) =>
     setSearchText({ ...searchText, [key]: event.target.value });
-  const searchFields = Object.keys(columnObj).map((key) => (
-    <Input
-      key={key}
-      placeholder={`Search ${columnTitle[key]}`}
-      value={searchText[key]}
-      onChange={handleSearchTextChange(key)}
-      onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, display: "inline", borderRadius: "15px" }}
-    />
-  ));
+
+  const handleSearchDateChange = (key) => (value) =>
+    setSearchText({ ...searchText, [key]: value });
+
+  const searchFields = Object.keys(columnObj).map((key) =>
+    columnObj[key] instanceof Array ? (
+      <DatePicker.RangePicker
+        key={key}
+        placeholder={["Search", columnTitle[key]]}
+        allowEmpty={[true, true]}
+        value={searchText[key]}
+        onChange={handleSearchDateChange(key)}
+        showTime
+        onOk={(value) => console.log(value)}
+        style={{
+          width: 250,
+          margin: 8,
+          borderRadius: "15px",
+        }}
+      />
+    ) : (
+      <Input
+        key={key}
+        placeholder={`Search ${columnTitle[key]}`}
+        value={searchText[key]}
+        onChange={handleSearchTextChange(key)}
+        onPressEnter={handleSearch}
+        style={{
+          width: 188,
+          margin: 8,
+          display: "inline",
+          borderRadius: "15px",
+        }}
+      />
+    )
+  );
 
   return (
     <>
@@ -395,7 +424,6 @@ export default function List(props) {
             }
           },
         }}
-        className={styles.table}
         bordered
         scroll={{ x: 1200 }}
         columns={columns}

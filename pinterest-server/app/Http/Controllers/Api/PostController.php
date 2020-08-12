@@ -13,6 +13,7 @@ use App\Models\Image;
 use stdClass;
 use DateTime;
 use DateTimeZone;
+use Carbon\Carbon;
 
 // for delete images
 function removeDirectory($path)
@@ -139,15 +140,17 @@ class PostController extends BaseController
         if($request['username']!== null){
              $query = $query->where('username', 'like', "%{$request['username']}%");
         }
-        if($request['deleted_at']!== null){
-             $query = $query->where('deleted_at', 'like', "%{$request['deleted_at']}%");
+        
+        foreach (array('deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
         }
-        if($request['created_at']!== null){
-             $query = $query->where('created_at', 'like', "%{$request['created_at']}%");
-        }
-        if($request['updated_at']!== null){
-             $query = $query->where('updated_at', 'like', "%{$request['updated_at']}%");
-        }
+
         $size = $query->count();
         $posts['data'] = $query->skip(($request['page']-1)*$request['size'])->take($request['size'])->get();
         $posts['total'] = $size;
@@ -160,7 +163,7 @@ class PostController extends BaseController
         $ndate = new DateTime(null);
         $res['n'] = $ndate;
         $res['valid'] = Post::all()->count();
-        $res['new'] = Post::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        $res['new'] = Post::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 

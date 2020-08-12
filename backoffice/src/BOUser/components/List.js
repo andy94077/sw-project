@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { Table, Modal, Space, Button, Input, Tooltip, message } from "antd";
+import {
+  Table,
+  Modal,
+  Space,
+  Button,
+  Input,
+  Tooltip,
+  message,
+  DatePicker,
+} from "antd";
 import {
   ExclamationCircleOutlined,
   DeleteOutlined,
@@ -17,9 +26,9 @@ export default function List(props) {
     id: "",
     name: "",
     email: "",
-    deleted_at: "",
-    created_at: "",
-    updated_at: "",
+    created_at: ["", ""],
+    deleted_at: ["", ""],
+    updated_at: ["", ""],
   };
   const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState(initialSearchText);
@@ -34,19 +43,10 @@ export default function List(props) {
     length: 0,
   });
 
-  const columnTitle = {
-    id: "Id",
-    name: "Name",
-    email: "Email",
-    deleted_at: "Delete Time",
-    created_at: "Create Time",
-    updated_at: "Updated Time",
-  };
-
   const tableColumns = useMemo(
     () => [
       {
-        title: "ID",
+        title: "Id",
         dataIndex: "id",
         key: "id",
         width: 70,
@@ -66,38 +66,28 @@ export default function List(props) {
         sorter: (a, b) => a.email.localeCompare(b.email),
       },
       {
-        title: "created_at",
+        title: "Create Time",
         dataIndex: "created_at",
         key: "created_at",
         sorter: (a, b) => a.created_at.localeCompare(b.created_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
-        timeZone: "Asia/China",
+        timeZone: "Asia/Taipei",
       },
       {
-        title: "deleted_at",
+        title: "Delete Time",
         dataIndex: "deleted_at",
         key: "deleted_at",
-        sorter: (a, b) =>
-          a.deleted_at === null
-            ? 1
-            : b.deleted_at === null
-            ? -1
-            : Number(a.deleted_at > b.deleted_at),
+        sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
-        timeZone: "Asia/China",
+        timeZone: "Asia/Taipei",
       },
       {
-        title: "updated_at",
+        title: "Update Time",
         dataIndex: "updated_at",
         key: "updated_at",
-        sorter: (a, b) =>
-          a.updated_at === null
-            ? 1
-            : b.updated_at === null
-            ? -1
-            : Number(a.updated_at > b.updated_at),
+        sorter: (a, b) => a.updated_at.localeCompare(b.updated_at),
         timeFormat: "yyyy-MM-dd HH:mm:ss",
-        timeZone: "Asia/China",
+        timeZone: "Asia/Taipei",
       },
     ],
     []
@@ -169,7 +159,7 @@ export default function List(props) {
       }),
       render: (_, row) => (
         <div style={{ textAlign: "center" }}>
-          {row.deleted_at === null ? (
+          {row.deleted_at === "" ? (
             <Tooltip title="Delete">
               <Button
                 danger
@@ -202,7 +192,19 @@ export default function List(props) {
     setIsLoading(true);
     axios
       .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
-        params: filter,
+        params: {
+          ...filter,
+          ...Object.fromEntries(
+            tableColumns
+              .filter((col) => col.hasOwnProperty("timeFormat"))
+              .map((col) => [
+                col.dataIndex,
+                filter[col.dataIndex].map((item) =>
+                  item === "" || item === null ? "" : item.format()
+                ),
+              ])
+          ),
+        },
       })
       .then((res) => {
         if (res.data.data !== null) {
@@ -212,15 +214,11 @@ export default function List(props) {
                 ...item,
                 ...Object.fromEntries(
                   tableColumns
-                    .filter(
-                      (col) =>
-                        col.hasOwnProperty("timeFormat") &&
-                        col.hasOwnProperty("timeZone")
-                    )
+                    .filter((col) => col.hasOwnProperty("timeFormat"))
                     .map(({ dataIndex, timeFormat, timeZone }) => [
                       dataIndex,
                       item[dataIndex] === null
-                        ? null
+                        ? ""
                         : format(new Date(item[dataIndex]), timeFormat, {
                             timeZone,
                           }),
@@ -259,16 +257,41 @@ export default function List(props) {
   const handleSearchTextChange = (key) => (event) =>
     setSearchText({ ...searchText, [key]: event.target.value });
 
-  const searchFields = Object.keys(initialSearchText).map((key) => (
-    <Input
-      key={key}
-      placeholder={`Search ${columnTitle[key]}`}
-      value={searchText[key]}
-      onChange={handleSearchTextChange(key)}
-      onPressEnter={handleSearch}
-      style={{ width: 188, margin: 8, display: "inline", borderRadius: "15px" }}
-    />
-  ));
+  const handleSearchDateChange = (key) => (value) =>
+    setSearchText({ ...searchText, [key]: value });
+
+  const searchFields = tableColumns.map((col) =>
+    col.hasOwnProperty("timeFormat") ? (
+      <DatePicker.RangePicker
+        key={col.dataIndex}
+        placeholder={["Search", col.title]}
+        allowEmpty={[true, true]}
+        value={searchText[col.dataIndex]}
+        onChange={handleSearchDateChange(col.dataIndex)}
+        showTime
+        onOk={(value) => console.log(value)}
+        style={{
+          width: 250,
+          margin: 8,
+          borderRadius: "15px",
+        }}
+      />
+    ) : (
+      <Input
+        key={col.dataIndex}
+        placeholder={`Search ${col.title}`}
+        value={searchText[col.dataIndex]}
+        onChange={handleSearchTextChange(col.dataIndex)}
+        onPressEnter={handleSearch}
+        style={{
+          width: 188,
+          margin: 8,
+          display: "inline",
+          borderRadius: "15px",
+        }}
+      />
+    )
+  );
 
   return (
     <div>

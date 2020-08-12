@@ -186,7 +186,6 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
-      <MyQuill />
     </>
   );
 }
