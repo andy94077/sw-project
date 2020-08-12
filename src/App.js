@@ -11,6 +11,9 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+import Echo from "laravel-echo";
+import io from "socket.io-client";
+
 import Bar from "./Bar/Bar";
 import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
@@ -21,7 +24,7 @@ import { getCookie } from "./cookieHelper";
 import ErrorMsg from "./components/ErrorMsg";
 import { setData, selectUser } from "./redux/userSlice";
 
-import { CONCAT_SERVER_URL } from "./constants";
+import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
 
 export default function App() {
@@ -36,6 +39,31 @@ export default function App() {
   function handleClose() {
     setIsDialogOpen(false);
   }
+
+  function checkBucket(bucketTime) {
+    if (bucketTime) {
+      const bucketDate = addHours(new Date(bucketTime), 8);
+      const now = new Date();
+      if (compareAsc(bucketDate, now) === 1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Broadcast
+  useEffect(() => {
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("AdPosting").listen("AdPosted", (e) => {
+      console.log(e);
+    });
+  }, []);
 
   useEffect(() => {
     const accessToken = getCookie();
