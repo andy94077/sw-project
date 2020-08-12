@@ -15,6 +15,7 @@ use stdClass;
 use DateTime;
 use DateInterval;
 use date;
+use Carbon\Carbon;
 
 class UserController extends BaseController
 {
@@ -93,7 +94,7 @@ class UserController extends BaseController
     public function count(Request $request){
         if($request['id'] != null){
             $user = User::find($request['id']);
-            $user->online_time = date('Y-m-d H:i:s');
+            $user->online_time = Carbon::now();
             $user->save();
             return response()->json($user, 200);
         }
@@ -202,11 +203,10 @@ class UserController extends BaseController
         return $this->sendResponse($user, "success");
     }
 
-    public function getUserInfo()
-    {
-        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 10 MINUTE'))->count();
+    public function getUserInfo(){
+        $res['online'] = User::where('online_time', '>=',Carbon::parse('-10 minutes'))->count();
         $res['valid'] = User::all()->count();
-        $res['new'] = User::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        $res['new'] = User::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 }
