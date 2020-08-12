@@ -14,7 +14,6 @@ import {
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
-import styles from "./List.less";
 import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
@@ -425,7 +424,6 @@ export default function List(props) {
             }
           },
         }}
-        className={styles.table}
         bordered
         scroll={{ x: 1200 }}
         columns={columns}
