@@ -140,28 +140,14 @@ class PostController extends BaseController
              $query = $query->where('username', 'like', "%{$request['username']}%");
         }
         
-        if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] !== null) {
-            $query = $query->whereBetween('deleted_at', $request['deleted_at']);
-        } else if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] === null) {
-            $query = $query->where('deleted_at', '>=', $request['deleted_at'][0]);
-        } else if ($request['deleted_at'][0] === null && $request['deleted_at'][1] !== null) {
-            $query = $query->where('deleted_at', '<=', $request['deleted_at'][1]);
-        }
-
-        if ($request['created_at'][0] !== null && $request['created_at'][1] !== null) {
-            $query = $query->whereBetween('created_at', $request['created_at']);
-        } else if ($request['created_at'][0] !== null && $request['created_at'][1] === null) {
-            $query = $query->where('created_at', '>=', $request['created_at'][0]);
-        } else if ($request['created_at'][0] === null && $request['created_at'][1] !== null) {
-            $query = $query->where('created_at', '<=', $request['created_at'][1]);
-        }
-
-        if ($request['updated_at'][0] !== null && $request['updated_at'][1] !== null) {
-            $query = $query->whereBetween('updated_at', $request['updated_at']);
-        } else if ($request['updated_at'][0] !== null && $request['updated_at'][1] === null) {
-            $query = $query->where('updated_at', '>=', $request['updated_at'][0]);
-        } else if ($request['updated_at'][0] === null && $request['updated_at'][1] !== null) {
-            $query = $query->where('updated_at', '<=', $request['updated_at'][1]);
+        foreach (array('deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
         }
 
         $size = $query->count();
