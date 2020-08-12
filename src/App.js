@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  Snackbar,
+  SnackbarContent,
+} from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 import { addHours, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,6 +17,7 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+
 import Echo from "laravel-echo";
 import io from "socket.io-client";
 
@@ -19,13 +26,13 @@ import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
 import Content from "./Content/Content";
 import Profile from "./Profile/Profile";
-import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
-import ErrorMsg from "./components/ErrorMsg";
 import { setData, selectUser } from "./redux/userSlice";
 
 import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
+import ErrorMsg from "./components/ErrorMsg";
+import Loading from "./components/Loading";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
@@ -33,11 +40,17 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAdOpen, setisAdOpen] = useState(false);
+  const [adMessage, setAdMessage] = useState("");
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
   function handleClose() {
     setIsDialogOpen(false);
+  }
+
+  function handleAdClose() {
+    setisAdOpen(false);
   }
 
   // Broadcast
@@ -49,8 +62,13 @@ export default function App() {
       host: REDIS_URL, // this is laravel-echo-server host
     });
 
-    window.Echo.channel("AdPosting").listen("AdPosted", (e) => {
-      console.log(e);
+    window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
+      const { text } = event;
+      setisAdOpen(true);
+      setAdMessage(text);
+      setTimeout(() => {
+        setisAdOpen(false);
+      }, 5000);
     });
   }, []);
 
@@ -112,8 +130,11 @@ export default function App() {
           .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
             id: user.userId,
           })
-          .catch((e) => {
-            console.log(e);
+          .catch(() => {
+            setError({
+              message: "Connection Error",
+              url: "/pictures/connection-error.svg",
+            });
           });
       }
     }, 600000);
@@ -160,6 +181,43 @@ export default function App() {
           }
           onClose={handleClose}
         />
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isAdOpen}
+        >
+          <SnackbarContent
+            message={
+              <div
+                style={{
+                  maxWidth: "275px",
+                  minHeight: "10px",
+                }}
+                dangerouslySetInnerHTML={{ __html: adMessage }}
+              />
+            }
+            action={
+              <IconButton
+                size="small"
+                component="span"
+                aria-label="close"
+                color="inherit"
+                onClick={handleAdClose}
+                style={{
+                  position: "absolute",
+                  top: 5,
+                  right: 5,
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            }
+            style={{
+              background: "white",
+              color: "black",
+              borderRadius: 10,
+            }}
+          />
+        </Snackbar>
       </div>
     );
   }

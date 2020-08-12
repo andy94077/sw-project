@@ -6,8 +6,6 @@ import { useEffect } from "react";
 import { format } from "date-fns";
 import "./Dashboard.css";
 
-import MyQuill from "../components/MyQuill";
-
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
   const [postInfo, setPostInfo] = useState({ valid: 0, new: 0 });
@@ -36,6 +34,7 @@ export default function Dashboard() {
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
     Promise.all([user, comment, post])
       .then((res) => {
+        console.log(res);
         setUserInfo(res[0].data);
         setCommentInfo(res[1].data);
         setPostInfo(res[2].data);
@@ -237,7 +236,6 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
-      <MyQuill />
     </div>
   );
 }

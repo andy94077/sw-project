@@ -39,6 +39,6 @@ class AdPosted implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return ['text' => "Buy my products, " . $this->text];
+        return ['text' => $this->text];
     }
 }
