@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
-import { message, Button, Input, Modal, Space, Table, Tooltip } from "antd";
+import {
+  message,
+  Button,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Tooltip,
+  DatePicker,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -18,12 +27,18 @@ export default function Comment(props) {
     id: "Id",
     user_id: "User id",
     content: "Content",
+    created_at: "Publish Time",
+    updated_at: "Update Time",
+    deleted_at: "Delete Time",
   };
   const columnObj = {
     id: "",
     post_id,
     user_id: "",
     content: "",
+    created_at: ["", ""],
+    updated_at: ["", ""],
+    deleted_at: ["", ""],
   };
   const [searchText, setSearchText] = useState(columnObj);
   const [filter, setFilter] = useState({
@@ -42,35 +57,30 @@ export default function Comment(props) {
       .request({
         method: "GET",
         url: CONCAT_SERVER_URL("/api/v1/comments/admin"),
-        params: filter,
+        params: {
+          ...filter,
+          ...Object.fromEntries(
+            ["created_at", "updated_at", "deleted_at"].map((time) => [
+              time,
+              filter[time].map((item) =>
+                item === "" || item === null ? "" : item.format()
+              ),
+            ])
+          ),
+        },
       })
       .then((res) => {
         setData(
           res.data["data"].map((item) => {
-            item.deleted_at =
-              item.deleted_at === null
-                ? null
-                : String(
-                    format(new Date(item.deleted_at), "yyyy-MM-dd HH:mm:ss", {
+            ["created_at", "updated_at", "deleted_at"].map((time) => {
+              item[time] =
+                item[time] === null
+                  ? ""
+                  : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
                       timeZone: "Asia/Taipei",
-                    })
-                  );
-            item.updated_at =
-              item.updated_at === null
-                ? null
-                : String(
-                    format(new Date(item.updated_at), "yyyy-MM-dd HH:mm:ss", {
-                      timeZone: "Asia/Taipei",
-                    })
-                  );
-            item.created_at =
-              item.created_at === null
-                ? null
-                : String(
-                    format(new Date(item.created_at), "yyyy-MM-dd HH:mm:ss", {
-                      timeZone: "Asia/Taipei",
-                    })
-                  );
+                    });
+              return time;
+            });
             return item;
           })
         );
@@ -144,6 +154,12 @@ export default function Comment(props) {
         text
       ),
   });
+
+  const handleSetSearchText = (key) => (event) =>
+    setSearchText({ ...searchText, [key]: event.target.value });
+
+  const handleSearchDateChange = (key) => (value) =>
+    setSearchText({ ...searchText, [key]: value });
 
   const handleSearch = () => {
     setFilter({
@@ -219,11 +235,7 @@ export default function Comment(props) {
       dataIndex: "deleted_at",
       // render: (deleted_at) =>
       //   deleted_at === null ? <Tag color="geekblue">NULL</Tag> : deleted_at,
-      sorter: (a, b) => {
-        const A = a.deleted_at === null ? "null" : a.deleted_at;
-        const B = b.deleted_at === null ? "null" : b.deleted_at;
-        A.localeCompare(B);
-      },
+      sorter: (a, b) => a.deleted_at.localeCompare(b.deleted_at),
     },
     {
       title: "Options",
@@ -245,7 +257,7 @@ export default function Comment(props) {
       }),
       render: (_, row) => (
         <div style={{ textAlign: "center" }}>
-          {row.deleted_at === null ? (
+          {row.deleted_at === "" ? (
             <Tooltip title="Delete">
               <Button
                 danger
@@ -274,33 +286,46 @@ export default function Comment(props) {
     },
   ];
 
-  const searchFields = [];
-  Object.keys(columnObj).forEach(function (key) {
-    if (key !== "post_id") {
-      searchFields.push(
+  const searchFields = Object.keys(columnObj)
+    .filter((key) => key !== "post_id")
+    .map((key) =>
+      columnObj[key] instanceof Array ? (
+        <DatePicker.RangePicker
+          key={key}
+          placeholder={["Search", columnTitle[key]]}
+          allowEmpty={[true, true]}
+          value={searchText[key]}
+          onChange={handleSearchDateChange(key)}
+          showTime
+          onOk={(value) => console.log(value)}
+          style={{
+            width: 250,
+            margin: 8,
+            borderRadius: "15px",
+          }}
+        />
+      ) : (
         <Input
           key={key}
           placeholder={`Search ${columnTitle[key]}`}
           value={searchText[key]}
-          onChange={(event) =>
-            setSearchText({
-              ...searchText,
-              [key]: event.target.value,
-            })
-          }
+          onChange={handleSetSearchText(key)}
           onPressEnter={handleSearch}
-          style={{ width: 188, margin: 8, display: "inline" }}
+          style={{ width: 188, margin: 8, borderRadius: 15 }}
         />
-      );
-    }
-  });
+      )
+    );
 
   return (
     <div>
       <div style={{ padding: 8 }}>
         {searchFields}
-        <Space>
-          <Button onClick={handleReset} size="small" style={{ width: 90 }}>
+        <Space style={{ margin: 8 }}>
+          <Button
+            onClick={handleReset}
+            size="small"
+            style={{ width: 90, height: 30, borderRadius: 15, marginRight: 10 }}
+          >
             Reset
           </Button>
           <Button
@@ -308,7 +333,7 @@ export default function Comment(props) {
             onClick={handleSearch}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
+            style={{ width: 90, height: 30, borderRadius: 15 }}
           >
             Search
           </Button>
