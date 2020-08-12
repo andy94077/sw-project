@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments/latest', 'CommentController@getLatest');
     Route::get('/comments/info', 'CommentController@getCommentInfo');
@@ -77,4 +78,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage');
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc');
+    // for broadcasting
+    Route::get('/broadcast/adPost', function (Request $request)
+    {
+        $text = $request->input('text');
+        event(new \App\Events\AdPosted($text)); // trigger
+        return Response::make('Ad Posted!');
+    });
 });

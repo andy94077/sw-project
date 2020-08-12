@@ -15,6 +15,7 @@ use stdClass;
 use DateTime;
 use DateInterval;
 use date;
+use Carbon\Carbon;
 
 class UserController extends BaseController
 {
@@ -93,7 +94,7 @@ class UserController extends BaseController
     public function count(Request $request){
         if($request['id'] != null){
             $user = User::find($request['id']);
-            $user->online_time = date('Y-m-d H:i:s');
+            $user->online_time = Carbon::now();
             $user->save();
             return response()->json($user, 200);
         }
@@ -140,51 +141,21 @@ class UserController extends BaseController
         if ($request['email'] !== null) {
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
+
+        foreach (array('online_time', 'bucket_time', 'deleted_at', 'created_at', 'updated_at') as $col){
+            if ($request[$col][0] !== null && $request[$col][1] !== null) {
+                $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
+            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+                $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
+            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+                $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
+            }
+        }
         
-        if ($request['online_time'][0] !== null && $request['online_time'][1] !== null) {
-            $query = $query->whereBetween('online_time', $request['online_time']);
-        } else if ($request['online_time'][0] !== null && $request['online_time'][1] === null) {
-            $query = $query->where('online_time', '>=', $request['online_time'][0]);
-        } else if ($request['online_time'][0] === null && $request['online_time'][1] !== null) {
-            $query = $query->where('online_time', '<=', $request['online_time'][1]);
-        }
-
-        if ($request['bucket_time'][0] !== null && $request['bucket_time'][1] !== null) {
-            $query = $query->whereBetween('bucket_time', $request['bucket_time']);
-        } else if ($request['bucket_time'][0] !== null && $request['bucket_time'][1] === null) {
-            $query = $query->where('bucket_time', '>=', $request['bucket_time'][0]);
-        } else if ($request['bucket_time'][0] === null && $request['bucket_time'][1] !== null) {
-            $query = $query->where('bucket_time', '<=', $request['bucket_time'][1]);
-        }
-
-        if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] !== null) {
-            $query = $query->whereBetween('deleted_at', $request['deleted_at']);
-        } else if ($request['deleted_at'][0] !== null && $request['deleted_at'][1] === null) {
-            $query = $query->where('deleted_at', '>=', $request['deleted_at'][0]);
-        } else if ($request['deleted_at'][0] === null && $request['deleted_at'][1] !== null) {
-            $query = $query->where('deleted_at', '<=', $request['deleted_at'][1]);
-        }
-
-        if ($request['created_at'][0] !== null && $request['created_at'][1] !== null) {
-            $query = $query->whereBetween('created_at', $request['created_at']);
-        } else if ($request['created_at'][0] !== null && $request['created_at'][1] === null) {
-            $query = $query->where('created_at', '>=', $request['created_at'][0]);
-        } else if ($request['created_at'][0] === null && $request['created_at'][1] !== null) {
-            $query = $query->where('created_at', '<=', $request['created_at'][1]);
-        }
-
-        if ($request['updated_at'][0] !== null && $request['updated_at'][1] !== null) {
-            $query = $query->whereBetween('updated_at', $request['updated_at']);
-        } else if ($request['updated_at'][0] !== null && $request['updated_at'][1] === null) {
-            $query = $query->where('updated_at', '>=', $request['updated_at'][0]);
-        } else if ($request['updated_at'][0] === null && $request['updated_at'][1] !== null) {
-            $query = $query->where('updated_at', '<=', $request['updated_at'][1]);
-        }
-
         $size = $query->count();
         $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
-        //echo date('c', $users['data'][0]['online_time']);
+
         return response()->json($users, 200);
     }
 
@@ -202,11 +173,10 @@ class UserController extends BaseController
         return $this->sendResponse($user, "success");
     }
 
-    public function getUserInfo()
-    {
-        $res['online'] = User::where('online_time', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 10 MINUTE'))->count();
+    public function getUserInfo(){
+        $res['online'] = User::where('online_time', '>=',Carbon::parse('-10 minutes'))->count();
         $res['valid'] = User::all()->count();
-        $res['new'] = User::where('created_at', '>=', DB::raw('Now() - INTERVAL 8 HOUR - INTERVAL 1 DAY'))->count();
+        $res['new'] = User::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 }
