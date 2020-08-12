@@ -14,7 +14,6 @@ import {
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../constants";
-import styles from "./List.less";
 import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
@@ -203,15 +202,15 @@ export default function List(props) {
                   "created_at",
                   "updated_at",
                   "deleted_at",
-                ].map((time) => {
-                  item[time] =
-                    item[time] === null
-                      ? ""
-                      : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
-                          timeZone: "Asia/Taipei",
-                        });
-                  return time;
-                });
+                ].map(
+                  (time) =>
+                    (item[time] =
+                      item[time] === null
+                        ? ""
+                        : format(new Date(item[time]), "yyyy-MM-dd HH:mm:ss", {
+                            timeZone: "Asia/Taipei",
+                          }))
+                );
                 return item;
               }),
               length: response.data.total,
@@ -425,7 +424,6 @@ export default function List(props) {
             }
           },
         }}
-        className={styles.table}
         bordered
         scroll={{ x: 1200 }}
         columns={columns}
