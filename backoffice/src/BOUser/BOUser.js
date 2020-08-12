@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, DatePicker } from "antd";
+import { Button } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 
 import List from "./components/List";
@@ -23,7 +23,6 @@ export default function BOUser(props) {
           New Admin User
         </Button>
       </div>
-      {/* <DatePicker/> */}
       <List refresh={refresh} setRefresh={handleSetRefresh} />
       <SignUpForm
         visible={visible}

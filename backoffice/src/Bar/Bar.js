@@ -68,7 +68,9 @@ export default function Bar(props) {
           </Menu>
         </Sider>
         <Layout>
-          <Content className="content">{content}</Content>
+          <Content className="content">
+            <div style={{ margin: "0 16px" }}>{content}</div>
+          </Content>
           <Footer className="footer">
             sw-project ©2020 Created by Funpodium
           </Footer>
