@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
 
+    Route::get('/likes/latest', 'LikeController@getLatest');
     Route::get('/likes/sum', 'LikeController@sum');
     Route::apiResource('likes', 'LikeController');
     
