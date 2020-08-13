@@ -31,12 +31,13 @@ class LikeController extends BaseController
     }
 
     public function store(Request $request){
-        if($request['user_id'] != null || $request['post_id'] != null){
+        if($request['user_id'] === null || $request['post_id'] === null){
             return response()->json("user_id or post_id not found", 404);
         }
-        $like = Like::withTrashed()->where('user_id', $request['user_id'])->where('post_id', $request['post_id'])->get();
-        if($like !== null){
-            if($like->trashed()){
+        $likes = Like::withTrashed()->where('user_id', $request['user_id'])->where('post_id', $request['post_id'])->get();
+        if($likes->count() !== 0){
+            $like = $likes[0];
+            if($like->deleted_at !== null){
                 $like->restore();
             }
         }
@@ -44,11 +45,12 @@ class LikeController extends BaseController
             $like = new Like();
             $like->user_id = $request['user_id'];
             $like->post_id = $request['post_id'];
+            $like->save();
         }
         return response()->json($like);
     }
 
-    public function destory($id){
+    public function destroy($id){
         $like = Like::find($id)->delete();
         return response()->json($like);
     }

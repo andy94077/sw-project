@@ -18,6 +18,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 
 import { Link, Redirect } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -166,6 +167,9 @@ const useStyles = makeStyles((theme) => ({
   myQuill: {
     marginRight: "5%",
     width: "90%",
+  },
+  red: {
+    color: "red",
   },
 }));
 
@@ -438,18 +442,23 @@ export default function ContentCard(props) {
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </CardContent>
-          <Fab
-            component="span"
-            onClick={() => {
-              setExpand(!expand);
-            }}
-            className={clsx(classes.expand, {
-              [classes.expandOpen]: expand,
-            })}
-            size={expand ? "small" : "medium"}
-          >
-            <ExpandMoreIcon />
-          </Fab>
+          <div>
+            <IconButton>
+              <FavoriteIcon className={classes.red} />
+            </IconButton>
+            <Fab
+              component="span"
+              onClick={() => {
+                setExpand(!expand);
+              }}
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: expand,
+              })}
+              size={expand ? "small" : "medium"}
+            >
+              <ExpandMoreIcon />
+            </Fab>
+          </div>
           <Collapse
             in={expand}
             classes={{
