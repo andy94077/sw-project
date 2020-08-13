@@ -3,6 +3,7 @@ import axios from "axios";
 import Avatar from "react-avatar-edit";
 import { Button } from "@material-ui/core";
 import { CONCAT_SERVER_URL } from "../constants";
+import AlertDialog from "../components/AlertDialog";
 
 export default function AvatarUpload(props) {
   const { name, setIsUpload, onHide } = props;
@@ -10,6 +11,7 @@ export default function AvatarUpload(props) {
     src: null,
     preview: null,
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const onClose = () => {
     setAvatar({ ...avatar, preview: null });
@@ -26,6 +28,10 @@ export default function AvatarUpload(props) {
     }
   };
 
+  function handleDialogClose() {
+    setIsDialogOpen(false);
+  }
+
   const handleUpload = () => {
     axios({
       method: "POST",
@@ -34,13 +40,10 @@ export default function AvatarUpload(props) {
     })
       .then(() => {
         setIsUpload();
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Fails !");
-      })
-      .finally(() => {
         onHide();
+      })
+      .catch(() => {
+        setIsDialogOpen(true);
       });
   };
 
@@ -59,7 +62,6 @@ export default function AvatarUpload(props) {
           overflow: "hidden",
         }}
       />
-      {/* <img style={{ display: "block" }} src={avatar.preview} alt="Preview" /> */}
       <Button
         component="span"
         style={{
@@ -72,6 +74,17 @@ export default function AvatarUpload(props) {
       >
         Submit
       </Button>
+      <AlertDialog
+        open={isDialogOpen}
+        alertTitle="Warning"
+        alertDesciption="You need to upload picture before submit !"
+        alertButton={
+          <>
+            <Button onClick={handleDialogClose}>Got it</Button>
+          </>
+        }
+        onClose={handleDialogClose}
+      />
     </div>
   );
 }

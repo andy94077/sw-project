@@ -134,9 +134,6 @@ export default function Profile(props) {
       })
       .then((response) => {
         setAvatar(CONCAT_SERVER_URL(`${response.data}`));
-      })
-      .catch(() => {
-        console.log("Upload Fails");
       });
   }, [isUpload]);
 
