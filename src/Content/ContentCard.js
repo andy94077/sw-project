@@ -201,6 +201,19 @@ export default function ContentCard(props) {
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
   const [likeInfo, setLikeInfo] = useState({ id: null, red: false });
+  const [likeCount, setLikeCount] = useState(0);
+
+  function refreshLikeCount() {
+    Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
+      params: { post_id: id },
+    })
+      .then((res) => {
+        setLikeCount(res.data.sum);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -294,6 +307,7 @@ export default function ContentCard(props) {
   useEffect(() => {
     refreshComment();
     refreshLike();
+    refreshLikeCount();
   }, [id]);
 
   const handleClick = (event) => {
@@ -344,6 +358,7 @@ export default function ContentCard(props) {
               id: likeInfo.id,
               red: false,
             });
+            refreshLikeCount();
           })
           .catch((e) => {
             console.log(e);
@@ -355,6 +370,7 @@ export default function ContentCard(props) {
               id: likeInfo.id,
               red: true,
             });
+            refreshLikeCount();
           })
           .catch((e) => {
             console.log(e);
@@ -366,11 +382,11 @@ export default function ContentCard(props) {
         post_id: id,
       })
         .then((res) => {
-          console.log(res.data.id);
           setLikeInfo({
             id: res.data.id,
             red: true,
           });
+          refreshLikeCount();
         })
         .catch((e) => {
           console.log(e);
@@ -520,6 +536,7 @@ export default function ContentCard(props) {
                 />
               </IconButton>
             )}
+            {`${likeCount} Likes`}
             <Fab
               component="span"
               onClick={() => {
