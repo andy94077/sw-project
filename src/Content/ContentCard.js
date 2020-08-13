@@ -171,6 +171,7 @@ const useStyles = makeStyles((theme) => ({
   red: {
     color: "red",
   },
+  none: {},
 }));
 
 export default function ContentCard(props) {
@@ -199,6 +200,7 @@ export default function ContentCard(props) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
+  const [likeInfo, setLikeInfo] = useState({ id: null, red: false });
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -211,6 +213,28 @@ export default function ContentCard(props) {
       .catch(() => {
         setIsUpload(false);
       });
+  }
+
+  function refreshLike() {
+    if (userId) {
+      Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
+        params: {
+          user_id: userId,
+          post_id: id,
+        },
+      })
+        .then((res) => {
+          if (res.data[0]) {
+            setLikeInfo({
+              id: res.data[0].id,
+              red: res.data[0].deleted_at === null,
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   function upload() {
@@ -269,6 +293,7 @@ export default function ContentCard(props) {
 
   useEffect(() => {
     refreshComment();
+    refreshLike();
   }, [id]);
 
   const handleClick = (event) => {
@@ -308,6 +333,49 @@ export default function ContentCard(props) {
 
   function handleEditDialogClose() {
     setIsEditDialogOpen(false);
+  }
+
+  function handleLike() {
+    if (likeInfo.id !== null) {
+      if (likeInfo.red) {
+        Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
+          .then(() => {
+            setLikeInfo({
+              id: likeInfo.id,
+              red: false,
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        Axios.put(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
+          .then(() => {
+            setLikeInfo({
+              id: likeInfo.id,
+              red: true,
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    } else {
+      Axios.post(CONCAT_SERVER_URL("/api/v1/likes"), {
+        user_id: userId,
+        post_id: id,
+      })
+        .then((res) => {
+          console.log(res.data.id);
+          setLikeInfo({
+            id: res.data.id,
+            red: true,
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   async function handleEdit() {
@@ -443,9 +511,15 @@ export default function ContentCard(props) {
             />
           </CardContent>
           <div>
-            <IconButton>
-              <FavoriteIcon className={classes.red} />
-            </IconButton>
+            {userId && (
+              <IconButton onClick={handleLike}>
+                <FavoriteIcon
+                  className={clsx(classes.none, {
+                    [classes.red]: likeInfo.red,
+                  })}
+                />
+              </IconButton>
+            )}
             <Fab
               component="span"
               onClick={() => {
