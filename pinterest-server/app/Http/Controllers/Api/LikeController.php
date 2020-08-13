@@ -66,4 +66,9 @@ class LikeController extends BaseController
         $res['likers'] = $query->orderBy('updated_at', 'DESC')->take(3)->LeftJoin('users', 'users.id', '=', 'likes.user_id')->select('users.name as username', 'likes.updated_at as updated_at')->get();
         return response()->json($res);
     }
+
+    public function getLatest(){
+        $likes = Like::orderBy('updated_at', 'DESC')->take(8)->LeftJoin('users', 'users.id', '=', 'likes.user_id')->select('users.name as username', 'likes.*')->get();
+        return response()->json($likes);
+    }
 }

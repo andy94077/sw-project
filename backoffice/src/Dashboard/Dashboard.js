@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [commentUnfo, setCommentInfo] = useState({ valid: 0, new: 0 });
   const [latestPosts, setLatestPosts] = useState([]);
   const [latestComments, setLatestComments] = useState([]);
+  const [latestLikes, setLatestLikes] = useState([]);
   const [isCardLoading, setIsCardLoading] = useState(true);
   const [isListLoading, setIsListLoading] = useState(true);
 
@@ -97,10 +98,12 @@ export default function Dashboard() {
     setIsListLoading(true);
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
-    Promise.all([post, comment])
+    const like = Axios.get(CONCAT_SERVER_URL("/api/v1/likes/latest"));
+    Promise.all([post, comment, like])
       .then((res) => {
         setLatestPosts(res[0].data);
         setLatestComments(res[1].data);
+        setLatestLikes(res[2].data);
       })
       .finally(() => {
         setIsListLoading(false);
@@ -273,12 +276,35 @@ export default function Dashboard() {
                   <Typography.Text mark>
                     [{item.created_at === item.updated_at ? "NEW" : "EDIT"}]
                   </Typography.Text>
-                  {`\t${item.username} send "${item.content}" at ${format(
+                  {`\t${item.username} send "${item.content}" on post ${
+                    item.post_id
+                  }  at ${format(
                     new Date(item.updated_at),
                     "yyyy-MM-dd HH:mm:ss"
                   )}`}
                 </List.Item>
               )}
+            />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
+          <Card hoverable style={{ backgroundColor: "rgb(255, 255 , 253)" }}>
+            <List
+              header="Latest Likes Change"
+              bordered
+              dataSource={latestLikes}
+              renderItem={(item) => {
+                return (
+                  <List.Item>
+                    {`\t${item.username} likes post ${item.post_id} at ${format(
+                      new Date(item.updated_at),
+                      "yyyy-MM-dd HH:mm:ss"
+                    )}`}
+                  </List.Item>
+                );
+              }}
             />
           </Card>
         </Col>
