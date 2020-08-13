@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { makeStyles } from "@material-ui/core/styles";
+import { GridListTileBar, makeStyles, Button } from "@material-ui/core";
+import EditIcon from "@material-ui/icons/Edit";
+import IconButton from "@material-ui/core/IconButton";
 import { addHours, compareAsc } from "date-fns";
-import { Button } from "@material-ui/core";
 import Loading from "../components/Loading";
 import Errormsg from "../components/ErrorMsg";
 import ErrorGrid from "../components/ErrorGrid";
@@ -11,8 +12,33 @@ import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
 import { CONCAT_SERVER_URL } from "../constants";
 import { selectUser } from "../redux/userSlice";
+import CustomModal from "../components/CustomModal";
+import AvatarUpload from "./AvatarUpload";
+import "./Profile.css";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    position: "relative",
+    width: "120px",
+    margin: "auto",
+    outline: "none",
+    borderRadius: "60px",
+  },
+  jumpFrame: {
+    height: "400px",
+    width: "400px",
+    borderRadius: "30px",
+  },
+  icon: {
+    position: "absolute",
+    right: "-23px",
+    bottom: "-10px",
+    color: "#eeeeee",
+  },
+  bar: {
+    height: "120px",
+    borderRadius: "60px",
+  },
   central: {
     display: "block",
     margin: "auto",
@@ -82,18 +108,37 @@ export default function Profile(props) {
 
   const classes = useStyles();
   const follow = [123, 456];
-  const avatar = "/pictures/avatar.jpeg";
   const url = "localhost:3000";
   const intro = "hi";
 
   const [image, setImage] = useState("");
+  const [avatar, setAvatar] = useState(null);
+  const [isUpload, setIsUpload] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const [isReady, setIsReady] = useState("Loading");
   const [isMyself, setIsMyself] = useState(false);
+  const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
+  const [avatarVisibility, setUploadVisibility] = useState(false);
   const { username, userId, bucketTime } = useSelector(selectUser);
   const isBucket = checkBucket(bucketTime);
+  const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
+  console.log(avatar);
+  useEffect(() => {
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
+        data: { name },
+      })
+      .then((response) => {
+        setAvatar(CONCAT_SERVER_URL(`${response.data}`));
+      })
+      .catch(() => {
+        console.log("Upload Fails");
+      });
+  }, [isUpload]);
 
   useEffect(() => {
     setIsReady("Loading");
@@ -202,14 +247,62 @@ export default function Profile(props) {
     </Button>
   );
 
+  const onHide = () => {
+    setIsAvatarUpload(false);
+  };
+
+  const handleAvatarUpload = () => {
+    setIsAvatarUpload(true);
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.key === "Enter") {
+      handleAvatarUpload();
+    }
+  };
+
   if (isReady === "OK") {
     return (
       <div>
-        <img
-          alt="Avatar"
-          className={`${classes.central} ${classes.rounded}`}
-          src={avatar}
-        />
+        {/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
+        {isMyself ? (
+          <div
+            className={classes.root}
+            onMouseEnter={changeUploadVisibility}
+            onMouseLeave={changeUploadVisibility}
+            role="button"
+            tabIndex="0"
+            onClick={handleAvatarUpload}
+            onKeyUp={handleKeyUp}
+          >
+            <img
+              alt="Avatar"
+              className={`${classes.central} ${classes.rounded}`}
+              src={avatar}
+            />
+            {avatarVisibility && (
+              <GridListTileBar
+                className={classes.bar}
+                title={image}
+                actionIcon={
+                  <IconButton
+                    aria-label={`info about ${image}`}
+                    className={classes.icon}
+                    disabled
+                  >
+                    <EditIcon />
+                  </IconButton>
+                }
+              />
+            )}
+          </div>
+        ) : (
+          <img
+            alt="Avatar"
+            className={`${classes.central} ${classes.rounded}`}
+            src={avatar}
+          />
+        )}
         <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
         <div className={`${classes.center} ${classes.text}`}>
           <a className={`${classes.bold} ${classes.url}`} href={url}>
@@ -228,6 +321,20 @@ export default function Profile(props) {
         <div className={classes.central}>
           <PhotoGrid userId={id} />
         </div>
+        <CustomModal
+          show={isAvatarUpload}
+          onHide={onHide}
+          jumpFrame={classes.jumpFrame}
+          backdrop
+        >
+          <AvatarUpload
+            name={name}
+            setIsUpload={() => {
+              setIsUpload((preState) => !preState);
+            }}
+            onHide={onHide}
+          />
+        </CustomModal>
       </div>
     );
   }

@@ -40,17 +40,6 @@ export default function App() {
     setIsDialogOpen(false);
   }
 
-  function checkBucket(bucketTime) {
-    if (bucketTime) {
-      const bucketDate = addHours(new Date(bucketTime), 8);
-      const now = new Date();
-      if (compareAsc(bucketDate, now) === 1) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   // Broadcast
   useEffect(() => {
     window.io = io;

@@ -179,4 +179,28 @@ class UserController extends BaseController
         $res['new'] = User::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
+
+    public function uploadUserAvatar(Request $request){
+        $user = User::where('name', $request['name'])->first();
+        echo substr($user->avatar_url, 1);
+        //unlink(substr($user->avatar_url, 1));
+
+        $output_file = "img/". $request["name"] ."Avatar". ((new DateTime())->format('Y-m-d--H:i:s')).".jpeg";
+        $ifp = fopen( $output_file, 'wb' );
+        $data = explode( ',', $request["imgBase64"] );
+        fwrite( $ifp, base64_decode( $data[ 1 ] ) );
+        fclose( $ifp );
+
+        $user = User::where('name', $request['name'])->first();
+        $user->avatar_url = "/" . $output_file;
+        $user->save();
+
+        return response()->json($output_file);
+    }
+
+    public function getUserAvatar(Request $request){
+        $user = User::where('name', $request['name'])->first();
+        $img_location = $user->avatar_url;
+        return response()->json($img_location);
+    }
 }

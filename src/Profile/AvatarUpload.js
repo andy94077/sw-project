@@ -1,0 +1,77 @@
+import React, { useState } from "react";
+import axios from "axios";
+import Avatar from "react-avatar-edit";
+import { Button } from "@material-ui/core";
+import { CONCAT_SERVER_URL } from "../constants";
+
+export default function AvatarUpload(props) {
+  const { name, setIsUpload, onHide } = props;
+  const [avatar, setAvatar] = useState({
+    src: null,
+    preview: null,
+  });
+
+  const onClose = () => {
+    setAvatar({ ...avatar, preview: null });
+  };
+
+  const onCrop = (preview) => {
+    setAvatar({ ...avatar, preview });
+  };
+
+  const onBeforeFileLoad = (e) => {
+    if (e.target.files[0].size < 0) {
+      alert("File is too big!");
+      e.target.value = "";
+    }
+  };
+
+  const handleUpload = () => {
+    axios({
+      method: "POST",
+      url: CONCAT_SERVER_URL("/api/v1/user/uploadUserAvatar"),
+      data: { name, imgBase64: avatar.preview },
+    })
+      .then(() => {
+        setIsUpload();
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Fails !");
+      })
+      .finally(() => {
+        onHide();
+      });
+  };
+
+  return (
+    <div>
+      <Avatar
+        width={400}
+        height={400}
+        onCrop={onCrop}
+        onClose={onClose}
+        onBeforeFileLoad={onBeforeFileLoad}
+        src={avatar.src}
+        borderStyle={{
+          borderRadius: "40px",
+          textAlign: "center",
+          overflow: "hidden",
+        }}
+      />
+      {/* <img style={{ display: "block" }} src={avatar.preview} alt="Preview" /> */}
+      <Button
+        component="span"
+        style={{
+          borderRadius: "0px",
+          height: "40px",
+          width: "100%",
+          backgroundColor: "gainsboro",
+        }}
+        onClick={handleUpload}
+      >
+        Submit
+      </Button>
+    </div>
+  );
+}

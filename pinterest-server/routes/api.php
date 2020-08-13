@@ -61,6 +61,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/user/count', 'UserController@count');
     Route::post('/user/authentication','UserController@authentication')->name('user.authentication');
     Route::post('/user/userExist','UserController@userExist')->name('user.userExist');
+    Route::post('/user/uploadUserAvatar','UserController@uploadUserAvatar')->name('user.uploadUserAvatar');
+    Route::post('/user/getUserAvatar','UserController@getUserAvatar')->name('user.getUserAvatar');
 
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('user', 'UserController');
