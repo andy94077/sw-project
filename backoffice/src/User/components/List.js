@@ -183,9 +183,11 @@ export default function List(props) {
               "deleted_at",
             ].map((time) => [
               time,
-              filter[time].map((item) =>
-                item === "" || item === null ? "" : item.format()
-              ),
+              filter[time] === null
+                ? ["", ""]
+                : filter[time].map((item) =>
+                    item === "" || item === null ? "" : item.format()
+                  ),
             ])
           ),
         },
@@ -350,7 +352,6 @@ export default function List(props) {
         value={searchText[key]}
         onChange={handleSearchDateChange(key)}
         showTime
-        onOk={(value) => console.log(value)}
         style={{
           width: 250,
           margin: 8,
