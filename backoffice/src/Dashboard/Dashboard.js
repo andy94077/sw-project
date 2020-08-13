@@ -34,7 +34,6 @@ export default function Dashboard() {
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
     Promise.all([user, comment, post])
       .then((res) => {
-        console.log(res);
         setUserInfo(res[0].data);
         setCommentInfo(res[1].data);
         setPostInfo(res[2].data);

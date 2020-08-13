@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  Button,
-  IconButton,
-  Snackbar,
-  SnackbarContent,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Button } from "@material-ui/core";
 import { addHours, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -31,6 +25,7 @@ import { setData, selectUser } from "./redux/userSlice";
 
 import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
+import AnnouncementGrid from "./components/AnnouncementGrid";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 
@@ -68,7 +63,7 @@ export default function App() {
       setAdMessage(text);
       setTimeout(() => {
         setisAdOpen(false);
-      }, 5000);
+      }, 10000);
     });
   }, []);
 
@@ -181,43 +176,11 @@ export default function App() {
           }
           onClose={handleClose}
         />
-        <Snackbar
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          open={isAdOpen}
-        >
-          <SnackbarContent
-            message={
-              <div
-                style={{
-                  maxWidth: "275px",
-                  minHeight: "10px",
-                }}
-                dangerouslySetInnerHTML={{ __html: adMessage }}
-              />
-            }
-            action={
-              <IconButton
-                size="small"
-                component="span"
-                aria-label="close"
-                color="inherit"
-                onClick={handleAdClose}
-                style={{
-                  position: "absolute",
-                  top: 5,
-                  right: 5,
-                }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            }
-            style={{
-              background: "white",
-              color: "black",
-              borderRadius: 10,
-            }}
-          />
-        </Snackbar>
+        <AnnouncementGrid
+          isAdOpen={isAdOpen}
+          handleAdClose={handleAdClose}
+          adMessage={adMessage}
+        />
       </div>
     );
   }
