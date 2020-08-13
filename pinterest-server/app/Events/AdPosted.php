@@ -20,11 +20,11 @@ class AdPosted implements ShouldBroadcast
      * @return void
      */
 
-    public $text;
+    public $data;
 
-    public function __construct($text)
+    public function __construct($data)
     {
-        $this->text = $text;
+        $this->data = $data;
     }
 
     /**
@@ -35,10 +35,5 @@ class AdPosted implements ShouldBroadcast
     public function broadcastOn()
     {
         return new Channel('AdPosting');
-    }
-
-    public function broadcastWith()
-    {
-        return ['text' => $this->text];
     }
 }
