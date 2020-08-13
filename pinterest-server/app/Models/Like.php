@@ -11,7 +11,7 @@ class Like extends Model
     protected $table = 'likes';
     public $timestamps = true;
     protected $primaryKey = 'id';
-    protected $fillable = ['user_id', 'post_id'];
+    protected $fillable = ['user_id', 'post_id', 'deleted_at'];
 
     protected static function boot()
     {
