@@ -81,4 +81,5 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc');
     // for broadcasting
    Route::post('/broadcast/adPost', 'BroadcastController@adPost')->name('broadcast.adPost');
+   Route::apiResource('notifications', 'NotificationController');
 });
