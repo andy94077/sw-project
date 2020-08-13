@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::namespace('Api')->prefix('v1')->group(function () {
+
+    Route::apiResource('likes', 'LikeController');
+    
     Route::get('/comments/latest', 'CommentController@getLatest');
     Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
@@ -33,12 +36,9 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::get('/my/orders/1/payments/3/verify', 'PostController@index');
 
-    Route::get('/posts', 'PostController@index');
-
     Route::get('/posts/latest', 'PostController@getLatest');
     Route::get('/posts/info', 'PostController@getPostInfo');
     Route::post('/post/recovery', 'PostController@recover');
-    Route::get('/posts', 'PostController@index');
     Route::get('/posts/admin', 'PostController@adminAll');
     Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
@@ -47,7 +47,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
-    Route::apiResource('post', 'PostController');
+    Route::apiResource('posts', 'PostController');
 
     Route::get('users/info', 'UserController@getUserInfo');
     Route::delete('/user/admin', 'UserController@adminDelete');
@@ -63,7 +63,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/user/userExist','UserController@userExist')->name('user.userExist');
 
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
-    Route::apiResource('user', 'UserController');
+    Route::apiResource('users', 'UserController');
 
     Route::delete('/superUser/admin', 'SuperUserController@adminDelete');
     Route::post('/superUser/admin', 'SuperUserController@adminRecover');
