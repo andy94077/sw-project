@@ -44,10 +44,6 @@ export default function App() {
     setIsDialogOpen(false);
   }
 
-  function handleAdClose() {
-    setisAdOpen(false);
-  }
-
   // Broadcast
   useEffect(() => {
     window.io = io;

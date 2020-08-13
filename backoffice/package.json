@@ -13,6 +13,7 @@
     "laravel-echo": "^1.8.1",
     "moment": "^2.27.0",
     "react": "^16.13.1",
+    "react-avatar-edit": "^0.8.3",
     "react-bootstrap": "^1.3.0",
     "react-dom": "^16.13.1",
     "react-highlight-words": "^0.16.0",
