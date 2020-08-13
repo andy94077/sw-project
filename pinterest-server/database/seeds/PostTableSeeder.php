@@ -19,7 +19,7 @@ class PostTableSeeder extends Seeder
                     'url' => '/uploads/image/' . $i . '/original/' . $i . '.jpg',
                     'user_id' => $i % 4 + 1,
                     'username' => 'user' . ($i % 4 + 1),
-                    'content' => 'hello world',
+                    'content' => '<h>hello world</h>',
                     'tag' => $i >= 8 ? 'dog' : 'cat',
                     'publish_time' => date('Y-m-d H:i:s'),
                     'created_at' => date('Y-m-d H:i:s'),

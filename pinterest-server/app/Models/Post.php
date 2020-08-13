@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
+use App\Events\PostChanged;
+
 class Post extends Model
 {
     //status 1 = published
@@ -14,7 +16,7 @@ class Post extends Model
     public $timestamps = true;
     protected $table = 'posts';
     protected $primaryKey = 'id';
-    protected $fillable = ['url', 'user_id', 'username', 'content', 'tag', 'publish_time'];
+    protected $fillable = ['url', 'user_id', 'username', 'content', 'tag', 'publish_time', 'like'];
     public $image;
 
     protected static function boot()
@@ -44,4 +46,11 @@ class Post extends Model
     // {
     //     return $this->belongsToMany('App\Models\Label', 'post_label', 'post_id', 'label_id')->withTimestamps();
     // }
+    
+    // Post events
+    protected $dispatchesEvents = [
+        'saved' => PostChanged::class,
+        'deleted' => PostChanged::class,
+        'restored' => PostChanged::class,
+    ];
 }

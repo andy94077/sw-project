@@ -1,7 +1,7 @@
 import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Card } from "antd";
+import { Card } from "@material-ui/core";
 
 import "./MyQuill.css";
 

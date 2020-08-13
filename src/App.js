@@ -11,6 +11,7 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+
 import Echo from "laravel-echo";
 import io from "socket.io-client";
 
@@ -19,13 +20,14 @@ import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
 import Content from "./Content/Content";
 import Profile from "./Profile/Profile";
-import Loading from "./components/Loading";
 import { getCookie } from "./cookieHelper";
-import ErrorMsg from "./components/ErrorMsg";
 import { setData, selectUser } from "./redux/userSlice";
 
 import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
+import AnnouncementGrid from "./components/AnnouncementGrid";
+import ErrorMsg from "./components/ErrorMsg";
+import Loading from "./components/Loading";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
@@ -33,6 +35,8 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAdOpen, setisAdOpen] = useState(false);
+  const [adMessage, setAdMessage] = useState("");
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
@@ -49,8 +53,13 @@ export default function App() {
       host: REDIS_URL, // this is laravel-echo-server host
     });
 
-    window.Echo.channel("AdPosting").listen("AdPosted", (e) => {
-      console.log(e);
+    window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
+      const { text } = event;
+      setisAdOpen(true);
+      setAdMessage(text);
+      setTimeout(() => {
+        setisAdOpen(false);
+      }, 10000);
     });
   }, []);
 
@@ -112,8 +121,11 @@ export default function App() {
           .post(CONCAT_SERVER_URL("/api/v1/user/count"), {
             id: user.userId,
           })
-          .catch((e) => {
-            console.log(e);
+          .catch(() => {
+            setError({
+              message: "Connection Error",
+              url: "/pictures/connection-error.svg",
+            });
           });
       }
     }, 600000);
@@ -159,6 +171,11 @@ export default function App() {
             </>
           }
           onClose={handleClose}
+        />
+        <AnnouncementGrid
+          isAdOpen={isAdOpen}
+          handleAdClose={handleAdClose}
+          adMessage={adMessage}
         />
       </div>
     );

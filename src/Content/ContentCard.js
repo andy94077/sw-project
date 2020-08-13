@@ -6,20 +6,19 @@ import {
   Collapse,
   TextareaAutosize,
   Button,
-  Fab,
-  Typography,
   CardMedia,
   CardContent,
   Card,
-  CardActionArea,
+  CardHeader,
   IconButton,
   Menu,
   MenuItem,
-  TextField,
 } from "@material-ui/core";
+import CardActions from "@material-ui/core/CardActions";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 
 import { Link, Redirect } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -27,6 +26,8 @@ import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
+import MyQuill from "../components/MyQuill";
+import "./Content.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     [theme.breakpoints.down("xs")]: {
-      height: "55%",
+      height: "60%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
@@ -65,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
   cover: {
     [theme.breakpoints.down("xs")]: {
-      height: "45%",
+      height: "40%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
@@ -88,11 +89,11 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create("transform", {
       duration: theme.transitions.duration.shortest,
     }),
-    marginLeft: "5%",
+    marginLeft: "auto",
   },
   expandOpen: {
     transform: "rotate(180deg)",
-    marginLeft: "5%",
+    marginLeft: "auto",
   },
   input: {
     resize: "none",
@@ -121,10 +122,12 @@ const useStyles = makeStyles((theme) => ({
     height: "40px",
   },
   content: {
-    maxHeight: "50%",
+    maxHeight: "40%",
     minHeight: "130px",
     display: "flex",
     flexDirection: "column",
+    padding: "0px",
+    margin: "16px 16px 0px 16px",
   },
   collapse: {
     display: "flex",
@@ -151,16 +154,33 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     flexGrow: "1",
   },
-  cardAction: {
-    display: "flex",
-    flexDirection: "row",
+  cardHeader: {
+    padding: 0,
+  },
+  action: {
+    margin: 0,
+  },
+  subheader: {
+    fontWeight: 500,
+    fontSize: "0.875em",
   },
   user: {
     flexGrow: "1",
   },
-  TextField: {
-    marginLeft: "5%",
+  myQuill: {
     marginRight: "5%",
+    width: "90%",
+  },
+  red: {
+    color: "red",
+  },
+  none: {},
+  cardActions: {
+    padding: "0px",
+  },
+  likeUser: {
+    fontSize: "0.7em",
+    fontWeight: "450",
   },
 }));
 
@@ -190,6 +210,100 @@ export default function ContentCard(props) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
+  const [likeInfo, setLikeInfo] = useState({
+    id: null,
+    red: false,
+  });
+  const [likeCount, setLikeCount] = useState({ sum: 0, likers: "" });
+
+  function refreshLikeCount() {
+    Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
+      params: { post_id: id },
+    })
+      .then((res) => {
+        let likerString = "";
+        if (res.data.likers.length === 1) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {" likes this post."}
+            </div>
+          );
+        } else if (res.data.likers.length === 2) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {" like this post."}
+            </div>
+          );
+        } else if (res.data.sum === 3) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>
+              {" like this post."}
+            </div>
+          );
+        } else if (res.data.sum === 4) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>{" "}
+              {`and other ${res.data.sum - 3} user
+              like this post.`}
+            </div>
+          );
+        } else {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>{" "}
+              {`and other ${res.data.sum - 3} users
+              like this post.`}
+            </div>
+          );
+        }
+        setLikeCount({ sum: res.data.sum, likers: likerString });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -202,6 +316,28 @@ export default function ContentCard(props) {
       .catch(() => {
         setIsUpload(false);
       });
+  }
+
+  function refreshLike() {
+    if (userId) {
+      Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
+        params: {
+          user_id: userId,
+          post_id: id,
+        },
+      })
+        .then((res) => {
+          if (res.data[0]) {
+            setLikeInfo({
+              id: res.data[0].id,
+              red: res.data[0].deleted_at === null,
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   function upload() {
@@ -260,6 +396,8 @@ export default function ContentCard(props) {
 
   useEffect(() => {
     refreshComment();
+    refreshLike();
+    refreshLikeCount();
   }, [id]);
 
   const handleClick = (event) => {
@@ -299,6 +437,51 @@ export default function ContentCard(props) {
 
   function handleEditDialogClose() {
     setIsEditDialogOpen(false);
+  }
+
+  function handleLike() {
+    if (likeInfo.id !== null) {
+      if (likeInfo.red) {
+        Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
+          .then(() => {
+            setLikeInfo({
+              id: likeInfo.id,
+              red: false,
+            });
+            refreshLikeCount();
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        Axios.put(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
+          .then(() => {
+            setLikeInfo({
+              id: likeInfo.id,
+              red: true,
+            });
+            refreshLikeCount();
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    } else {
+      Axios.post(CONCAT_SERVER_URL("/api/v1/likes"), {
+        user_id: userId,
+        post_id: id,
+      })
+        .then((res) => {
+          setLikeInfo({
+            id: res.data.id,
+            red: true,
+          });
+          refreshLikeCount();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   async function handleEdit() {
@@ -348,117 +531,118 @@ export default function ContentCard(props) {
         />
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <CardActionArea className={classes.cardAction}>
-              <Link to={`/profile/${author}`} className={classes.user}>
-                <Typography
-                  component="h5"
-                  variant="h5"
-                  className={classes.author}
-                >
+            <CardHeader
+              classes={{
+                root: classes.cardHeader,
+                action: classes.action,
+                subheader: classes.subheader,
+              }}
+              title={
+                <Link to={`/profile/${author}`} className={classes.user}>
                   {author}
-                </Typography>
-              </Link>
-              {author === username && (
-                <>
-                  <IconButton
-                    size="small"
-                    onClick={handleClick}
-                    aria-controls="m"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    id="m"
-                    anchorEl={menu}
-                    keepMounted
-                    open={Boolean(menu)}
-                    onClose={handleClose}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsDialogOpen(true);
-                      }}
+                </Link>
+              }
+              subheader={timeAgo}
+              action={
+                author === username && (
+                  <>
+                    <IconButton
+                      size="small"
+                      onClick={handleClick}
+                      aria-controls="m"
                     >
-                      delete
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setMenu(false);
-                        setIsEditDialogOpen(true);
-                      }}
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      id="m"
+                      anchorEl={menu}
+                      keepMounted
+                      open={Boolean(menu)}
+                      onClose={handleClose}
                     >
-                      Edit
-                    </MenuItem>
-                  </Menu>
-                  <AlertDialog
-                    open={isDialogOpen}
-                    alertTitle="Warning"
-                    alertDesciption="You are trying to delete a post"
-                    alertButton={
-                      <>
-                        <Button onClick={handleDelete}>Yes</Button>
-                        <Button onClick={handleDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleDialogClose}
-                  />
-                  <AlertDialog
-                    open={isEditDialogOpen}
-                    alertTitle="Edit Commit"
-                    alertButton={
-                      <>
-                        <Button onClick={handleEdit}>Yes</Button>
-                        <Button onClick={handleEditDialogClose}>No</Button>
-                      </>
-                    }
-                    onClose={handleEditDialogClose}
-                    moreComponent={
-                      <TextField
-                        className={classes.TextField}
-                        multiline
-                        rowsMax={4}
-                        value={newPost}
-                        onChange={(e) => {
-                          setNewPost(e.target.value);
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsDialogOpen(true);
                         }}
-                      />
-                    }
-                  />
-                </>
-              )}
-            </CardActionArea>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              display="block"
-              component="div"
-              className={classes.time}
-            >
-              {timeAgo}
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              color="textSecondary"
-              display="block"
-              component="div"
+                      >
+                        delete
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setMenu(false);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        Edit
+                      </MenuItem>
+                    </Menu>
+                    <AlertDialog
+                      open={isDialogOpen}
+                      alertTitle="Warning"
+                      alertDesciption="Do you really want to delete this post?"
+                      alertButton={
+                        <>
+                          <Button onClick={handleDelete}>Yes</Button>
+                          <Button onClick={handleDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleDialogClose}
+                    />
+                    <AlertDialog
+                      open={isEditDialogOpen}
+                      alertTitle="Edit Post"
+                      alertButton={
+                        <>
+                          <Button onClick={handleEdit}>Yes</Button>
+                          <Button onClick={handleEditDialogClose}>No</Button>
+                        </>
+                      }
+                      onClose={handleEditDialogClose}
+                      moreComponent={
+                        <MyQuill
+                          className={classes.myQuill}
+                          value={newPost}
+                          setValue={setNewPost}
+                        />
+                      }
+                    />
+                  </>
+                )
+              }
+            />
+            <div
               className={classes.text}
-            >
-              {content}
-            </Typography>
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           </CardContent>
-          <Fab
-            component="span"
-            onClick={() => {
-              setExpand(!expand);
-            }}
-            className={clsx(classes.expand, {
-              [classes.expandOpen]: expand,
-            })}
-            size={expand ? "small" : "medium"}
-          >
-            <ExpandMoreIcon />
-          </Fab>
+          <CardActions disableSpacing className={classes.cardActions}>
+            {userId && (
+              <IconButton onClick={handleLike}>
+                <FavoriteIcon
+                  className={clsx(classes.none, {
+                    [classes.red]: likeInfo.red,
+                  })}
+                />
+              </IconButton>
+            )}
+            <div>
+              <div>{`${likeCount.sum} Likes`}</div>
+              {likeCount.likers}
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => {
+                setExpand(!expand);
+              }}
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: expand,
+              })}
+              size={expand ? "small" : "medium"}
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          </CardActions>
           <Collapse
             in={expand}
             classes={{

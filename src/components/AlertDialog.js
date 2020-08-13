@@ -5,15 +5,27 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import "../css/AlertDialog.css";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   frame: {
-    height: "25%",
-    minHeight: "200px",
-    width: "40%",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
+    [theme.breakpoints.only("sm")]: {
+      width: "70%",
+    },
+    [theme.breakpoints.up("md")]: {
+      width: "40%",
+    },
     borderRadius: "25px",
     padding: "5px",
+  },
+  content: {
+    padding: "0 24px",
+  },
+  contentText: {
+    padding: "0 4%",
+    fontSize: "20px",
   },
 }));
 
@@ -39,12 +51,17 @@ export default function AlertDialog(props) {
         onClose={onClose}
       >
         <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {alertDesciption}
-          </DialogContentText>
+        <DialogContent className={classes.content}>
+          {alertDesciption !== undefined && alertDesciption !== "" && (
+            <DialogContentText
+              className={classes.contentText}
+              id="alert-dialog-description"
+            >
+              {alertDesciption}
+            </DialogContentText>
+          )}
+          {moreComponent}
         </DialogContent>
-        {moreComponent}
         <DialogActions>{alertButton}</DialogActions>
       </Dialog>
     </div>

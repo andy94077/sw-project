@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,11 +8,11 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import TextField from "@material-ui/core/TextField";
 import { useHistory } from "react-router-dom";
 import Errormsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
+import MyQuill from "../components/MyQuill";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -112,8 +112,8 @@ const useStyles = makeStyles((theme) => ({
 export default function ContentCard(props) {
   const { userId, username, src } = props;
   const classes = useStyles();
-  const desc = useRef();
   const history = useHistory();
+  const [value, setValue] = useState("");
 
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
@@ -140,7 +140,7 @@ export default function ContentCard(props) {
       url: src,
       user_id: userId,
       username,
-      content: desc.current.value,
+      content: value,
       tag,
     };
 
@@ -214,18 +214,7 @@ export default function ContentCard(props) {
               </Button>
             )}
           </FormControl>
-          <TextField
-            id="outlined-start-adornment"
-            className={classes.textfield}
-            label="Image description"
-            multiline
-            rowsMax="19"
-            variant="outlined"
-            InputProps={{
-              className: classes.textarea,
-            }}
-            inputRef={desc}
-          />
+          <MyQuill value={value} setValue={setValue} />
         </div>
       </Card>
     );
