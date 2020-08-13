@@ -182,8 +182,7 @@ class UserController extends BaseController
 
     public function uploadUserAvatar(Request $request){
         $user = User::where('name', $request['name'])->first();
-        echo substr($user->avatar_url, 1);
-        //unlink(substr($user->avatar_url, 1));
+        unlink(substr($user->avatar_url, 1));
 
         $output_file = "img/". $request["name"] ."Avatar". ((new DateTime())->format('Y-m-d--H:i:s')).".jpeg";
         $ifp = fopen( $output_file, 'wb' );
