@@ -59,4 +59,9 @@ class LikeController extends BaseController
         $like = Like::withTrashed()->find($id)->restore();
         return response()->json($like);
     }
+
+    public function sum(Request $request){
+        $res['sum'] = Like::where('post_id', $request['post_id'])->count();
+        return response()->json($res);
+    }
 }
