@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
@@ -12,6 +15,7 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import { Link } from "react-router-dom";
 import { deleteCookie } from "../cookieHelper";
 import LoginForm from "../Login/LoginForm";
+import { selectUser } from "../redux/userSlice";
 
 const useStyles = makeStyles({
   list: {
@@ -31,7 +35,8 @@ const useStyles = makeStyles({
 
 export default function RightDrawer(props) {
   const classes = useStyles();
-  const { open, toggleDrawer, button, username, avatar } = props;
+  const { open, toggleDrawer, button, avatar } = props;
+  const { username } = useSelector(selectUser);
   const [modalShow, setModalShow] = useState(false);
 
   const logIn = (e) => {

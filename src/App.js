@@ -144,7 +144,7 @@ export default function App() {
     }
     return (
       <div>
-        {window.location.pathname !== "/" && <Bar username={user.username} />}
+        {window.location.pathname !== "/" && <Bar />}
         <Switch>
           <Route exact path="/" component={SignUpPage} />
           <Route exact path="/home" component={Homepage} />

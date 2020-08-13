@@ -1,14 +1,18 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Accordion from "@material-ui/core/Accordion";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Typography from "@material-ui/core/Typography";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Typography,
+} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
+    minWidth: "400px",
+    maxWidth: "600px",
+    zIndex: "2000",
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
@@ -27,27 +31,31 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
 
-  const { text } = props;
+  const { text, defaultExpanded = false } = props;
 
   return (
     <div className={classes.root}>
       {text.map((value) => {
         return (
-          <Accordion key={value.id}>
+          <Accordion
+            key={value.id}
+            defaultExpanded={defaultExpanded}
+            style={{ margin: 0, borderBottom: "1px solid #aaa" }}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
               <Typography className={classes.heading}>
-                {value.subject}
+                {value.header}
               </Typography>
               <Typography className={classes.secondaryHeading}>
-                {value.sender}
+                from {value.secondary}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{value.content}</Typography>
+              <div dangerouslySetInnerHTML={{ __html: value.content }} />
             </AccordionDetails>
           </Accordion>
         );
