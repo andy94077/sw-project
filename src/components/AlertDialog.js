@@ -6,9 +6,17 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   frame: {
-    width: "40%",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
+    [theme.breakpoints.only("sm")]: {
+      width: "70%",
+    },
+    [theme.breakpoints.up("md")]: {
+      width: "40%",
+    },
     borderRadius: "25px",
     padding: "5px",
   },

@@ -18,7 +18,10 @@ export default function Announcement() {
         url: CONCAT_SERVER_URL("/api/v1/broadcast/adPost"),
         data: jsonData,
       })
-      .then((res) => console.log(res))
+      .then((res) => {
+        console.log(res);
+        setValue("");
+      })
       .catch(() => console.log("Error"));
   };
 
