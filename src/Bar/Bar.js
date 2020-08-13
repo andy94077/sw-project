@@ -1,23 +1,29 @@
-import React, { useState } from "react";
-import { fade, makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import InputBase from "@material-ui/core/InputBase";
-import Badge from "@material-ui/core/Badge";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import SearchIcon from "@material-ui/icons/Search";
-import MailIcon from "@material-ui/icons/Mail";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import MoreIcon from "@material-ui/icons/MoreVert";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
+import { fade, makeStyles } from "@material-ui/core/styles";
+import {
+  AppBar,
+  Badge,
+  IconButton,
+  InputBase,
+  Menu,
+  MenuItem,
+  Popper,
+  Toolbar,
+  Typography,
+} from "@material-ui/core";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import MailIcon from "@material-ui/icons/Mail";
+import MoreIcon from "@material-ui/icons/MoreVert";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import SearchIcon from "@material-ui/icons/Search";
 
-import { Popover } from "@material-ui/core";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
+import { selectUser } from "../redux/userSlice";
+import { CONCAT_SERVER_URL } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -32,11 +38,6 @@ const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
-  },
-  // For popover
-  paper: {
-    minWidth: "400px",
-    maxWidth: "600px",
   },
   title: {
     color: "white",
@@ -104,48 +105,62 @@ const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.toolbar,
 }));
 
-export default function Bar(props) {
-  const { username } = props;
+export default function Bar() {
+  const { username, userId } = useSelector(selectUser);
   const [, page, tag] = window.location.pathname.split("/");
 
   // Classes & States
   const classes = useStyles();
   const history = useHistory();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const [content, setContent] = useState(null);
-  const [text, setText] = useState([{ id: 1 }]);
-  const [open, setOpen] = useState(false);
+  const [contentAnchorEl, setContentAnchorEl] = useState(null);
+  const [contentText, setContentText] = useState([{ id: 1 }]);
+  const [notes, setNotes] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
   const avatar = "/pictures/avatar.jpeg";
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  const isContentOpen = Boolean(content);
+  const isContentOpen = Boolean(contentAnchorEl);
 
-  const mailId = "primary-search-mail-menu";
-  const noteId = "primary-search-notification-menu";
-  const menuId = "primary-search-account-menu";
-  const mobileMenuId = "primary-search-account-menu-mobile";
+  useEffect(() => {
+    const jsonData = {
+      user_id: userId,
+    };
+    axios
+      .request({
+        method: "GET",
+        url: CONCAT_SERVER_URL("/api/v1/notifications"),
+        params: jsonData,
+      })
+      .then((res) => setNotes(res.data))
+      .catch(() =>
+        setNotes([
+          {
+            id: 0,
+            header: "ERROR",
+            secondary: "SYSTEM",
+            content: "Connection error",
+          },
+        ])
+      );
+  }, []);
 
   // Static contents
   const mails = [
     {
       id: 1,
-      subject: "Mail 1",
-      sender: "from Andy Chen",
+      header: "Mail 1",
+      secondary: "from Andy Chen",
       content: "How are you?",
     },
     {
       id: 2,
-      subject: "Mail 2",
-      sender: "from Jason Hung",
+      header: "Mail 2",
+      secondary: "from Jason Hung",
       content: "How do you do?",
     },
-  ];
-  const notes = [
-    { id: 1, subject: "Hint 1", sender: "", content: "Hey!" },
-    { id: 2, subject: "Hint 2", sender: "", content: "Hey you!" },
-    { id: 3, subject: "Hint 3", sender: "", content: "Yes you!" },
   ];
 
   // Toggle functions
@@ -158,12 +173,12 @@ export default function Bar(props) {
   };
 
   const handleContentClose = () => {
-    setContent(null);
+    setContentAnchorEl(null);
   };
 
   const handleContentOpen = (texts) => (event) => {
-    setText(texts);
-    setContent(event.currentTarget);
+    setContentText(texts);
+    setContentAnchorEl(event.currentTarget);
   };
 
   const handleSearch = (e) => {
@@ -182,42 +197,33 @@ export default function Bar(props) {
       return;
     }
 
-    setOpen(isOpen);
+    setDrawerOpen(isOpen);
   };
 
   // Toggled components
   const renderContent = (
-    <Popover
-      anchorEl={content}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      classes={{ paper: `${classes.paper}` }}
-      id={mailId}
+    <Popper
+      anchorEl={contentAnchorEl}
       keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isContentOpen}
       onClose={handleContentClose}
-      width="50%"
+      style={{ zIndex: "1000" }}
     >
-      <Content text={text} />
-    </Popover>
+      <Content text={contentText} />
+    </Popper>
   );
 
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      id={mobileMenuId}
       keepMounted
       transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton
-          aria-label="popup 2 new mails"
-          color="inherit"
-          component="span"
-        >
+        <IconButton color="inherit" component="span">
           <Badge badgeContent={2} color="secondary">
             <MailIcon />
           </Badge>
@@ -225,11 +231,7 @@ export default function Bar(props) {
         <p>Messages</p>
       </MenuItem>
       <MenuItem>
-        <IconButton
-          aria-label="popup 3 new notifications"
-          color="inherit"
-          component="span"
-        >
+        <IconButton color="inherit" component="span">
           <Badge badgeContent={3} color="secondary">
             <NotificationsIcon />
           </Badge>
@@ -237,13 +239,7 @@ export default function Bar(props) {
         <p>Notifications</p>
       </MenuItem>
       <MenuItem onClick={toggleDrawer(true)}>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-          component="span"
-        >
+        <IconButton color="inherit" component="span">
           {username === null ? (
             <AccountCircleIcon />
           ) : (
@@ -275,7 +271,6 @@ export default function Bar(props) {
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
-              inputProps={{ "aria-label": "search" }}
               onKeyUp={handleSearch}
               onChange={handleSetSearchValue}
               value={searchValue}
@@ -284,9 +279,6 @@ export default function Bar(props) {
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton
-              aria-label="popup 2 new mails"
-              aria-controls={mailId}
-              aria-haspopup="true"
               onClick={handleContentOpen(mails)}
               color="inherit"
               component="span"
@@ -296,9 +288,6 @@ export default function Bar(props) {
               </Badge>
             </IconButton>
             <IconButton
-              aria-label="popup 3 new notifications"
-              aria-controls={noteId}
-              aria-haspopup="true"
               onClick={handleContentOpen(notes)}
               color="inherit"
               component="span"
@@ -308,14 +297,11 @@ export default function Bar(props) {
               </Badge>
             </IconButton>
             <RightDrawer
-              open={open}
+              open={drawerOpen}
               toggleDrawer={toggleDrawer}
               button={
                 <IconButton
                   edge="end"
-                  aria-label="account of current user"
-                  aria-controls={menuId}
-                  aria-haspopup="true"
                   onClick={toggleDrawer(true)}
                   color="inherit"
                   component="span"
@@ -331,15 +317,11 @@ export default function Bar(props) {
                   )}
                 </IconButton>
               }
-              username={username}
               avatar={avatar}
             />
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
-              aria-label="popup more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
               component="span"

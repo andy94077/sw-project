@@ -102,10 +102,6 @@ export default function Profile(props) {
     },
   } = props;
 
-  // const userId = 1;
-  // const username = "user1";
-  // const { name } = match.params;
-
   const classes = useStyles();
   const follow = [123, 456];
   const url = "localhost:3000";
