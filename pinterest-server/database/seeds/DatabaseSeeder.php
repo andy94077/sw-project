@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
             PostTableSeeder::class,
             CommentsTableSeeder::class,
             SuperUsersTableSeeder::class,
-            
             NotificationsTableSeeder::class,
+            LikeTableSeeder::class,
         ]);
     }
 }

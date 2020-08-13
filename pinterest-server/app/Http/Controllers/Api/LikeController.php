@@ -61,7 +61,14 @@ class LikeController extends BaseController
     }
 
     public function sum(Request $request){
-        $res['sum'] = Like::where('post_id', $request['post_id'])->count();
+        $query = Like::where('likes.post_id', $request['post_id']);
+        $res['sum'] = $query->count();
+        $res['likers'] = $query->orderBy('updated_at', 'DESC')->take(3)->LeftJoin('users', 'users.id', '=', 'likes.user_id')->select('users.name as username', 'likes.updated_at as updated_at')->get();
         return response()->json($res);
+    }
+
+    public function getLatest(){
+        $likes = Like::orderBy('updated_at', 'DESC')->take(8)->LeftJoin('users', 'users.id', '=', 'likes.user_id')->select('users.name as username', 'likes.*')->get();
+        return response()->json($likes);
     }
 }
