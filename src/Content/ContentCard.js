@@ -6,7 +6,6 @@ import {
   Collapse,
   TextareaAutosize,
   Button,
-  Fab,
   CardMedia,
   CardContent,
   Card,
@@ -15,6 +14,7 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
+import CardActions from "@material-ui/core/CardActions";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -27,6 +27,7 @@ import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
 import MyQuill from "../components/MyQuill";
+import "./Content.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     [theme.breakpoints.down("xs")]: {
-      height: "55%",
+      height: "60%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
@@ -65,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
   cover: {
     [theme.breakpoints.down("xs")]: {
-      height: "45%",
+      height: "40%",
       flex: "100%",
     },
     [theme.breakpoints.only("sm")]: {
@@ -88,11 +89,11 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create("transform", {
       duration: theme.transitions.duration.shortest,
     }),
-    marginLeft: "5%",
+    marginLeft: "auto",
   },
   expandOpen: {
     transform: "rotate(180deg)",
-    marginLeft: "5%",
+    marginLeft: "auto",
   },
   input: {
     resize: "none",
@@ -121,10 +122,12 @@ const useStyles = makeStyles((theme) => ({
     height: "40px",
   },
   content: {
-    maxHeight: "50%",
+    maxHeight: "40%",
     minHeight: "130px",
     display: "flex",
     flexDirection: "column",
+    padding: "0px",
+    margin: "16px 16px 0px 16px",
   },
   collapse: {
     display: "flex",
@@ -172,6 +175,13 @@ const useStyles = makeStyles((theme) => ({
     color: "red",
   },
   none: {},
+  cardActions: {
+    padding: "0px",
+  },
+  likeUser: {
+    fontSize: "0.7em",
+    fontWeight: "450",
+  },
 }));
 
 export default function ContentCard(props) {
@@ -200,15 +210,95 @@ export default function ContentCard(props) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
-  const [likeInfo, setLikeInfo] = useState({ id: null, red: false });
-  const [likeCount, setLikeCount] = useState(0);
+  const [likeInfo, setLikeInfo] = useState({
+    id: null,
+    red: false,
+  });
+  const [likeCount, setLikeCount] = useState({ sum: 0, likers: "" });
 
   function refreshLikeCount() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
       params: { post_id: id },
     })
       .then((res) => {
-        setLikeCount(res.data.sum);
+        let likerString = "";
+        if (res.data.likers.length === 1) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {" likes this post."}
+            </div>
+          );
+        } else if (res.data.likers.length === 2) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {" like this post."}
+            </div>
+          );
+        } else if (res.data.sum === 3) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>
+              {" like this post."}
+            </div>
+          );
+        } else if (res.data.sum === 4) {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>{" "}
+              {`and other ${res.data.sum - 3} user
+              like this post.`}
+            </div>
+          );
+        } else {
+          likerString = (
+            <div className={classes.likeUser}>
+              <Link to={`/profile/${res.data.likers[0].username}`}>
+                {res.data.likers[0].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[1].username}`}>
+                {res.data.likers[1].username}
+              </Link>
+              {", "}
+              <Link to={`/profile/${res.data.likers[2].username}`}>
+                {res.data.likers[2].username}
+              </Link>{" "}
+              {`and other ${res.data.sum - 3} users
+              like this post.`}
+            </div>
+          );
+        }
+        setLikeCount({ sum: res.data.sum, likers: likerString });
       })
       .catch((e) => {
         console.log(e);
@@ -526,7 +616,7 @@ export default function ContentCard(props) {
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </CardContent>
-          <div>
+          <CardActions disableSpacing className={classes.cardActions}>
             {userId && (
               <IconButton onClick={handleLike}>
                 <FavoriteIcon
@@ -536,8 +626,11 @@ export default function ContentCard(props) {
                 />
               </IconButton>
             )}
-            {`${likeCount} Likes`}
-            <Fab
+            <div>
+              <div>{`${likeCount.sum} Likes`}</div>
+              {likeCount.likers}
+            </div>
+            <IconButton
               component="span"
               onClick={() => {
                 setExpand(!expand);
@@ -548,8 +641,8 @@ export default function ContentCard(props) {
               size={expand ? "small" : "medium"}
             >
               <ExpandMoreIcon />
-            </Fab>
-          </div>
+            </IconButton>
+          </CardActions>
           <Collapse
             in={expand}
             classes={{
