@@ -23,7 +23,6 @@ const useStyles = makeStyles(() => ({
     top: -10,
     right: -5,
     background: "white",
-    border: "2px solid #aaa",
     zIndex: 2000,
   },
 }));

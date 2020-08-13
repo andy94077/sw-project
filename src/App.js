@@ -58,9 +58,9 @@ export default function App() {
     });
 
     window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
-      const { text } = event;
+      const { data } = event;
       setIsAdOpen(true);
-      setAdMessage(text);
+      setAdMessage({ id: 2147483647, ...data });
       setTimeout(() => {
         setIsAdOpen(false);
       }, 10000);

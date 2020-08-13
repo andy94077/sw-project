@@ -20,9 +20,9 @@ export default function Announcement() {
   const handleSubmit = () => {
     const jsonData = {
       data: {
-        title,
-        sender,
-        value,
+        header: title,
+        secondary: sender,
+        content: value,
       },
     };
 
