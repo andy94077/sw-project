@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { Row, Col, Card, Statistic, Button, Typography, List } from "antd";
+import { Row, Col, Card, Statistic, Typography, List, message } from "antd";
 import Axios from "axios";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
 import { useEffect } from "react";
 import { format } from "date-fns";
 import "./Dashboard.css";
+
+import Echo from "laravel-echo";
+import io from "socket.io-client";
 
 export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
@@ -15,26 +18,72 @@ export default function Dashboard() {
   const [isCardLoading, setIsCardLoading] = useState(true);
   const [isListLoading, setIsListLoading] = useState(true);
 
+  // Broadcast
   useEffect(() => {
-    refreshInfo();
-    refreshLatestInfo();
-    const timer = setInterval(() => {
-      refreshInfo();
-      refreshLatestInfo();
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("Dashboard").listen("PostChanged", () => {
+      const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
+      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"))
+        .then((res) => {
+          setPostInfo(res.data);
+        })
+        .finally(() => {
+          clearTimeout(timer1);
+          setIsCardLoading(false);
+        });
+
+      const timer2 = setTimeout(() => setIsListLoading(true), 1000);
+      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
+        .then((res) => {
+          setLatestPosts(res.data);
+        })
+        .finally(() => {
+          clearTimeout(timer2);
+          setIsListLoading(false);
+        });
+    });
+
+    window.Echo.channel("Dashboard").listen("CommentChanged", () => {
+      const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
+      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"))
+        .then((res) => {
+          setCommentInfo(res.data);
+        })
+        .finally(() => {
+          clearTimeout(timer1);
+          setIsCardLoading(false);
+        });
+
+      const timer2 = setTimeout(() => setIsListLoading(true), 1000);
+      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
+        .then((res) => {
+          setLatestComments(res.data);
+        })
+        .finally(() => {
+          clearTimeout(timer2);
+          setIsListLoading(false);
+        });
+    });
   }, []);
 
-  async function refreshInfo() {
+  useEffect(() => {
+    getInfo();
+    getLatestInfo();
+  }, []);
+
+  async function getInfo() {
     setIsCardLoading(true);
     const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
     Promise.all([user, comment, post])
       .then((res) => {
-        console.log(res);
         setUserInfo(res[0].data);
         setCommentInfo(res[1].data);
         setPostInfo(res[2].data);
@@ -44,7 +93,7 @@ export default function Dashboard() {
       });
   }
 
-  async function refreshLatestInfo() {
+  async function getLatestInfo() {
     setIsListLoading(true);
     const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
     const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
@@ -58,8 +107,17 @@ export default function Dashboard() {
       });
   }
 
+  console.log(isCardLoading || isListLoading);
   return (
     <div style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }}>
+      {message.loading({
+        key: "loading",
+        content: "Loading...",
+        duration: 0,
+        style: {
+          display: isCardLoading || isListLoading ? "block" : "none",
+        },
+      })}
       <Card style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }} bordered={false}>
         <Row gutter={[16, 16]}>
           <Col span={8}>
@@ -180,17 +238,6 @@ export default function Dashboard() {
           </Col>
         </Row>
       </Card>
-      <Button
-        onClick={() => {
-          setIsCardLoading(true);
-          setIsListLoading(true);
-          refreshInfo();
-          refreshLatestInfo();
-        }}
-        loading={isCardLoading || isListLoading}
-      >
-        refresh
-      </Button>
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Card hoverable style={{ backgroundColor: "rgb(255, 255 , 253)" }}>

@@ -21,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\AdPosted' => [
             'App\Listeners\AdPost',
         ],
+        'App\Events\PostChanged' => [
+            'App\Listeners\PostChange',
+        ],
+        'App\Events\CommentChanged' => [
+            'App\Listeners\CommentChange',
+        ],
     ];
 
     /**
