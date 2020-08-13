@@ -199,9 +199,11 @@ export default function List(props) {
               .filter((col) => col.hasOwnProperty("timeFormat"))
               .map((col) => [
                 col.dataIndex,
-                filter[col.dataIndex].map((item) =>
-                  item === "" || item === null ? "" : item.format()
-                ),
+                filter[col.dataIndex] === null
+                  ? ["", ""]
+                  : filter[col.dataIndex].map((item) =>
+                      item === "" || item === null ? "" : item.format()
+                    ),
               ])
           ),
         },
@@ -269,7 +271,6 @@ export default function List(props) {
         value={searchText[col.dataIndex]}
         onChange={handleSearchDateChange(col.dataIndex)}
         showTime
-        onOk={(value) => console.log(value)}
         style={{
           width: 250,
           margin: 8,

@@ -68,9 +68,11 @@ export default function Post() {
           ...Object.fromEntries(
             ["created_at", "updated_at", "deleted_at"].map((time) => [
               time,
-              filter[time].map((item) =>
-                item === "" || item === null ? "" : item.format()
-              ),
+              filter[time] === null
+                ? ["", ""]
+                : filter[time].map((item) =>
+                    item === "" || item === null ? "" : item.format()
+                  ),
             ])
           ),
         },
@@ -376,7 +378,6 @@ export default function Post() {
         value={searchText[key]}
         onChange={handleSearchDateChange(key)}
         showTime
-        onOk={(value) => console.log(value)}
         style={{
           width: 250,
           margin: 8,
