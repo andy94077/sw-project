@@ -35,7 +35,7 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAdOpen, setisAdOpen] = useState(false);
+  const [isAdOpen, setIsAdOpen] = useState(false);
   const [adMessage, setAdMessage] = useState("");
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
@@ -45,7 +45,7 @@ export default function App() {
   }
 
   function handleAdClose() {
-    setisAdOpen(false);
+    setIsAdOpen(false);
   }
 
   // Broadcast
@@ -59,10 +59,10 @@ export default function App() {
 
     window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
       const { text } = event;
-      setisAdOpen(true);
+      setIsAdOpen(true);
       setAdMessage(text);
       setTimeout(() => {
-        setisAdOpen(false);
+        setIsAdOpen(false);
       }, 10000);
     });
   }, []);
