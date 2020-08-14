@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import { Row, Col, Card, Statistic, Typography, List, message } from "antd";
+import {
+  UserOutlined,
+  UserAddOutlined,
+  TeamOutlined,
+  FileDoneOutlined,
+  FileAddOutlined,
+  MessageOutlined,
+  CloudUploadOutlined,
+} from "@ant-design/icons";
 import Axios from "axios";
 import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
 import { useEffect } from "react";
@@ -130,7 +139,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <UserOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="Valid Users"
                   value={userInfo.valid}
@@ -146,7 +159,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <TeamOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="Online Users"
                   value={userInfo.online}
@@ -162,7 +179,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <UserAddOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="New Users(in 1 day)"
                   value={userInfo.new}
@@ -180,7 +201,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <FileDoneOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="Valid Posts"
                   value={postInfo.valid}
@@ -196,7 +221,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <FileAddOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="New Posts(in 1 day)"
                   value={postInfo.new}
@@ -214,7 +243,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <MessageOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="Valid Comments"
                   value={commentUnfo.valid}
@@ -230,7 +263,11 @@ export default function Dashboard() {
                 padding: "7px",
               }}
             >
-              <Card hoverable>
+              <Card hoverable bodyStyle={{ display: "flex" }}>
+                <CloudUploadOutlined
+                  style={{ display: "inline-block", fontSize: "55px" }}
+                />
+                <div style={{ width: "10%" }} />
                 <Statistic
                   title="New Comments(in 1 hour)"
                   value={commentUnfo.new}
