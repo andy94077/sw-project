@@ -120,8 +120,10 @@ export default function Profile(props) {
   const { username, userId, bucketTime } = useSelector(selectUser);
   const isBucket = checkBucket(bucketTime);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .request({
         method: "POST",
@@ -130,7 +132,8 @@ export default function Profile(props) {
       })
       .then((response) => {
         setAvatar(CONCAT_SERVER_URL(`${response.data}`));
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, [isUpload]);
 
   useEffect(() => {
@@ -268,11 +271,17 @@ export default function Profile(props) {
             onClick={handleAvatarUpload}
             onKeyUp={handleKeyUp}
           >
-            <img
-              alt="Avatar"
-              className={`${classes.central} ${classes.rounded}`}
-              src={avatar}
-            />
+            {isLoading ? (
+              <div style={{ height: "120px" }}>
+                <Loading />
+              </div>
+            ) : (
+              <img
+                alt="Avatar"
+                className={`${classes.central} ${classes.rounded}`}
+                src={avatar}
+              />
+            )}
             {avatarVisibility && (
               <GridListTileBar
                 className={classes.bar}
@@ -321,6 +330,7 @@ export default function Profile(props) {
           backdrop
         >
           <AvatarUpload
+            setIsLoading={setIsLoading}
             name={name}
             setIsUpload={() => {
               setIsUpload((preState) => !preState);
