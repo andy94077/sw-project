@@ -242,7 +242,6 @@ export default function Bar() {
   const handleContentClose = () => {
     setContentAnchorEl(null);
     setCookie("noteCheck", Date.now(), 60);
-    setNoteCount(0);
   };
 
   const handleContentOpen = (text) => (event) => {
@@ -251,6 +250,7 @@ export default function Bar() {
     } else {
       setContentText(text);
       setContentAnchorEl(event.currentTarget);
+      if (text === notes) setNoteCount(0);
     }
   };
 
@@ -304,17 +304,17 @@ export default function Bar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      <MenuItem onClick={handleContentOpen(mails)}>
         <IconButton color="inherit" component="span">
-          <Badge badgeContent={2} color="secondary">
+          <Badge badgeContent={0} color="secondary">
             <MailIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Mails</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem onClick={handleContentOpen(notes)}>
         <IconButton color="inherit" component="span">
-          <Badge badgeContent={3} color="secondary">
+          <Badge badgeContent={noteCount} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -327,6 +327,14 @@ export default function Bar() {
         <p>Profile</p>
       </MenuItem>
     </Menu>
+  );
+
+  const renderAnnouncementGrid = (
+    <AnnouncementGrid
+      isAdOpen={isAdOpen}
+      handleAdClose={handleAdClose}
+      adMessage={adMessage}
+    />
   );
 
   // The bar
@@ -381,11 +389,7 @@ export default function Bar() {
                   </IconButton>
                 )}
                 {renderContent}
-                <AnnouncementGrid
-                  isAdOpen={isAdOpen}
-                  handleAdClose={handleAdClose}
-                  adMessage={adMessage}
-                />
+                {renderAnnouncementGrid}
               </div>
             </ClickAwayListener>
             <RightDrawer
