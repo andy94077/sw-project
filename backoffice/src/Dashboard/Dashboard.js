@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Row, Col, Card, Statistic, Typography, List, message } from "antd";
 import Axios from "axios";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { CONCAT_SERVER_URL, REDIS_URL, SERVER_URL } from "../constants";
+
 import { useEffect } from "react";
 import { format } from "date-fns";
 import "./Dashboard.css";
@@ -9,23 +10,35 @@ import "./Dashboard.css";
 import Echo from "laravel-echo";
 import io from "socket.io-client";
 
-export default function Dashboard() {
+export default function Dashboard(props) {
+  const { user } = props;
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
   const [postInfo, setPostInfo] = useState({ valid: 0, new: 0 });
   const [commentUnfo, setCommentInfo] = useState({ valid: 0, new: 0 });
   const [latestPosts, setLatestPosts] = useState([]);
   const [latestComments, setLatestComments] = useState([]);
-  const [isCardLoading, setIsCardLoading] = useState(true);
-  const [isListLoading, setIsListLoading] = useState(true);
+  const [isCardLoading, setIsCardLoading] = useState(false);
+  const [isListLoading, setIsListLoading] = useState(false);
 
   // Broadcast
   useEffect(() => {
     window.io = io;
-
     window.Echo = new Echo({
       broadcaster: "socket.io",
       host: REDIS_URL, // this is laravel-echo-server host
+      authEndpoint: "/super/broadcasting/auth",
+      auth: {
+        headers: {
+          Authorization: `Bearer ${user.apiToken}`,
+        },
+      },
     });
+    console.log(window.Echo);
+
+    window.Echo.join("Online")
+      .here(() => console.log(user.username, "join"))
+      .joining((user) => console.log(user, "join"))
+      .leaving((user) => console.log(user, "leave"));
 
     window.Echo.channel("Dashboard").listen("PostChanged", () => {
       const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
@@ -70,7 +83,7 @@ export default function Dashboard() {
           setIsListLoading(false);
         });
     });
-  }, []);
+  }, [user.apiToken, user.username]);
 
   useEffect(() => {
     getInfo();
@@ -107,7 +120,6 @@ export default function Dashboard() {
       });
   }
 
-  console.log(isCardLoading || isListLoading);
   return (
     <div style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }}>
       {message.loading({

@@ -27,6 +27,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\CommentChanged' => [
             'App\Listeners\CommentChange',
         ],
+        'App\Events\UserChanged' => [
+            'App\Listeners\UserChange',
+        ],
+
     ];
 
     /**

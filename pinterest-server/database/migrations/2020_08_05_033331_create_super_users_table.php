@@ -19,6 +19,7 @@ class CreateSuperUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->rememberToken();
+            $table->string('api_token')->nullable()->default(null);
             $table->softDeletes();
             $table->timestamps();
         });

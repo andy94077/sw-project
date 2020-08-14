@@ -71,6 +71,7 @@ class SuperUserController extends BaseController
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
+                'api_token' => $userInfo->api_token,
                 'isValid' => true
             ], 200);
         }

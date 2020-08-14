@@ -16,7 +16,11 @@ import { CONCAT_SERVER_URL } from "./constants";
 import Announcement from "./Announcement/Announcement";
 
 export default function App() {
-  const [user, setUser] = useState({ username: null, userId: null });
+  const [user, setUser] = useState({
+    username: null,
+    userId: null,
+    apiToken: null,
+  });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const history = useHistory();
@@ -25,7 +29,7 @@ export default function App() {
   useEffect(() => {
     const accessToken = getCookie();
     setError({ message: "", url: "" });
-    setUser({ username: null, userId: null });
+    setUser({ username: null, userId: null, apiToken: null });
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
@@ -34,7 +38,11 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            setUser({ username: res.data.username, userId: res.data.user_id });
+            setUser({
+              username: res.data.username,
+              userId: res.data.user_id,
+              apiToken: res.data.api_token,
+            });
             if (location.pathname === "/") history.push("/dashboard");
           } else {
             deleteCookie();
@@ -67,7 +75,11 @@ export default function App() {
         username={user.username}
         content={
           <Switch>
-            <Route exact path={"/dashboard"} component={Dashboard} />
+            <Route
+              exact
+              path={"/dashboard"}
+              render={() => <Dashboard user={user} />}
+            />
             <Route exact path={"/user"} component={User} />
             <Route exact path={"/post"} component={Post} />
             <Route exact path={"/BOUser"} component={BOUser} />
