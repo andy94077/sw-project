@@ -104,7 +104,7 @@ export default function Content(props) {
             />
           </Grid>
           <Grid item xs={12} sm={11} md={10}>
-            <PhotoGrid />
+            <PhotoGrid showError={false} />
           </Grid>
         </Grid>
       </>
