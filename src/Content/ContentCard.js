@@ -642,7 +642,7 @@ export default function ContentCard(props) {
             />
           </CardContent>
           <CardActions disableSpacing className={classes.cardActions}>
-            {userId && (
+            {userId ? (
               <IconButton onClick={handleLike}>
                 <FavoriteIcon
                   className={clsx(classes.none, {
@@ -650,6 +650,8 @@ export default function ContentCard(props) {
                   })}
                 />
               </IconButton>
+            ) : (
+              <div style={{ width: "15px" }} />
             )}
             <div>
               <div>{`${likeCount.sum} Likes`}</div>
