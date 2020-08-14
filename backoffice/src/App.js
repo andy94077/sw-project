@@ -75,11 +75,7 @@ export default function App() {
         username={user.username}
         content={
           <Switch>
-            <Route
-              exact
-              path={"/dashboard"}
-              render={() => <Dashboard user={user} />}
-            />
+            <Route exact path={"/dashboard"} component={Dashboard} />
             <Route exact path={"/user"} component={User} />
             <Route exact path={"/post"} component={Post} />
             <Route exact path={"/BOUser"} component={BOUser} />

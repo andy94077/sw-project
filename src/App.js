@@ -50,48 +50,29 @@ export default function App() {
 
   // Broadcast
   useEffect(() => {
-    const accessToken = getCookie();
     window.io = io;
-
-    axios
-      .post(CONCAT_SERVER_URL("/api/v1/user/authentication"), {
-        accessToken,
-      })
-      .then((res) => {
-        if (res.data.isValid === true) {
-          dispatch(
-            setData({
-              username: res.data.username,
-              user_id: res.data.user_id,
-              bucket_time: res.data.bucket_time,
-              api_token: res.data.api_token,
-            })
-          );
-        }
-        window.Echo = new Echo({
-          broadcaster: "socket.io",
-          host: REDIS_URL, // this is laravel-echo-server host
-          auth: {
-            headers: {
-              Authorization: `Bearer ${res.data.api_token}`,
-            },
+    if (user.apiToken !== null) {
+      window.Echo = new Echo({
+        broadcaster: "socket.io",
+        host: REDIS_URL, // this is laravel-echo-server host
+        auth: {
+          headers: {
+            Authorization: `Bearer ${user.apiToken}`,
           },
-        });
-        window.Echo.join("Online").here(() =>
-          console.log(`${res.data.username} join online`)
-        );
-      })
-      .finally(() => {
-        window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
-          const { text } = event;
-          setisAdOpen(true);
-          setAdMessage(text);
-          setTimeout(() => {
-            setisAdOpen(false);
-          }, 10000);
-        });
+        },
       });
-  }, []);
+      window.Echo.join("Online");
+
+      window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
+        const { text } = event;
+        setisAdOpen(true);
+        setAdMessage(text);
+        setTimeout(() => {
+          setisAdOpen(false);
+        }, 10000);
+      });
+    }
+  }, [user.apiToken]);
 
   useEffect(() => {
     const accessToken = getCookie();

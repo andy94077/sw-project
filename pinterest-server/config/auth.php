@@ -49,11 +49,6 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
-        'super_api' => [
-            'driver' => 'token',
-            'provider' => 'super_users',
-            'hash' => false,
-        ],
     ],
 
     /*

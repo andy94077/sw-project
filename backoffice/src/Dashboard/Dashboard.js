@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Statistic, Typography, List, message } from "antd";
-import Axios from "axios";
-import { CONCAT_SERVER_URL, REDIS_URL, SERVER_URL } from "../constants";
-
-import { useEffect } from "react";
+import axios from "axios";
 import { format } from "date-fns";
+import sha256 from "js-sha256";
+
 import "./Dashboard.css";
+import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
 
 import Echo from "laravel-echo";
 import io from "socket.io-client";
 
-export default function Dashboard(props) {
-  const { user } = props;
+export default function Dashboard() {
   const [userInfo, setUserInfo] = useState({ valid: 0, online: 0, new: 0 });
   const [postInfo, setPostInfo] = useState({ valid: 0, new: 0 });
   const [commentUnfo, setCommentInfo] = useState({ valid: 0, new: 0 });
@@ -19,6 +18,7 @@ export default function Dashboard(props) {
   const [latestComments, setLatestComments] = useState([]);
   const [isCardLoading, setIsCardLoading] = useState(false);
   const [isListLoading, setIsListLoading] = useState(false);
+  const [onlineUser, setOnlineUser] = useState({});
 
   // Broadcast
   useEffect(() => {
@@ -26,23 +26,35 @@ export default function Dashboard(props) {
     window.Echo = new Echo({
       broadcaster: "socket.io",
       host: REDIS_URL, // this is laravel-echo-server host
-      authEndpoint: "/super/broadcasting/auth",
       auth: {
         headers: {
-          Authorization: `Bearer ${user.apiToken}`,
+          Authorization: `Bearer ${sha256("admin")}`,
         },
       },
     });
-    console.log(window.Echo);
 
     window.Echo.join("Online")
-      .here(() => console.log(user.username, "join"))
-      .joining((user) => console.log(user, "join"))
-      .leaving((user) => console.log(user, "leave"));
+      .here((users) =>
+        setOnlineUser((prevUsers) => ({
+          ...prevUsers,
+          ...Object.fromEntries(users.map((user) => [user.id, user])),
+        }))
+      )
+      .joining((user) =>
+        setOnlineUser((prevUsers) => ({ ...prevUsers, [user.id]: user }))
+      )
+      .leaving((user) =>
+        setOnlineUser((prevUsers) => {
+          const newUsers = { ...prevUsers };
+          delete newUsers[user.id];
+          return newUsers;
+        })
+      );
 
     window.Echo.channel("Dashboard").listen("PostChanged", () => {
       const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/posts/info"))
         .then((res) => {
           setPostInfo(res.data);
         })
@@ -52,7 +64,8 @@ export default function Dashboard(props) {
         });
 
       const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
         .then((res) => {
           setLatestPosts(res.data);
         })
@@ -64,7 +77,8 @@ export default function Dashboard(props) {
 
     window.Echo.channel("Dashboard").listen("CommentChanged", () => {
       const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/comments/info"))
         .then((res) => {
           setCommentInfo(res.data);
         })
@@ -74,7 +88,8 @@ export default function Dashboard(props) {
         });
 
       const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
         .then((res) => {
           setLatestComments(res.data);
         })
@@ -83,21 +98,34 @@ export default function Dashboard(props) {
           setIsListLoading(false);
         });
     });
-  }, [user.apiToken, user.username]);
+  }, []);
 
   useEffect(() => {
     getInfo();
     getLatestInfo();
-  }, []);
+  }, [getInfo]);
+
+  useEffect(
+    () =>
+      setUserInfo((info) => ({
+        ...info,
+        online: Math.max(Object.keys(onlineUser).length - 1, 0), // exclude admin user
+      })),
+    [onlineUser]
+  );
 
   async function getInfo() {
     setIsCardLoading(true);
-    const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
-    const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
-    const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
+    const user = axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
+    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
+    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
     Promise.all([user, comment, post])
       .then((res) => {
-        setUserInfo(res[0].data);
+        setUserInfo({
+          ...userInfo,
+          valid: res[0].data.valid,
+          new: res[0].data.new,
+        });
         setCommentInfo(res[1].data);
         setPostInfo(res[2].data);
       })
@@ -108,8 +136,8 @@ export default function Dashboard(props) {
 
   async function getLatestInfo() {
     setIsListLoading(true);
-    const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
-    const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
+    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
+    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
     Promise.all([post, comment])
       .then((res) => {
         setLatestPosts(res[0].data);

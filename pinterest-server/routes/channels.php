@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,5 +19,8 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('Online', function ($user) {
-    return ['id' => "123"];
+    return [
+        'id' => $user->id, 
+        'name' => $user->name,
+    ];
 });
