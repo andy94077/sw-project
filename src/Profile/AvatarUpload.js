@@ -32,19 +32,23 @@ export default function AvatarUpload(props) {
   }
 
   const handleUpload = () => {
-    setIsLoading(true);
-    onHide();
-    axios({
-      method: "POST",
-      url: CONCAT_SERVER_URL("/api/v1/user/uploadUserAvatar"),
-      data: { name, imgBase64: avatar.preview },
-    })
-      .then(() => {
-        setIsUpload();
+    if (avatar.preview === null || avatar.preview === "") {
+      setIsDialogOpen(true);
+    } else {
+      setIsLoading(true);
+      onHide();
+      axios({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/user/uploadUserAvatar"),
+        data: { name, imgBase64: avatar.preview },
       })
-      .catch(() => {
-        setIsDialogOpen(true);
-      });
+        .then(() => {
+          setIsUpload();
+        })
+        .catch(() => {
+          setIsDialogOpen(true);
+        });
+    }
   };
 
   return (
