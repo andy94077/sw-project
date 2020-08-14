@@ -11,18 +11,19 @@ import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    minWidth: "400px",
+    minWidth: "350px",
     maxWidth: "600px",
     zIndex: "2000",
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
-    flexBasis: "33.33%",
+    flexBasis: "44.44%",
     flexShrink: 0,
     fontWeight: 800,
     overflow: "hidden",
   },
   secondaryHeading: {
+    paddingLeft: "50px",
     fontSize: theme.typography.pxToRem(14),
     color: theme.palette.text.secondary,
     overflow: "hidden",
@@ -45,7 +46,7 @@ export default function Content(props) {
         return (
           <Accordion
             key={value.id}
-            defaultExpanded={defaultExpanded}
+            defaultExpanded={defaultExpanded || background === "#fff8e5"}
             style={{
               margin: 0,
               borderBottom: "1px solid #aaa",

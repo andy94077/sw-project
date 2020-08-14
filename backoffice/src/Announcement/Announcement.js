@@ -6,52 +6,53 @@ import { CONCAT_SERVER_URL } from "../constants";
 
 export default function Announcement() {
   const [title, setTitle] = useState("");
-  const [sender, setSender] = useState("");
   const [value, setValue] = useState("");
 
   const handleSetTitle = (event) => {
     setTitle(event.target.value);
   };
 
-  const handleSetSender = (event) => {
-    setSender(event.target.value);
-  };
-
   const handleSubmit = () => {
-    if (value === "" || value === "<p><br></p>") {
+    if (title === "" || value === "" || value === "<p><br></p>") {
       Modal.warning({
-        title: "Announcement contents cannot be empty.",
+        title: "Announcement title & contents cannot be empty.",
       });
       return;
     }
 
-    const jsonData = {
-      data: {
-        group: "public",
-        header: title,
-        secondary: sender,
-        content: value,
+    Modal.confirm({
+      title: "Are you sure you want to broadcast this announcement?",
+      content: `(Title: ${title})`,
+      onOk() {
+        const jsonData = {
+          data: {
+            group: "public",
+            header: title,
+            content: value,
+          },
+        };
+        setTitle("");
+        setValue("");
+
+        axios
+          .request({
+            method: "POST",
+            url: CONCAT_SERVER_URL("/api/v1/broadcast/adPost"),
+            data: jsonData,
+          })
+          // .then((res) => console.log(res))
+          .catch(() => console.log("Error"));
+
+        axios
+          .request({
+            method: "POST",
+            url: CONCAT_SERVER_URL("/api/v1/notifications"),
+            data: jsonData.data,
+          })
+          // .then((res) => console.log(res))
+          .catch(() => console.log("Error"));
       },
-    };
-    setValue("");
-
-    axios
-      .request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/broadcast/adPost"),
-        data: jsonData,
-      })
-      .then((res) => console.log(res))
-      .catch(() => console.log("Error"));
-
-    axios
-      .request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/notifications"),
-        data: jsonData.data,
-      })
-      .then((res) => console.log(res))
-      .catch(() => console.log("Error"));
+    });
   };
 
   return (
@@ -60,12 +61,6 @@ export default function Announcement() {
         placeholder={`Enter title here`}
         value={title}
         onChange={handleSetTitle}
-        style={{ width: 188, margin: 8, borderRadius: 15 }}
-      />
-      <Input
-        placeholder={`Enter sender here`}
-        value={sender}
-        onChange={handleSetSender}
         style={{ width: 188, margin: 8, borderRadius: 15 }}
       />
       <MyQuill value={value} setValue={setValue} />
