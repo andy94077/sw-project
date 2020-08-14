@@ -120,6 +120,7 @@ export default function Profile(props) {
   const { username, userId, bucketTime } = useSelector(selectUser);
   const isBucket = checkBucket(bucketTime);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
+
   useEffect(() => {
     axios
       .request({

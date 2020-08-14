@@ -12,9 +12,6 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Echo from "laravel-echo";
-import io from "socket.io-client";
-
 import Bar from "./Bar/Bar";
 import Homepage from "./Homepage/Homepage";
 import SignUpPage from "./Login/SignUpPage";
@@ -23,9 +20,8 @@ import Profile from "./Profile/Profile";
 import { getCookie } from "./cookieHelper";
 import { setData, selectUser } from "./redux/userSlice";
 
-import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
+import { CONCAT_SERVER_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
-import AnnouncementGrid from "./components/AnnouncementGrid";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 
@@ -35,37 +31,12 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAdOpen, setIsAdOpen] = useState(false);
-  const [adMessage, setAdMessage] = useState("");
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
   function handleClose() {
     setIsDialogOpen(false);
   }
-
-  function handleAdClose() {
-    setIsAdOpen(false);
-  }
-
-  // Broadcast
-  useEffect(() => {
-    window.io = io;
-
-    window.Echo = new Echo({
-      broadcaster: "socket.io",
-      host: REDIS_URL, // this is laravel-echo-server host
-    });
-
-    window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
-      const { data } = event;
-      setIsAdOpen(true);
-      setAdMessage({ id: 2147483647, ...data });
-      setTimeout(() => {
-        setIsAdOpen(false);
-      }, 10000);
-    });
-  }, []);
 
   useEffect(() => {
     const accessToken = getCookie();
@@ -175,11 +146,6 @@ export default function App() {
             </>
           }
           onClose={handleClose}
-        />
-        <AnnouncementGrid
-          isAdOpen={isAdOpen}
-          handleAdClose={handleAdClose}
-          adMessage={adMessage}
         />
       </div>
     );

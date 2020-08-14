@@ -6,6 +6,7 @@ import { fade, makeStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Badge,
+  ClickAwayListener,
   IconButton,
   InputBase,
   Menu,
@@ -20,10 +21,16 @@ import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import SearchIcon from "@material-ui/icons/Search";
 
+import Echo from "laravel-echo";
+import io from "socket.io-client";
+
+import { format } from "date-fns";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
+import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -113,39 +120,99 @@ export default function Bar() {
   const classes = useStyles();
   const history = useHistory();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [notes, setNotes] = useState([]);
+  const [noteCount, setNoteCount] = useState([]);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
+  const [isAdOpen, setIsAdOpen] = useState(false);
+  const [adMessage, setAdMessage] = useState("");
 
   const avatar = "/pictures/avatar.jpeg";
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(contentAnchorEl);
 
+  // Broadcast
+  useEffect(() => {
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("Notifications").listen("AdPosted", (event) => {
+      const { data } = event;
+      setIsAdOpen(true);
+      setAdMessage({
+        id: 0,
+        created_at: Date.now(),
+        ...data,
+      });
+      setTimeout(() => {
+        setIsAdOpen(false);
+      }, 10000);
+    });
+  }, []);
+
+  // Notifications
   useEffect(() => {
     const jsonData = {
       user_id: userId,
     };
-    axios
-      .request({
-        method: "GET",
-        url: CONCAT_SERVER_URL("/api/v1/notifications"),
-        params: jsonData,
-      })
-      .then((res) => setNotes(res.data))
-      .catch(() =>
-        setNotes([
-          {
-            id: 0,
-            header: "ERROR",
-            secondary: "SYSTEM",
-            content: "Connection error",
-          },
-        ])
-      );
+    const pullNotes = () =>
+      axios
+        .request({
+          method: "GET",
+          url: CONCAT_SERVER_URL("/api/v1/notifications"),
+          params: jsonData,
+        })
+        .then((res) =>
+          setNotes(
+            res.data.map((item) => {
+              item.created_at = format(new Date(item.created_at), "T", {
+                timeZone: "Asia/Taipei",
+              });
+              return item;
+            })
+          )
+        )
+        .catch(() =>
+          setNotes([
+            {
+              id: 0,
+              header: "ERROR",
+              secondary: "SYSTEM",
+              content: "Connection error",
+            },
+          ])
+        );
+    pullNotes();
+
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("Notifications").listen("NotificationChanged", () =>
+      pullNotes()
+    );
   }, []);
+
+  useEffect(() => {
+    setContentText(notes);
+    const noteCheck = getCookie("noteCheck");
+    setNoteCount(notes.filter((note) => note.created_at > noteCheck).length);
+    if (noteCount > 9) {
+      setNoteCount("10+");
+    }
+  }, [notes]);
 
   // Static contents
   const mails = [
@@ -174,12 +241,22 @@ export default function Bar() {
 
   const handleContentClose = () => {
     setContentAnchorEl(null);
+    setCookie("noteCheck", Date.now(), 60);
+    setNoteCount(0);
   };
 
-  const handleContentOpen = (texts) => (event) => {
-    setContentText(texts);
-    setContentAnchorEl(event.currentTarget);
+  const handleContentOpen = (text) => (event) => {
+    if (contentAnchorEl === event.currentTarget) {
+      handleContentClose();
+    } else {
+      setContentText(text);
+      setContentAnchorEl(event.currentTarget);
+    }
   };
+
+  function handleAdClose() {
+    setIsAdOpen(false);
+  }
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
@@ -207,7 +284,6 @@ export default function Bar() {
       keepMounted
       open={isContentOpen}
       onClose={handleContentClose}
-      style={{ zIndex: "1000" }}
     >
       <Content text={contentText} />
     </Popper>
@@ -216,9 +292,15 @@ export default function Bar() {
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
       keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
@@ -240,11 +322,7 @@ export default function Bar() {
       </MenuItem>
       <MenuItem onClick={toggleDrawer(true)}>
         <IconButton color="inherit" component="span">
-          {username === null ? (
-            <AccountCircleIcon />
-          ) : (
-            <img alt="Avatar" className={classes.rounded} src={avatar} />
-          )}
+          <img alt="Avatar" className={classes.rounded} src={avatar} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -278,24 +356,38 @@ export default function Bar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton
-              onClick={handleContentOpen(mails)}
-              color="inherit"
-              component="span"
-            >
-              <Badge badgeContent={2} color="secondary">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              onClick={handleContentOpen(notes)}
-              color="inherit"
-              component="span"
-            >
-              <Badge badgeContent={3} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <ClickAwayListener onClickAway={handleContentClose}>
+              <div style={{ display: "flex" }}>
+                {username === null ? null : (
+                  <IconButton
+                    onClick={handleContentOpen(mails)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <Badge badgeContent={0} color="secondary">
+                      <MailIcon />
+                    </Badge>
+                  </IconButton>
+                )}
+                {username === null ? null : (
+                  <IconButton
+                    onClick={handleContentOpen(notes)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <Badge badgeContent={noteCount} color="secondary">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
+                )}
+                {renderContent}
+                <AnnouncementGrid
+                  isAdOpen={isAdOpen}
+                  handleAdClose={handleAdClose}
+                  adMessage={adMessage}
+                />
+              </div>
+            </ClickAwayListener>
             <RightDrawer
               open={drawerOpen}
               toggleDrawer={toggleDrawer}
@@ -321,17 +413,34 @@ export default function Bar() {
             />
           </div>
           <div className={classes.sectionMobile}>
-            <IconButton
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-              component="span"
-            >
-              <MoreIcon />
-            </IconButton>
+            {username == null ? (
+              <RightDrawer
+                open={drawerOpen}
+                toggleDrawer={toggleDrawer}
+                button={
+                  <IconButton
+                    edge="end"
+                    onClick={toggleDrawer(true)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <AccountCircleIcon />
+                  </IconButton>
+                }
+                avatar={avatar}
+              />
+            ) : (
+              <IconButton
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+                component="span"
+              >
+                <MoreIcon />
+              </IconButton>
+            )}
           </div>
         </Toolbar>
       </AppBar>
-      {renderContent}
       {renderMobileMenu}
       <div className={classes.offset} />
     </div>

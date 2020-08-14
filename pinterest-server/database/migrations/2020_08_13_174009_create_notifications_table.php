@@ -17,8 +17,8 @@ class CreateNotificationsTable extends Migration
             $table->bigIncrements('id');
             $table->string('group');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->string('header');
-            $table->string('secondary');
+            $table->string('header')->nullable();
+            $table->string('secondary')->nullable();
             $table->string('content');
             $table->timestamps();
         });
