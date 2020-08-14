@@ -23,7 +23,6 @@ export default function AvatarUpload(props) {
 
   const onBeforeFileLoad = (e) => {
     if (e.target.files[0].size < 0) {
-      alert("File is too big!");
       e.target.value = "";
     }
   };
@@ -33,7 +32,6 @@ export default function AvatarUpload(props) {
   }
 
   const handleUpload = () => {
-    console.log(avatar.preview);
     axios({
       method: "POST",
       url: CONCAT_SERVER_URL("/api/v1/user/uploadUserAvatar"),

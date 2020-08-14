@@ -23,9 +23,7 @@ export const userSlice = createSlice({
             id,
           })
           .then()
-          .catch((e) => {
-            console.log(e);
-          });
+          .catch();
       }
       state.username = action.payload.username;
       state.userId = action.payload.user_id;
