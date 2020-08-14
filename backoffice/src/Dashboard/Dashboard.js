@@ -101,9 +101,38 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    getInfo();
-    getLatestInfo();
-  }, [getInfo]);
+    setIsCardLoading(true);
+    const user = axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
+    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
+    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
+    Promise.all([user, comment, post])
+      .then((res) => {
+        setUserInfo((info) => ({
+          ...info,
+          valid: res[0].data.valid,
+          new: res[0].data.new,
+        }));
+        setCommentInfo(res[1].data);
+        setPostInfo(res[2].data);
+      })
+      .finally(() => {
+        setIsCardLoading(false);
+      });
+
+    setIsListLoading(true);
+    const postLatest = axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
+    const commentLatest = axios.get(
+      CONCAT_SERVER_URL("/api/v1/comments/latest")
+    );
+    Promise.all([postLatest, commentLatest])
+      .then((res) => {
+        setLatestPosts(res[0].data);
+        setLatestComments(res[1].data);
+      })
+      .finally(() => {
+        setIsListLoading(false);
+      });
+  }, []);
 
   useEffect(
     () =>
@@ -113,40 +142,6 @@ export default function Dashboard() {
       })),
     [onlineUser]
   );
-
-  async function getInfo() {
-    setIsCardLoading(true);
-    const user = axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
-    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
-    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
-    Promise.all([user, comment, post])
-      .then((res) => {
-        setUserInfo({
-          ...userInfo,
-          valid: res[0].data.valid,
-          new: res[0].data.new,
-        });
-        setCommentInfo(res[1].data);
-        setPostInfo(res[2].data);
-      })
-      .finally(() => {
-        setIsCardLoading(false);
-      });
-  }
-
-  async function getLatestInfo() {
-    setIsListLoading(true);
-    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
-    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
-    Promise.all([post, comment])
-      .then((res) => {
-        setLatestPosts(res[0].data);
-        setLatestComments(res[1].data);
-      })
-      .finally(() => {
-        setIsListLoading(false);
-      });
-  }
 
   return (
     <div style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }}>
