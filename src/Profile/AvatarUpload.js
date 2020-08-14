@@ -6,7 +6,7 @@ import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
 
 export default function AvatarUpload(props) {
-  const { name, setIsUpload, onHide } = props;
+  const { name, setIsUpload, setIsLoading, onHide } = props;
   const [avatar, setAvatar] = useState({
     src: null,
     preview: null,
@@ -32,6 +32,8 @@ export default function AvatarUpload(props) {
   }
 
   const handleUpload = () => {
+    setIsLoading(true);
+    onHide();
     axios({
       method: "POST",
       url: CONCAT_SERVER_URL("/api/v1/user/uploadUserAvatar"),
@@ -39,7 +41,6 @@ export default function AvatarUpload(props) {
     })
       .then(() => {
         setIsUpload();
-        onHide();
       })
       .catch(() => {
         setIsDialogOpen(true);
