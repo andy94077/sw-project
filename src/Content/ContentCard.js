@@ -222,83 +222,86 @@ export default function ContentCard(props) {
     })
       .then((res) => {
         let likerString = "";
-        if (res.data.likers.length === 1) {
-          likerString = (
-            <div className={classes.likeUser}>
-              <Link to={`/profile/${res.data.likers[0].username}`}>
-                {res.data.likers[0].username}
-              </Link>
-              {" likes this post."}
-            </div>
-          );
-        } else if (res.data.likers.length === 2) {
-          likerString = (
-            <div className={classes.likeUser}>
-              <Link to={`/profile/${res.data.likers[0].username}`}>
-                {res.data.likers[0].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[1].username}`}>
-                {res.data.likers[1].username}
-              </Link>
-              {" like this post."}
-            </div>
-          );
-        } else if (res.data.sum === 3) {
-          likerString = (
-            <div className={classes.likeUser}>
-              <Link to={`/profile/${res.data.likers[0].username}`}>
-                {res.data.likers[0].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[1].username}`}>
-                {res.data.likers[1].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[2].username}`}>
-                {res.data.likers[2].username}
-              </Link>
-              {" like this post."}
-            </div>
-          );
-        } else if (res.data.sum === 4) {
-          likerString = (
-            <div className={classes.likeUser}>
-              <Link to={`/profile/${res.data.likers[0].username}`}>
-                {res.data.likers[0].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[1].username}`}>
-                {res.data.likers[1].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[2].username}`}>
-                {res.data.likers[2].username}
-              </Link>{" "}
-              {`and other ${res.data.sum - 3} user
+        if (res.data.likers.length !== 0) {
+          if (res.data.likers.length === 1) {
+            likerString = (
+              <div className={classes.likeUser}>
+                <Link to={`/profile/${res.data.likers[0].username}`}>
+                  {res.data.likers[0].username}
+                </Link>
+                {" likes this post."}
+              </div>
+            );
+          } else if (res.data.likers.length === 2) {
+            likerString = (
+              <div className={classes.likeUser}>
+                <Link to={`/profile/${res.data.likers[0].username}`}>
+                  {res.data.likers[0].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[1].username}`}>
+                  {res.data.likers[1].username}
+                </Link>
+                {" like this post."}
+              </div>
+            );
+          } else if (res.data.sum === 3) {
+            likerString = (
+              <div className={classes.likeUser}>
+                <Link to={`/profile/${res.data.likers[0].username}`}>
+                  {res.data.likers[0].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[1].username}`}>
+                  {res.data.likers[1].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[2].username}`}>
+                  {res.data.likers[2].username}
+                </Link>
+                {" like this post."}
+              </div>
+            );
+          } else if (res.data.sum === 4) {
+            likerString = (
+              <div className={classes.likeUser}>
+                <Link to={`/profile/${res.data.likers[0].username}`}>
+                  {res.data.likers[0].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[1].username}`}>
+                  {res.data.likers[1].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[2].username}`}>
+                  {res.data.likers[2].username}
+                </Link>{" "}
+                {`and other ${res.data.sum - 3} user
               like this post.`}
-            </div>
-          );
-        } else {
-          likerString = (
-            <div className={classes.likeUser}>
-              <Link to={`/profile/${res.data.likers[0].username}`}>
-                {res.data.likers[0].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[1].username}`}>
-                {res.data.likers[1].username}
-              </Link>
-              {", "}
-              <Link to={`/profile/${res.data.likers[2].username}`}>
-                {res.data.likers[2].username}
-              </Link>{" "}
-              {`and other ${res.data.sum - 3} users
+              </div>
+            );
+          } else {
+            likerString = (
+              <div className={classes.likeUser}>
+                <Link to={`/profile/${res.data.likers[0].username}`}>
+                  {res.data.likers[0].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[1].username}`}>
+                  {res.data.likers[1].username}
+                </Link>
+                {", "}
+                <Link to={`/profile/${res.data.likers[2].username}`}>
+                  {res.data.likers[2].username}
+                </Link>{" "}
+                {`and other ${res.data.sum - 3} users
               like this post.`}
-            </div>
-          );
+              </div>
+            );
+          }
         }
         setLikeCount({ sum: res.data.sum, likers: likerString });
+        console.log(likeCount.sum, likeCount.likers);
       })
       .catch((e) => {
         console.log(e);
@@ -318,7 +321,7 @@ export default function ContentCard(props) {
       });
   }
 
-  function refreshLike() {
+  const refreshLike = () => {
     if (userId) {
       Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
         params: {
@@ -338,7 +341,7 @@ export default function ContentCard(props) {
           console.log(e);
         });
     }
-  }
+  };
 
   function upload() {
     if (isBucket) {
@@ -408,7 +411,7 @@ export default function ContentCard(props) {
     setMenu(null);
   };
 
-  function handleDelete() {
+  const handleDelete = () => {
     setOnDelete(1);
     Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), {
       data: { id },
@@ -429,17 +432,17 @@ export default function ContentCard(props) {
       .finally(() => {
         setIsDialogOpen(false);
       });
-  }
+  };
 
-  function handleDialogClose() {
+  const handleDialogClose = () => {
     setIsDialogOpen(false);
-  }
+  };
 
-  function handleEditDialogClose() {
+  const handleEditDialogClose = () => {
     setIsEditDialogOpen(false);
-  }
+  };
 
-  function handleLike() {
+  const handleLike = () => {
     if (likeInfo.id !== null) {
       if (likeInfo.red) {
         Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
@@ -482,7 +485,7 @@ export default function ContentCard(props) {
           console.log(e);
         });
     }
-  }
+  };
 
   async function handleEdit() {
     if (onEdit === 0) {
