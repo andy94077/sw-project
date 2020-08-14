@@ -27,10 +27,10 @@ import io from "socket.io-client";
 import { format } from "date-fns";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
+import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser } from "../redux/userSlice";
 import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
-
-import { setCookie } from "../cookieHelper";
+import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -120,17 +120,46 @@ export default function Bar() {
   const classes = useStyles();
   const history = useHistory();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [notes, setNotes] = useState([]);
+  const [noteCount, setNoteCount] = useState([]);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
+  const [isAdOpen, setIsAdOpen] = useState(false);
+  const [adMessage, setAdMessage] = useState("");
 
   const avatar = "/pictures/avatar.jpeg";
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(contentAnchorEl);
 
+  // Broadcast
+  useEffect(() => {
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("Notifications").listen("AdPosted", (event) => {
+      const { data } = event;
+      setIsAdOpen(true);
+      setAdMessage({
+        id: 0,
+        created_at: Date.now(),
+        ...data,
+      });
+      setTimeout(() => {
+        setIsAdOpen(false);
+      }, 10000);
+    });
+  }, []);
+
+  // Notifications
   useEffect(() => {
     const jsonData = {
       user_id: userId,
@@ -176,6 +205,15 @@ export default function Bar() {
     );
   }, []);
 
+  useEffect(() => {
+    setContentText(notes);
+    const noteCheck = getCookie("noteCheck");
+    setNoteCount(notes.filter((note) => note.created_at > noteCheck).length);
+    if (noteCount > 9) {
+      setNoteCount("10+");
+    }
+  }, [notes]);
+
   // Static contents
   const mails = [
     {
@@ -204,16 +242,21 @@ export default function Bar() {
   const handleContentClose = () => {
     setContentAnchorEl(null);
     setCookie("noteCheck", Date.now(), 60);
+    setNoteCount(0);
   };
 
-  const handleContentOpen = (texts) => (event) => {
+  const handleContentOpen = (text) => (event) => {
     if (contentAnchorEl === event.currentTarget) {
       handleContentClose();
     } else {
-      setContentText(texts);
+      setContentText(text);
       setContentAnchorEl(event.currentTarget);
     }
   };
+
+  function handleAdClose() {
+    setIsAdOpen(false);
+  }
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
@@ -241,7 +284,6 @@ export default function Bar() {
       keepMounted
       open={isContentOpen}
       onClose={handleContentClose}
-      style={{ zIndex: "1000" }}
     >
       <Content text={contentText} />
     </Popper>
@@ -250,9 +292,15 @@ export default function Bar() {
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
       keepMounted
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
@@ -316,7 +364,7 @@ export default function Bar() {
                     color="inherit"
                     component="span"
                   >
-                    <Badge badgeContent={2} color="secondary">
+                    <Badge badgeContent={0} color="secondary">
                       <MailIcon />
                     </Badge>
                   </IconButton>
@@ -327,12 +375,17 @@ export default function Bar() {
                     color="inherit"
                     component="span"
                   >
-                    <Badge badgeContent={3} color="secondary">
+                    <Badge badgeContent={noteCount} color="secondary">
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>
                 )}
                 {renderContent}
+                <AnnouncementGrid
+                  isAdOpen={isAdOpen}
+                  handleAdClose={handleAdClose}
+                  adMessage={adMessage}
+                />
               </div>
             </ClickAwayListener>
             <RightDrawer

@@ -23,6 +23,7 @@ const useStyles = makeStyles(() => ({
     top: -10,
     right: -5,
     background: "white",
+    color: "black",
     zIndex: 2000,
     "&:hover": {
       background: "#aaa",
@@ -52,7 +53,7 @@ export default function AnnouncementGrid(props) {
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content text={[adMessage]} defaultExpanded />
+        <Content text={[{ ...adMessage, id: 0 }]} defaultExpanded />
       </div>
     </Snackbar>
   );

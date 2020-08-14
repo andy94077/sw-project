@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import MyQuill from "../components/MyQuill";
-import { Button, Input } from "antd";
+import { Button, Input, Modal } from "antd";
 import { CONCAT_SERVER_URL } from "../constants";
 
 export default function Announcement() {
@@ -18,6 +18,13 @@ export default function Announcement() {
   };
 
   const handleSubmit = () => {
+    if (value === "" || value === "<p><br></p>") {
+      Modal.warning({
+        title: "Announcement contents cannot be empty.",
+      });
+      return;
+    }
+
     const jsonData = {
       data: {
         group: "public",
@@ -26,6 +33,7 @@ export default function Announcement() {
         content: value,
       },
     };
+    setValue("");
 
     axios
       .request({
@@ -44,7 +52,6 @@ export default function Announcement() {
       })
       .then((res) => console.log(res))
       .catch(() => console.log("Error"));
-    setValue("");
   };
 
   return (

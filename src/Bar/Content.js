@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { text, defaultExpanded = false } = props;
-
   const noteCheck = getCookie("noteCheck");
 
   return (
@@ -62,7 +61,7 @@ export default function Content(props) {
                 {value.header}
               </Typography>
               <Typography className={classes.secondaryHeading}>
-                from {value.secondary}
+                {value.secondary}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
