@@ -57,10 +57,10 @@ export default function App() {
       host: REDIS_URL, // this is laravel-echo-server host
     });
 
-    window.Echo.channel("AdPosting").listen("AdPosted", (event) => {
+    window.Echo.channel("Notifications").listen("AdPosted", (event) => {
       const { data } = event;
       setIsAdOpen(true);
-      setAdMessage({ id: 2147483647, ...data });
+      setAdMessage({ id: 0, created_at: Date.now(), ...data });
       setTimeout(() => {
         setIsAdOpen(false);
       }, 10000);

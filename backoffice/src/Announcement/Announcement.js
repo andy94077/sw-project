@@ -20,6 +20,7 @@ export default function Announcement() {
   const handleSubmit = () => {
     const jsonData = {
       data: {
+        group: "public",
         header: title,
         secondary: sender,
         content: value,
@@ -32,11 +33,18 @@ export default function Announcement() {
         url: CONCAT_SERVER_URL("/api/v1/broadcast/adPost"),
         data: jsonData,
       })
-      .then((res) => {
-        console.log(res);
-        setValue("");
-      })
+      .then((res) => console.log(res))
       .catch(() => console.log("Error"));
+
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/notifications"),
+        data: jsonData.data,
+      })
+      .then((res) => console.log(res))
+      .catch(() => console.log("Error"));
+    setValue("");
   };
 
   return (

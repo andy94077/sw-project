@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Events\NotificationChanged;
+
 class Notification extends Model
 {
     public $timestamps = true;
@@ -14,4 +16,11 @@ class Notification extends Model
     {
         parent::boot();
     }
+    
+    // Notification events
+    protected $dispatchesEvents = [
+        'saved' => NotificationChanged::class,
+        'deleted' => NotificationChanged::class,
+        'restored' => NotificationChanged::class,
+    ];
 }

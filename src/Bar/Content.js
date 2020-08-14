@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,17 +31,27 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Content(props) {
   const classes = useStyles();
-
   const { text, defaultExpanded = false } = props;
+
+  const noteCheck = getCookie("noteCheck");
 
   return (
     <div className={classes.root}>
       {text.map((value) => {
+        const background =
+          noteCheck < value.created_at && noteCheck !== null
+            ? "#fff8e5"
+            : "white";
+
         return (
           <Accordion
             key={value.id}
             defaultExpanded={defaultExpanded}
-            style={{ margin: 0, borderBottom: "1px solid #aaa" }}
+            style={{
+              margin: 0,
+              borderBottom: "1px solid #aaa",
+              background,
+            }}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}

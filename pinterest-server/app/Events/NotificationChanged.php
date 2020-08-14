@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdPosted implements ShouldBroadcast
+class NotificationChanged implements Shouldbroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,12 +19,9 @@ class AdPosted implements ShouldBroadcast
      *
      * @return void
      */
-
-    public $data;
-
-    public function __construct($data)
+    public function __construct()
     {
-        $this->data = $data;
+        //
     }
 
     /**

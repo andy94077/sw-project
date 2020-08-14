@@ -6,6 +6,7 @@ import { fade, makeStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Badge,
+  ClickAwayListener,
   IconButton,
   InputBase,
   Menu,
@@ -20,10 +21,16 @@ import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import SearchIcon from "@material-ui/icons/Search";
 
+import Echo from "laravel-echo";
+import io from "socket.io-client";
+
+import { format } from "date-fns";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+
+import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -128,23 +135,45 @@ export default function Bar() {
     const jsonData = {
       user_id: userId,
     };
-    axios
-      .request({
-        method: "GET",
-        url: CONCAT_SERVER_URL("/api/v1/notifications"),
-        params: jsonData,
-      })
-      .then((res) => setNotes(res.data))
-      .catch(() =>
-        setNotes([
-          {
-            id: 0,
-            header: "ERROR",
-            secondary: "SYSTEM",
-            content: "Connection error",
-          },
-        ])
-      );
+    const pullNotes = () =>
+      axios
+        .request({
+          method: "GET",
+          url: CONCAT_SERVER_URL("/api/v1/notifications"),
+          params: jsonData,
+        })
+        .then((res) =>
+          setNotes(
+            res.data.map((item) => {
+              item.created_at = format(new Date(item.created_at), "T", {
+                timeZone: "Asia/Taipei",
+              });
+              return item;
+            })
+          )
+        )
+        .catch(() =>
+          setNotes([
+            {
+              id: 0,
+              header: "ERROR",
+              secondary: "SYSTEM",
+              content: "Connection error",
+            },
+          ])
+        );
+    pullNotes();
+
+    window.io = io;
+
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is laravel-echo-server host
+    });
+
+    window.Echo.channel("Notifications").listen("NotificationChanged", () =>
+      pullNotes()
+    );
   }, []);
 
   // Static contents
@@ -174,11 +203,16 @@ export default function Bar() {
 
   const handleContentClose = () => {
     setContentAnchorEl(null);
+    setCookie("noteCheck", Date.now(), 60);
   };
 
   const handleContentOpen = (texts) => (event) => {
-    setContentText(texts);
-    setContentAnchorEl(event.currentTarget);
+    if (contentAnchorEl === event.currentTarget) {
+      handleContentClose();
+    } else {
+      setContentText(texts);
+      setContentAnchorEl(event.currentTarget);
+    }
   };
 
   const handleSearch = (e) => {
@@ -240,11 +274,7 @@ export default function Bar() {
       </MenuItem>
       <MenuItem onClick={toggleDrawer(true)}>
         <IconButton color="inherit" component="span">
-          {username === null ? (
-            <AccountCircleIcon />
-          ) : (
-            <img alt="Avatar" className={classes.rounded} src={avatar} />
-          )}
+          <img alt="Avatar" className={classes.rounded} src={avatar} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -278,24 +308,33 @@ export default function Bar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton
-              onClick={handleContentOpen(mails)}
-              color="inherit"
-              component="span"
-            >
-              <Badge badgeContent={2} color="secondary">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              onClick={handleContentOpen(notes)}
-              color="inherit"
-              component="span"
-            >
-              <Badge badgeContent={3} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <ClickAwayListener onClickAway={handleContentClose}>
+              <div style={{ display: "flex" }}>
+                {username === null ? null : (
+                  <IconButton
+                    onClick={handleContentOpen(mails)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <Badge badgeContent={2} color="secondary">
+                      <MailIcon />
+                    </Badge>
+                  </IconButton>
+                )}
+                {username === null ? null : (
+                  <IconButton
+                    onClick={handleContentOpen(notes)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <Badge badgeContent={3} color="secondary">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
+                )}
+                {renderContent}
+              </div>
+            </ClickAwayListener>
             <RightDrawer
               open={drawerOpen}
               toggleDrawer={toggleDrawer}
@@ -321,17 +360,34 @@ export default function Bar() {
             />
           </div>
           <div className={classes.sectionMobile}>
-            <IconButton
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-              component="span"
-            >
-              <MoreIcon />
-            </IconButton>
+            {username == null ? (
+              <RightDrawer
+                open={drawerOpen}
+                toggleDrawer={toggleDrawer}
+                button={
+                  <IconButton
+                    edge="end"
+                    onClick={toggleDrawer(true)}
+                    color="inherit"
+                    component="span"
+                  >
+                    <AccountCircleIcon />
+                  </IconButton>
+                }
+                avatar={avatar}
+              />
+            ) : (
+              <IconButton
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+                component="span"
+              >
+                <MoreIcon />
+              </IconButton>
+            )}
           </div>
         </Toolbar>
       </AppBar>
-      {renderContent}
       {renderMobileMenu}
       <div className={classes.offset} />
     </div>

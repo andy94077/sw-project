@@ -24,6 +24,9 @@ const useStyles = makeStyles(() => ({
     right: -5,
     background: "white",
     zIndex: 2000,
+    "&:hover": {
+      background: "#aaa",
+    },
   },
 }));
 
