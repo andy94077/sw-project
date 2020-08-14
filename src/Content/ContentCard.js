@@ -27,6 +27,7 @@ import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
 import MyQuill from "../components/MyQuill";
+import ErrorMsg from "../components/ErrorMsg";
 import "./Content.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -197,6 +198,7 @@ export default function ContentCard(props) {
     isBucket,
   } = props;
   const classes = useStyles();
+  const [error, setError] = useState({ message: "", url: "" });
   const [expand, setExpand] = useState(true);
   const [value, setValue] = useState("");
   const [comments, setComments] = useState([]);
@@ -217,6 +219,7 @@ export default function ContentCard(props) {
   const [likeCount, setLikeCount] = useState({ sum: 0, likers: "" });
 
   function refreshLikeCount() {
+    setError({ message: "", url: "" });
     Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
       params: { post_id: id },
     })
@@ -301,10 +304,12 @@ export default function ContentCard(props) {
           }
         }
         setLikeCount({ sum: res.data.sum, likers: likerString });
-        console.log(likeCount.sum, likeCount.likers);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
+        setError({
+          message: "Connection Error",
+          url: "/pictures/connection-error.svg",
+        });
       });
   }
 
@@ -323,6 +328,7 @@ export default function ContentCard(props) {
 
   const refreshLike = () => {
     if (userId) {
+      setError({ message: "", url: "" });
       Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
         params: {
           user_id: userId,
@@ -337,8 +343,11 @@ export default function ContentCard(props) {
             });
           }
         })
-        .catch((e) => {
-          console.log(e);
+        .catch(() => {
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
+          });
         });
     }
   };
@@ -443,6 +452,7 @@ export default function ContentCard(props) {
   };
 
   const handleLike = () => {
+    setError({ message: "", url: "" });
     if (likeInfo.id !== null) {
       if (likeInfo.red) {
         Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
@@ -453,8 +463,11 @@ export default function ContentCard(props) {
             });
             refreshLikeCount();
           })
-          .catch((e) => {
-            console.log(e);
+          .catch(() => {
+            setError({
+              message: "Connection Error",
+              url: "/pictures/connection-error.svg",
+            });
           });
       } else {
         Axios.put(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
@@ -465,8 +478,11 @@ export default function ContentCard(props) {
             });
             refreshLikeCount();
           })
-          .catch((e) => {
-            console.log(e);
+          .catch(() => {
+            setError({
+              message: "Connection Error",
+              url: "/pictures/connection-error.svg",
+            });
           });
       }
     } else {
@@ -481,8 +497,11 @@ export default function ContentCard(props) {
           });
           refreshLikeCount();
         })
-        .catch((e) => {
-          console.log(e);
+        .catch(() => {
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
+          });
         });
     }
   };
@@ -520,6 +539,9 @@ export default function ContentCard(props) {
     return <Redirect to="/home" />;
   }
   if (onDelete === 0) {
+    if (error.message !== "") {
+      return <ErrorMsg message={error.message} imgUrl={error.url} />;
+    }
     return (
       <Card className={classes.root}>
         <CardMedia

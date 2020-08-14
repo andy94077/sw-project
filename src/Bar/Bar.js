@@ -131,10 +131,24 @@ export default function Bar() {
   const [isAdOpen, setIsAdOpen] = useState(false);
   const [adMessage, setAdMessage] = useState("");
 
-  const avatar = "/pictures/avatar.jpeg";
+  const [avatar, setAvatar] = useState(null);
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(contentAnchorEl);
+
+  useEffect(() => {
+    if (username != null) {
+      axios
+        .request({
+          method: "POST",
+          url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
+          data: { name: username },
+        })
+        .then((response) => {
+          setAvatar(CONCAT_SERVER_URL(`${response.data}`));
+        });
+    }
+  }, []);
 
   // Broadcast
   useEffect(() => {

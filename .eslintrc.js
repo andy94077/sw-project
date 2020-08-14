@@ -17,5 +17,6 @@ module.exports = {
     "prettier/prettier": ["error"],
     "react/prop-types": 0,
     "no-param-reassign": 0,
+    "react/no-danger": 0,
   },
 };

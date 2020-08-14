@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function PhotoGrid(props) {
-  const { tag, userId, number = 120 } = props;
+  const { tag, userId, number = 120, showError = true } = props;
   const classes = useStyles();
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState({ message: "", url: "" });
@@ -47,13 +47,15 @@ export default function PhotoGrid(props) {
         }
       })
       .catch(() => {
-        setError({
-          message: "Connection Error",
-          url: "/pictures/connection-error.svg",
-        });
+        if (showError === true) {
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
+          });
+        }
       })
       .finally(() => setIsReady(true));
-  }, [tag, number, userId]);
+  }, [tag, number, userId, showError]);
 
   if (isReady) {
     if (error.message !== "") {
