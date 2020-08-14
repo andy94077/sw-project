@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Statistic, Typography, List, message } from "antd";
 import {
   UserOutlined,
@@ -9,11 +9,12 @@ import {
   MessageOutlined,
   CloudUploadOutlined,
 } from "@ant-design/icons";
-import Axios from "axios";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
-import { useEffect } from "react";
+import axios from "axios";
 import { format } from "date-fns";
+import sha256 from "js-sha256";
+
 import "./Dashboard.css";
+import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
 
 import Echo from "laravel-echo";
 import io from "socket.io-client";
@@ -25,21 +26,45 @@ export default function Dashboard() {
   const [latestPosts, setLatestPosts] = useState([]);
   const [latestComments, setLatestComments] = useState([]);
   const [latestLikes, setLatestLikes] = useState([]);
-  const [isCardLoading, setIsCardLoading] = useState(true);
-  const [isListLoading, setIsListLoading] = useState(true);
+  const [isCardLoading, setIsCardLoading] = useState(false);
+  const [isListLoading, setIsListLoading] = useState(false);
+  const [onlineUser, setOnlineUser] = useState({});
 
   // Broadcast
   useEffect(() => {
     window.io = io;
-
     window.Echo = new Echo({
       broadcaster: "socket.io",
       host: REDIS_URL, // this is laravel-echo-server host
+      auth: {
+        headers: {
+          Authorization: `Bearer ${sha256("admin")}`,
+        },
+      },
     });
+
+    window.Echo.join("Online")
+      .here((users) =>
+        setOnlineUser((prevUsers) => ({
+          ...prevUsers,
+          ...Object.fromEntries(users.map((user) => [user.id, user])),
+        }))
+      )
+      .joining((user) =>
+        setOnlineUser((prevUsers) => ({ ...prevUsers, [user.id]: user }))
+      )
+      .leaving((user) =>
+        setOnlineUser((prevUsers) => {
+          const newUsers = { ...prevUsers };
+          delete newUsers[user.id];
+          return newUsers;
+        })
+      );
 
     window.Echo.channel("Dashboard").listen("PostChanged", () => {
       const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/posts/info"))
         .then((res) => {
           setPostInfo(res.data);
         })
@@ -49,7 +74,8 @@ export default function Dashboard() {
         });
 
       const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
         .then((res) => {
           setLatestPosts(res.data);
         })
@@ -61,7 +87,8 @@ export default function Dashboard() {
 
     window.Echo.channel("Dashboard").listen("CommentChanged", () => {
       const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/comments/info"))
         .then((res) => {
           setCommentInfo(res.data);
         })
@@ -71,7 +98,8 @@ export default function Dashboard() {
         });
 
       const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
         .then((res) => {
           setLatestComments(res.data);
         })
@@ -83,32 +111,31 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    getInfo();
-    getLatestInfo();
-  }, []);
-
-  async function getInfo() {
     setIsCardLoading(true);
-    const user = Axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
-    const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
-    const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
+    const user = axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
+    const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
+    const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
     Promise.all([user, comment, post])
       .then((res) => {
-        setUserInfo(res[0].data);
+        setUserInfo((info) => ({
+          ...info,
+          valid: res[0].data.valid,
+          new: res[0].data.new,
+        }));
         setCommentInfo(res[1].data);
         setPostInfo(res[2].data);
       })
       .finally(() => {
         setIsCardLoading(false);
       });
-  }
 
-  async function getLatestInfo() {
     setIsListLoading(true);
-    const post = Axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
-    const comment = Axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest"));
-    const like = Axios.get(CONCAT_SERVER_URL("/api/v1/likes/latest"));
-    Promise.all([post, comment, like])
+    const postLatest = axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
+    const commentLatest = axios.get(
+      CONCAT_SERVER_URL("/api/v1/comments/latest")
+    );
+    const likeLatest = axios.get(CONCAT_SERVER_URL("/api/v1/likes/latest"));
+    Promise.all([postLatest, commentLatest, likeLatest])
       .then((res) => {
         setLatestPosts(res[0].data);
         setLatestComments(res[1].data);
@@ -117,9 +144,17 @@ export default function Dashboard() {
       .finally(() => {
         setIsListLoading(false);
       });
-  }
+  }, []);
 
-  console.log(isCardLoading || isListLoading);
+  useEffect(
+    () =>
+      setUserInfo((info) => ({
+        ...info,
+        online: Math.max(Object.keys(onlineUser).length - 1, 0), // exclude admin user
+      })),
+    [onlineUser]
+  );
+
   return (
     <div style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }}>
       {message.loading({

@@ -46,6 +46,7 @@ export default function RightDrawer(props) {
 
   const logOut = () => {
     deleteCookie();
+    window.Echo.disconnect();
   };
 
   // Settings hasn't implemented.

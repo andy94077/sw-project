@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        "http://pinterest-server.test/broadcasting/auth",
+        "http://pinterest-server.test/super/broadcasting/auth"
     ];
 }

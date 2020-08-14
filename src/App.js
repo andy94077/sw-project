@@ -3,14 +3,10 @@ import axios from "axios";
 import { Button } from "@material-ui/core";
 import { addHours, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
+import { Switch, Route, useHistory, useLocation } from "react-router-dom";
 
-import {
-  // BrowserRouter as Router,
-  Switch,
-  Route,
-  useHistory,
-  useLocation,
-} from "react-router-dom";
+import Echo from "laravel-echo";
+import io from "socket.io-client";
 
 import Bar from "./Bar/Bar";
 import Homepage from "./Homepage/Homepage";
@@ -20,7 +16,7 @@ import Profile from "./Profile/Profile";
 import { getCookie } from "./cookieHelper";
 import { setData, selectUser } from "./redux/userSlice";
 
-import { CONCAT_SERVER_URL } from "./constants";
+import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
@@ -37,6 +33,23 @@ export default function App() {
   function handleClose() {
     setIsDialogOpen(false);
   }
+
+  // Broadcast
+  useEffect(() => {
+    window.io = io;
+    if (user.apiToken !== null) {
+      window.Echo = new Echo({
+        broadcaster: "socket.io",
+        host: REDIS_URL, // this is laravel-echo-server host
+        auth: {
+          headers: {
+            Authorization: `Bearer ${user.apiToken}`,
+          },
+        },
+      });
+      window.Echo.join("Online");
+    }
+  }, [user.apiToken]);
 
   useEffect(() => {
     const accessToken = getCookie();

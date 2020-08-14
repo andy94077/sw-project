@@ -208,8 +208,9 @@ export default function Bar() {
   useEffect(() => {
     setContentText(notes);
     const noteCheck = getCookie("noteCheck");
-    setNoteCount(notes.filter((note) => note.created_at > noteCheck).length);
-    if (noteCount > 9) {
+    const nc = notes.filter((note) => note.created_at > noteCheck).length;
+    setNoteCount(nc);
+    if (nc > 9) {
       setNoteCount("10+");
     }
   }, [notes]);
