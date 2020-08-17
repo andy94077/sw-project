@@ -21,7 +21,7 @@ export default function PhotoGrid(props) {
     userId,
     number = 120,
     showError = true,
-    order = { order: "id", asc: false },
+    order = { order: "id", sequence: "desc" },
   } = props;
   const classes = useStyles();
   const [isReady, setIsReady] = useState(false);
@@ -67,7 +67,7 @@ export default function PhotoGrid(props) {
         }
       })
       .finally(() => setIsReady(true));
-  }, [tag, number, userId, showError, order]);
+  }, [tag, number, userId, showError, order.order, order.sequence]);
 
   if (isReady) {
     if (error.message !== "") {
