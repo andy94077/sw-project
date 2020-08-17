@@ -7,7 +7,7 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
 import ErrorMsg from "../components/ErrorMsg";
 

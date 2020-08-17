@@ -13,7 +13,7 @@ import { Redirect, Link } from "react-router-dom";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { setDialog } from "../redux/dialogSlice";
 import Loading from "../components/Loading";
 import AlertDialog from "../components/AlertDialog";
