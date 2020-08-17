@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
-import { addHours, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { Switch, Route, useHistory, useLocation } from "react-router-dom";
 
@@ -20,19 +19,16 @@ import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
 import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
+import { closeDialog, selectDialog } from "./redux/dialogSlice";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
   const history = useHistory();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-
-  function handleClose() {
-    setIsDialogOpen(false);
-  }
+  const dialog = useSelector(selectDialog);
 
   // Broadcast
   useEffect(() => {
@@ -147,18 +143,23 @@ export default function App() {
           <Route exact path="/logout" component={() => <>logout</>} />
         </Switch>
         <AlertDialog
-          open={isDialogOpen}
-          alertTitle="You are during bucket"
-          alertDesciption={`End: ${format(
-            addHours(new Date(user.BucketTime), 8),
-            "yyyy-MM-dd hh:mm:ss"
-          )}`}
+          open={dialog.isOpen}
+          alertTitle={dialog.title}
+          alertDesciption={dialog.message}
           alertButton={
             <>
-              <Button onClick={handleClose}>Got it!</Button>
+              <Button
+                onClick={() => {
+                  dispatch(closeDialog());
+                }}
+              >
+                Got it!
+              </Button>
             </>
           }
-          onClose={handleClose}
+          onClose={() => {
+            dispatch(closeDialog());
+          }}
         />
       </div>
     );

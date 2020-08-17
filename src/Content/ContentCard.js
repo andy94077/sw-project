@@ -18,7 +18,7 @@ import CardActions from "@material-ui/core/CardActions";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import FavoriteIcon from "@material-ui/icons/Favorite";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Link, Redirect } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -28,7 +28,10 @@ import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
 import MyQuill from "../components/MyQuill";
 import ErrorMsg from "../components/ErrorMsg";
+import { setDialog } from "../redux/dialogSlice";
 import "./Content.css";
+import Like from "./Like";
+import { selectUser } from "../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -172,31 +175,10 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5%",
     width: "90%",
   },
-  red: {
-    color: "red",
-  },
-  none: {},
-  cardActions: {
-    padding: "0px",
-  },
-  likeUser: {
-    fontSize: "0.7em",
-    fontWeight: "450",
-  },
 }));
 
 export default function ContentCard(props) {
-  const {
-    src,
-    id,
-    author,
-    content,
-    userId,
-    username,
-    refresh,
-    timeAgo,
-    isBucket,
-  } = props;
+  const { src, id, author, content, refresh, timeAgo, isBucket } = props;
   const classes = useStyles();
   const [error, setError] = useState({ message: "", url: "" });
   const [expand, setExpand] = useState(true);
@@ -207,111 +189,11 @@ export default function ContentCard(props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [onDelete, setOnDelete] = useState(0);
-  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
-  const [errMessage, setErrMessage] = useState({ title: "", message: "" });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
-  const [likeInfo, setLikeInfo] = useState({
-    id: null,
-    red: false,
-  });
-  const [likeCount, setLikeCount] = useState({ sum: 0, likers: "" });
-
-  function refreshLikeCount() {
-    setError({ message: "", url: "" });
-    Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
-      params: { post_id: id },
-    })
-      .then((res) => {
-        let likerString = "";
-        if (res.data.likers.length !== 0) {
-          if (res.data.likers.length === 1) {
-            likerString = (
-              <div className={classes.likeUser}>
-                <Link to={`/profile/${res.data.likers[0].username}`}>
-                  {res.data.likers[0].username}
-                </Link>
-                {" likes this post."}
-              </div>
-            );
-          } else if (res.data.likers.length === 2) {
-            likerString = (
-              <div className={classes.likeUser}>
-                <Link to={`/profile/${res.data.likers[0].username}`}>
-                  {res.data.likers[0].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[1].username}`}>
-                  {res.data.likers[1].username}
-                </Link>
-                {" like this post."}
-              </div>
-            );
-          } else if (res.data.sum === 3) {
-            likerString = (
-              <div className={classes.likeUser}>
-                <Link to={`/profile/${res.data.likers[0].username}`}>
-                  {res.data.likers[0].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[1].username}`}>
-                  {res.data.likers[1].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[2].username}`}>
-                  {res.data.likers[2].username}
-                </Link>
-                {" like this post."}
-              </div>
-            );
-          } else if (res.data.sum === 4) {
-            likerString = (
-              <div className={classes.likeUser}>
-                <Link to={`/profile/${res.data.likers[0].username}`}>
-                  {res.data.likers[0].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[1].username}`}>
-                  {res.data.likers[1].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[2].username}`}>
-                  {res.data.likers[2].username}
-                </Link>{" "}
-                {`and other ${res.data.sum - 3} user
-              like this post.`}
-              </div>
-            );
-          } else {
-            likerString = (
-              <div className={classes.likeUser}>
-                <Link to={`/profile/${res.data.likers[0].username}`}>
-                  {res.data.likers[0].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[1].username}`}>
-                  {res.data.likers[1].username}
-                </Link>
-                {", "}
-                <Link to={`/profile/${res.data.likers[2].username}`}>
-                  {res.data.likers[2].username}
-                </Link>{" "}
-                {`and other ${res.data.sum - 3} users
-              like this post.`}
-              </div>
-            );
-          }
-        }
-        setLikeCount({ sum: res.data.sum, likers: likerString });
-      })
-      .catch(() => {
-        setError({
-          message: "Connection Error",
-          url: "/pictures/connection-error.svg",
-        });
-      });
-  }
+  const { username, userId } = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   function refreshComment() {
     Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
@@ -326,39 +208,14 @@ export default function ContentCard(props) {
       });
   }
 
-  const refreshLike = () => {
-    if (userId) {
-      setError({ message: "", url: "" });
-      Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
-        params: {
-          user_id: userId,
-          post_id: id,
-        },
-      })
-        .then((res) => {
-          if (res.data[0]) {
-            setLikeInfo({
-              id: res.data[0].id,
-              red: res.data[0].deleted_at === null,
-            });
-          }
-        })
-        .catch(() => {
-          setError({
-            message: "Connection Error",
-            url: "/pictures/connection-error.svg",
-          });
-        });
-    }
-  };
-
   function upload() {
     if (isBucket) {
-      setErrMessage({
-        title: "Bucket Error",
-        message: "You cannot send comment when you in the bucket",
-      });
-      setIsConnectionFailed(true);
+      dispatch(
+        setDialog({
+          title: "Bucket Error",
+          message: "You cannot send comment when you in the bucket",
+        })
+      );
     } else {
       setIsUpload(true);
       Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
@@ -373,24 +230,25 @@ export default function ContentCard(props) {
         })
         .catch((e) => {
           if (e.message === "Network Error") {
-            setErrMessage({
-              title: "Network Error",
-              message: "Failed to send comment, pleace retry",
+            setError({
+              message: "Connection Error",
+              url: "/pictures/connection-error.svg",
             });
-            setIsConnectionFailed(true);
             setIsUpload(false);
           } else if (e.message === "Request failed with status code 404") {
-            setIsConnectionFailed(true);
-            setErrMessage({
-              title: "Error",
-              message: "Post is deleted",
-            });
+            dispatch(
+              setDialog({
+                title: "Error",
+                message: "Post is deleted",
+              })
+            );
           } else if (e.message === "Request failed with status code 403") {
-            setIsConnectionFailed(true);
-            setErrMessage({
-              title: "Bucket Error",
-              message: "You cannot send comment when you in the bucket",
-            });
+            dispatch(
+              setDialog({
+                title: "Bucket Error",
+                message: "You cannot send comment when you in the bucket",
+              })
+            );
           }
           setIsUpload(false);
         });
@@ -408,8 +266,6 @@ export default function ContentCard(props) {
 
   useEffect(() => {
     refreshComment();
-    refreshLike();
-    refreshLikeCount();
   }, [id]);
 
   const handleClick = (event) => {
@@ -430,11 +286,12 @@ export default function ContentCard(props) {
       })
       .catch((e) => {
         if (e.message === "Network Error") {
-          setIsConnectionFailed(true);
-          setErrMessage({
-            title: "Network Error",
-            message: "Failed to delete post, pleace retry",
-          });
+          dispatch(
+            setDialog({
+              title: "Network Error",
+              message: "Failed to delete post, pleace retry",
+            })
+          );
         }
         setOnDelete(0);
       })
@@ -451,61 +308,6 @@ export default function ContentCard(props) {
     setIsEditDialogOpen(false);
   };
 
-  const handleLike = () => {
-    setError({ message: "", url: "" });
-    if (likeInfo.id !== null) {
-      if (likeInfo.red) {
-        Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
-          .then(() => {
-            setLikeInfo({
-              id: likeInfo.id,
-              red: false,
-            });
-            refreshLikeCount();
-          })
-          .catch(() => {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
-          });
-      } else {
-        Axios.put(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
-          .then(() => {
-            setLikeInfo({
-              id: likeInfo.id,
-              red: true,
-            });
-            refreshLikeCount();
-          })
-          .catch(() => {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
-          });
-      }
-    } else {
-      Axios.post(CONCAT_SERVER_URL("/api/v1/likes"), {
-        user_id: userId,
-        post_id: id,
-      })
-        .then((res) => {
-          setLikeInfo({
-            id: res.data.id,
-            red: true,
-          });
-          refreshLikeCount();
-        })
-        .catch(() => {
-          setError({
-            message: "Connection Error",
-            url: "/pictures/connection-error.svg",
-          });
-        });
-    }
-  };
-
   async function handleEdit() {
     if (onEdit === 0) {
       setOnEdit(1);
@@ -520,11 +322,10 @@ export default function ContentCard(props) {
           refresh();
         })
         .catch(() => {
-          setErrMessage({
-            title: "Network Error",
-            message: "Failed to edit post, pleace retry",
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
           });
-          setIsConnectionFailed(true);
         })
         .finally(() => {
           setOnEdit(0);
@@ -642,21 +443,7 @@ export default function ContentCard(props) {
             />
           </CardContent>
           <CardActions disableSpacing className={classes.cardActions}>
-            {userId ? (
-              <IconButton onClick={handleLike}>
-                <FavoriteIcon
-                  className={clsx(classes.none, {
-                    [classes.red]: likeInfo.red,
-                  })}
-                />
-              </IconButton>
-            ) : (
-              <div style={{ width: "15px" }} />
-            )}
-            <div>
-              <div>{`${likeCount.sum} Likes`}</div>
-              {likeCount.likers}
-            </div>
+            <Like id={id} />
             <IconButton
               component="span"
               onClick={() => {
@@ -721,25 +508,6 @@ export default function ContentCard(props) {
             )}
           </Collapse>
         </div>
-        <AlertDialog
-          open={isConnectionFailed}
-          alertTitle={errMessage.title}
-          alertDesciption={errMessage.message}
-          alertButton={
-            <>
-              <Button
-                onClick={() => {
-                  setIsConnectionFailed(false);
-                }}
-              >
-                Got it!
-              </Button>
-            </>
-          }
-          onClose={() => {
-            setIsConnectionFailed(false);
-          }}
-        />
       </Card>
     );
   }

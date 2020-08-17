@@ -44,7 +44,7 @@ export default function Content(props) {
     timeAgo: "",
   });
   const [pageState, setPageState] = useState("Loading");
-  const { username, userId, bucketTime } = useSelector(selectUser);
+  const { bucketTime } = useSelector(selectUser);
 
   const isBucket = checkBucket(bucketTime);
   async function refresh() {
@@ -97,8 +97,6 @@ export default function Content(props) {
               author={info.authorName}
               timeAgo={info.timeAgo}
               content={info.content}
-              userId={userId}
-              username={username}
               refresh={refresh}
               isBucket={isBucket}
             />
