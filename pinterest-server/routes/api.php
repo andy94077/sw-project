@@ -79,9 +79,9 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/superUser/password/reset', 'SuperUserController@reset');
     Route::apiResource('superUser', 'SuperUserController');
     // for upload images
-    Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage');
+    Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage')->middleware(['bucket']);
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
-    Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc');
+    Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
    Route::post('/broadcast/adPost', 'BroadcastController@adPost')->name('broadcast.adPost');
    Route::apiResource('notifications', 'NotificationController');

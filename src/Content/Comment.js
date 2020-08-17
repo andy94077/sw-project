@@ -8,7 +8,7 @@ import Axios from "axios";
 import CommentBox from "./CommentBox";
 import { selectUser } from "../redux/userSlice";
 import Loading from "../components/Loading";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { setDialog } from "../redux/dialogSlice";
 
 const useStyles = makeStyles(() => ({

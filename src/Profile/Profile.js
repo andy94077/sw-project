@@ -14,6 +14,7 @@ import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
+import { setDialog } from "../redux/dialogSlice";
 import "./Profile.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -178,6 +179,7 @@ export default function Profile(props) {
 
     const formData = new FormData();
     formData.append("imageupload", event.target.files[0]);
+    formData.append("user_id", userId);
 
     axios
       .request({
@@ -186,7 +188,18 @@ export default function Profile(props) {
         data: formData,
       })
       .then((res) => setImageURL(res.data.url))
-      .catch(() => setImageURL("Error"));
+      .catch((e) => {
+        if (e.message === "Request failed with status code 403") {
+          dispatch(
+            setDialog({
+              title: "Bucket Error",
+              message: "You cannot send comment when you in the bucket",
+            })
+          );
+        } else {
+          setImageURL("Error");
+        }
+      });
   };
 
   const handleUploadCancel = () => {
