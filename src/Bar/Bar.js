@@ -26,7 +26,6 @@ import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser, setAvatar } from "../redux/userSlice";
-import { REDIS_URL } from "../constants";
 import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
@@ -119,13 +118,15 @@ export default function Bar() {
   const history = useHistory();
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, []);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [contentCheck, setContentCheck] = useState(null);
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
+
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [mobileContentType, setMobileContentType] = useState("");
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
@@ -206,12 +207,12 @@ export default function Bar() {
       "NotificationChanged",
       pullNotes
     );
-
+    
     return () =>
       window.Echo.channel("Notifications")
         .stopListening("AdPosted")
         .stopListening("NotificationChanged");
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     setContentText(notes);
@@ -221,7 +222,7 @@ export default function Bar() {
     if (nc > 9) {
       setNotesCount("10+");
     }
-  }, [notes]);
+  }, [notes, userId]);
 
   // Static contents
   const mails = [
@@ -248,6 +249,19 @@ export default function Bar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const handleSetContent = (text) => {
+    // mails not implemented yet.
+    if (text === "mails") {
+      setContentText(mails);
+      setContentCheck(9999999999999);
+    } else {
+      setNotesCount(0);
+      setContentText(notes);
+      setContentCheck(getCookie(`notesCheck${userId}`));
+      setCookie(`notesCheck${userId}`, Date.now(), 60);
+    }
+  };
+
   const handleContentClose = () => {
     setContentAnchorEl(null);
   };
@@ -255,15 +269,24 @@ export default function Bar() {
   const handleContentOpen = (text) => (event) => {
     // Close itself:
     if (contentAnchorEl === event.currentTarget) {
+      if (text === "notes") setNotesCount(0);
       handleContentClose();
     } else {
-      setContentText(text);
+      handleSetContent(text);
       setContentAnchorEl(event.currentTarget);
-      if (text === notes) {
-        setNotesCount(0);
-        setContentCheck(getCookie(`notesCheck${userId}`));
-        setCookie(`notesCheck${userId}`, Date.now(), 60);
-      } else setContentCheck(9999999999999); // mails not implemented yet.
+    }
+  };
+
+  const handleMobileContentClose = () => {
+    setMobileContentType("");
+  };
+
+  const handleMobileContentOpen = (text) => () => {
+    // Close itself:
+    if (text === mobileContentType) handleMobileContentClose();
+    else {
+      setMobileContentType(text);
+      handleSetContent(text);
     }
   };
 
@@ -292,9 +315,26 @@ export default function Bar() {
 
   // Toggled components
   const renderContent = (
-    <Popper anchorEl={contentAnchorEl} keepMounted open={isContentOpen}>
+    <Popper
+      anchorEl={contentAnchorEl}
+      className={classes.sectionDesktop}
+      keepMounted
+      open={isContentOpen}
+    >
       <Content text={contentText} check={contentCheck} />
     </Popper>
+  );
+
+  const renderMobileContent = (
+    <Content text={contentText} check={contentCheck} />
+  );
+
+  const renderAnnouncementGrid = (
+    <AnnouncementGrid
+      isAdOpen={isAdOpen}
+      handleAdClose={handleAdClose}
+      adMessage={adMessage}
+    />
   );
 
   const renderMobileMenu = (
@@ -304,6 +344,7 @@ export default function Bar() {
         vertical: "top",
         horizontal: "right",
       }}
+      className={classes.sectionMobile}
       keepMounted
       transformOrigin={{
         vertical: "top",
@@ -312,7 +353,10 @@ export default function Bar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleContentOpen(mails)}>
+      <MenuItem
+        onClick={handleMobileContentOpen("mails")}
+        style={{ width: "320px" }}
+      >
         <IconButton color="inherit" component="span">
           <Badge badgeContent={0} color="secondary">
             <MailIcon />
@@ -320,7 +364,10 @@ export default function Bar() {
         </IconButton>
         <p>Mails</p>
       </MenuItem>
-      <MenuItem onClick={handleContentOpen(notes)}>
+      {mobileContentType === "mails" && (
+        <MenuItem>{renderMobileContent}</MenuItem>
+      )}
+      <MenuItem onClick={handleMobileContentOpen("notes")}>
         <IconButton color="inherit" component="span">
           <Badge badgeContent={notesCount} color="secondary">
             <NotificationsIcon />
@@ -328,6 +375,9 @@ export default function Bar() {
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
+      {mobileContentType === "notes" && (
+        <MenuItem>{renderMobileContent}</MenuItem>
+      )}
       <MenuItem onClick={toggleDrawer(true)}>
         <IconButton color="inherit" component="span">
           <img alt="Avatar" className={classes.rounded} src={userAvatar} />
@@ -335,14 +385,6 @@ export default function Bar() {
         <p>Profile</p>
       </MenuItem>
     </Menu>
-  );
-
-  const renderAnnouncementGrid = (
-    <AnnouncementGrid
-      isAdOpen={isAdOpen}
-      handleAdClose={handleAdClose}
-      adMessage={adMessage}
-    />
   );
 
   // The bar
@@ -376,7 +418,7 @@ export default function Bar() {
               <div style={{ display: "flex" }}>
                 {username === null ? null : (
                   <IconButton
-                    onClick={handleContentOpen(mails)}
+                    onClick={handleContentOpen("mails")}
                     color="inherit"
                     component="span"
                   >
@@ -387,7 +429,7 @@ export default function Bar() {
                 )}
                 {username === null ? null : (
                   <IconButton
-                    onClick={handleContentOpen(notes)}
+                    onClick={handleContentOpen("notes")}
                     color="inherit"
                     component="span"
                   >
@@ -447,9 +489,12 @@ export default function Bar() {
                 color="inherit"
                 component="span"
               >
-                <MoreIcon />
+                <Badge badgeContent={notesCount} color="secondary">
+                  <MoreIcon />
+                </Badge>
               </IconButton>
             )}
+            {renderAnnouncementGrid}
           </div>
         </Toolbar>
       </AppBar>
