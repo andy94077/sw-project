@@ -22,6 +22,8 @@ const usestyle = makeStyles(() => ({
     wordWrap: "break-word",
   },
   Icon: {
+    position: "absolute",
+    bottom: "0px",
     margin: "auto",
     height: "25px",
     width: "25px",
@@ -72,7 +74,7 @@ export default function SelfInformation() {
 
   return (
     <>
-      <div>
+      <div style={{ position: "relative" }}>
         <div className={classes.outFrame}>
           <span className={classes.autoBreakLine}>
             <div dangerouslySetInnerHTML={{ __html: intro }} />
