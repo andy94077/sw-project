@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Accordion,
@@ -8,8 +7,6 @@ import {
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { selectUser } from "../redux/userSlice";
-import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,22 +31,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Content(props) {
   const classes = useStyles();
-  const { text, defaultExpanded = false } = props;
-  const { userId } = useSelector(selectUser);
-  const notesCheck = getCookie(`notesCheck${userId}`);
+  const { text, check } = props;
 
   return (
     <div className={classes.root}>
       {text.map((value) => {
         const background =
-          notesCheck === null || notesCheck < value.created_at
-            ? "#fff8e5"
-            : "white";
+          check === null || check < value.created_at ? "#fff8e5" : "white";
 
         return (
           <Accordion
-            key={value.id}
-            defaultExpanded={defaultExpanded || background === "#fff8e5"}
+            key={check + value.id}
+            defaultExpanded={background === "#fff8e5"}
             style={{
               margin: 0,
               borderBottom: "1px solid #aaa",
