@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     display: "none",
   },
   rounded: {
-    width: "32px",
+    height: "32px",
     borderRadius: "16px",
   },
 });
