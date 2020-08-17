@@ -15,6 +15,7 @@ import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
 import "./Profile.css";
+import SelfInformation from "./SelfInformation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "700",
   },
   name: {
+    marginTop: "10px",
     fontSize: "36px",
   },
   text: {
@@ -105,7 +107,6 @@ export default function Profile(props) {
   const classes = useStyles();
   const follow = [123, 456];
   const url = "localhost:3000";
-  const intro = "hi";
 
   const [image, setImage] = useState("");
   const dispatch = useDispatch();
@@ -317,9 +318,7 @@ export default function Profile(props) {
           <a className={`${classes.bold} ${classes.url}`} href={url}>
             {url}
           </a>
-          &nbsp;·&nbsp;
-          <span>{intro}</span>
-          <br />
+          <SelfInformation />
           <span className={classes.bold}>
             {follow[0]} followers · {follow[1]} following
           </span>
