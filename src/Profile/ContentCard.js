@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import Errormsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
 import MyQuill from "../components/MyQuill";

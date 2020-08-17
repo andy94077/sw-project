@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./SignUpForm.css";
 import { Modal, Form, Input } from "antd";
-import { CONCAT_SERVER_URL } from "../../constants";
+import { CONCAT_SERVER_URL } from "../../utils";
 
 export default function SignUpForm(props) {
   const { visible, onCancel, setRefresh } = props;

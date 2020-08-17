@@ -2,7 +2,7 @@ import React from "react";
 import "./LoginPage.css";
 
 import LoginForm from "./LoginForm";
-import { CONCAT_BACKOFFICE_URL } from "../constants";
+import { CONCAT_BACKOFFICE_URL } from "../utils";
 
 export default function LoginPage() {
   return (

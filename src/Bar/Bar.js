@@ -29,7 +29,8 @@ import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { REDIS_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({

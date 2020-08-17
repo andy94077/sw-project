@@ -14,7 +14,8 @@ import { format } from "date-fns";
 import sha256 from "js-sha256";
 
 import "./Dashboard.css";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { REDIS_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 import Echo from "laravel-echo";
 import io from "socket.io-client";

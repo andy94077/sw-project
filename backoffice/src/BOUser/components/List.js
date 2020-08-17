@@ -16,7 +16,7 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import { CONCAT_SERVER_URL } from "../../constants";
+import { CONCAT_SERVER_URL } from "../../utils";
 import styles from "./List.less";
 import { format } from "date-fns";
 

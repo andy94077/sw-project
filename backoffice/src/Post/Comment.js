@@ -17,7 +17,7 @@ import {
   UndoOutlined,
 } from "@ant-design/icons";
 import { format } from "date-fns";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 export default function Comment(props) {
   const { post_id } = props;
