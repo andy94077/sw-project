@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import Axios from "axios";
 import {
   Collapse,
-  TextareaAutosize,
   Button,
   CardMedia,
   CardContent,
@@ -16,13 +15,10 @@ import {
 } from "@material-ui/core";
 import CardActions from "@material-ui/core/CardActions";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Link, Redirect } from "react-router-dom";
-import ScrollToBottom from "react-scroll-to-bottom";
-import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../constants";
 import AlertDialog from "../components/AlertDialog";
@@ -32,6 +28,7 @@ import { setDialog } from "../redux/dialogSlice";
 import "./Content.css";
 import Like from "./Like";
 import { selectUser } from "../redux/userSlice";
+import Comment from "./Comment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,31 +96,10 @@ const useStyles = makeStyles((theme) => ({
     transform: "rotate(180deg)",
     marginLeft: "auto",
   },
-  input: {
-    resize: "none",
-    width: "90%",
-    borderRadius: "20px",
-    fontSize: "20px",
-    alignItems: "center",
-  },
   button: {
     maxHeight: "35px",
     maxWidth: "30px",
     marginLeft: "10%",
-  },
-  comments: {
-    overflow: "auto",
-    weight: "100%",
-    flexGrow: "1",
-    marginLeft: "5%",
-    display: "flex",
-  },
-  comment: {
-    marginLeft: "10%",
-    display: "flex",
-    margin: "5px",
-    width: "80%",
-    height: "40px",
   },
   content: {
     maxHeight: "40%",
@@ -182,9 +158,6 @@ export default function ContentCard(props) {
   const classes = useStyles();
   const [error, setError] = useState({ message: "", url: "" });
   const [expand, setExpand] = useState(true);
-  const [value, setValue] = useState("");
-  const [comments, setComments] = useState([]);
-  const [isUpload, setIsUpload] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -193,80 +166,8 @@ export default function ContentCard(props) {
   const [onEdit, setOnEdit] = useState(0);
   const [newPost, setNewPost] = useState(content);
   const { username, userId } = useSelector(selectUser);
+
   const dispatch = useDispatch();
-
-  function refreshComment() {
-    Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
-      params: { post: id },
-    })
-      .then(({ data }) => {
-        setComments(data.reverse());
-        setIsUpload(false);
-      })
-      .catch(() => {
-        setIsUpload(false);
-      });
-  }
-
-  function upload() {
-    if (isBucket) {
-      dispatch(
-        setDialog({
-          title: "Bucket Error",
-          message: "You cannot send comment when you in the bucket",
-        })
-      );
-    } else {
-      setIsUpload(true);
-      Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
-        content: value,
-        user_id: userId,
-        post_id: id,
-        user: true,
-      })
-        .then(() => {
-          refreshComment();
-          setValue("");
-        })
-        .catch((e) => {
-          if (e.message === "Network Error") {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
-            setIsUpload(false);
-          } else if (e.message === "Request failed with status code 404") {
-            dispatch(
-              setDialog({
-                title: "Error",
-                message: "Post is deleted",
-              })
-            );
-          } else if (e.message === "Request failed with status code 403") {
-            dispatch(
-              setDialog({
-                title: "Bucket Error",
-                message: "You cannot send comment when you in the bucket",
-              })
-            );
-          }
-          setIsUpload(false);
-        });
-    }
-  }
-
-  const handleOnSubmit = (e) => {
-    e.preventDefault();
-    if (value !== "") upload();
-  };
-
-  const handleEnter = (e) => {
-    if (e.key === "Enter" && value !== "") upload();
-  };
-
-  useEffect(() => {
-    refreshComment();
-  }, [id]);
 
   const handleClick = (event) => {
     setMenu(event.currentTarget);
@@ -465,47 +366,12 @@ export default function ContentCard(props) {
               wrapperInner: classes.wrapperInner,
             }}
           >
-            <ScrollToBottom className={classes.comments}>
-              {comments.map((i) => (
-                <CommentBox
-                  key={i.id}
-                  author={i.user_name}
-                  comment={i.content}
-                  commentId={i.id}
-                  canDelete={username === i.user_name || username === author}
-                  canEdit={username === i.user_name}
-                  refresh={refreshComment}
-                  isUser={username !== null}
-                  userId={userId}
-                />
-              ))}
-            </ScrollToBottom>
-            {username && (
-              <form className={classes.comment}>
-                <TextareaAutosize
-                  id="standard-basic"
-                  className={classes.input}
-                  rowsMin={1}
-                  rowsMax={3}
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  onKeyDown={handleEnter}
-                />
-                {isUpload ? (
-                  <Loading />
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleOnSubmit}
-                    component="span"
-                    className={classes.button}
-                  >
-                    <SendIcon />
-                  </Button>
-                )}
-              </form>
-            )}
+            <Comment
+              author={author}
+              isBucket={isBucket}
+              id={id}
+              setError={setError}
+            />
           </Collapse>
         </div>
       </Card>
