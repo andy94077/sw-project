@@ -174,7 +174,7 @@ export default function Post() {
           ]
         : [
             loading === false ? (
-              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                   searchWords={[filter[dataIndex]]}
@@ -183,7 +183,7 @@ export default function Post() {
                 />
               </a>
             ) : (
-              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
                 {text}
               </a>
             ),
