@@ -21,15 +21,11 @@ import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import SearchIcon from "@material-ui/icons/Search";
 
-import Echo from "laravel-echo";
-import io from "socket.io-client";
-
 import { format } from "date-fns";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser } from "../redux/userSlice";
-import { REDIS_URL } from "../constants";
 import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
@@ -138,7 +134,7 @@ export default function Bar() {
   const isContentOpen = Boolean(contentAnchorEl);
 
   useEffect(() => {
-    if (username != null) {
+    if (username !== null) {
       axios
         .request({
           method: "POST",
@@ -153,12 +149,7 @@ export default function Bar() {
 
   // Broadcast
   useEffect(() => {
-    window.io = io;
-
-    window.Echo = new Echo({
-      broadcaster: "socket.io",
-      host: REDIS_URL, // this is laravel-echo-server host
-    });
+    if (window.Echo === undefined) return () => {};
 
     window.Echo.channel("Notifications").listen("AdPosted", (event) => {
       const { data } = event;
@@ -172,10 +163,7 @@ export default function Bar() {
         setIsAdOpen(false);
       }, 10000);
     });
-  }, []);
 
-  // Notifications
-  useEffect(() => {
     const jsonData = {
       user_id: userId,
     };
@@ -208,16 +196,15 @@ export default function Bar() {
         );
     pullNotes();
 
-    window.io = io;
-
-    window.Echo = new Echo({
-      broadcaster: "socket.io",
-      host: REDIS_URL, // this is laravel-echo-server host
-    });
-
-    window.Echo.channel("Notifications").listen("NotificationChanged", () =>
-      pullNotes()
+    window.Echo.channel("Notifications").listen(
+      "NotificationChanged",
+      pullNotes
     );
+
+    return () =>
+      window.Echo.channel("Notifications")
+        .stopListening("AdPosted")
+        .stopListening("NotificationChanged");
   }, []);
 
   useEffect(() => {

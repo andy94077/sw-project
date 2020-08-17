@@ -45,7 +45,7 @@ export default function App() {
     if (user.apiToken !== null) {
       window.Echo = new Echo({
         broadcaster: "socket.io",
-        host: REDIS_URL, // this is laravel-echo-server host
+        host: REDIS_URL, // this is the laravel-echo-server host
         auth: {
           headers: {
             Authorization: `Bearer ${user.apiToken}`,
@@ -53,6 +53,7 @@ export default function App() {
         },
       });
       window.Echo.join("Online");
+      window.Echo.channel("Notifications");
     }
   }, [user.apiToken]);
 
@@ -133,7 +134,7 @@ export default function App() {
     }
     return (
       <div>
-        {window.location.pathname !== "/" && <Bar />}
+        {location.pathname !== "/" && <Bar />}
         <Switch>
           <Route exact path="/" component={SignUpPage} />
           <Route exact path="/home" component={Homepage} />
