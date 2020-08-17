@@ -71,6 +71,7 @@ export default function App() {
               setData({
                 username: res.data.username,
                 user_id: res.data.user_id,
+                userAvatar: res.data.avatar_url,
                 bucket_time: res.data.bucket_time,
                 api_token: res.data.api_token,
               })
@@ -82,6 +83,7 @@ export default function App() {
               setData({
                 username: null,
                 user_id: null,
+                userAvatar: null,
                 bucket_time: null,
                 api_token: null,
               })
@@ -100,6 +102,7 @@ export default function App() {
         setData({
           username: null,
           user_id: null,
+          userAvatar: null,
           bucket_time: null,
           api_token: null,
         })
