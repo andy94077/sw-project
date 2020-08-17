@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch } from "react-redux";
 import {
   Button,
   CardMedia,
@@ -17,6 +18,7 @@ import { CONCAT_SERVER_URL } from "../utils";
 import Errormsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
 import MyQuill from "../components/MyQuill";
+import { setDialog } from "../redux/dialogSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -118,6 +120,7 @@ export default function ContentCard(props) {
   const classes = useStyles();
   const history = useHistory();
   const [value, setValue] = useState("");
+  const dispatch = useDispatch();
 
   const [tag, setTag] = useState("");
   const [empty, setEmpty] = useState(false);
@@ -155,7 +158,18 @@ export default function ContentCard(props) {
         data: jsonData,
       })
       .then((res) => history.push(`/picture/${res.data.id}`))
-      .catch(() => setIsReady("Error"));
+      .catch((e) => {
+        if (e.message === "Request failed with status code 403") {
+          dispatch(
+            setDialog({
+              title: "Bucket Error",
+              message: "You cannot send comment when you in the bucket",
+            })
+          );
+        } else {
+          setIsReady("Error");
+        }
+      });
   };
 
   if (isReady !== "Error") {
