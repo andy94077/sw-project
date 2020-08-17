@@ -74,6 +74,10 @@ export default function Content(props) {
   }
 
   useEffect(() => {
+    document.title = `賭ケグルイ-写真No.${pictureId}-`;
+  });
+
+  useEffect(() => {
     const { CancelToken } = Axios;
     const source = CancelToken.source();
     refresh();

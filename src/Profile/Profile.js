@@ -123,6 +123,10 @@ export default function Profile(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    document.title = `${name}のホームページ`;
+  });
+
+  useEffect(() => {
     setIsLoading(true);
     axios
       .request({

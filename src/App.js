@@ -35,6 +35,10 @@ export default function App() {
     setIsDialogOpen(false);
   }
 
+  useEffect(() => {
+    document.title = "賭ケグルイ";
+  }, []);
+
   // Broadcast
   useEffect(() => {
     window.io = io;
