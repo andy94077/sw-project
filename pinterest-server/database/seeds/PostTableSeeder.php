@@ -17,7 +17,7 @@ class PostTableSeeder extends Seeder
             DB::table('posts')->insert(
                 [
                     'url' => '/uploads/image/' . $i . '/original/' . $i . '.jpg',
-                    'user_id' => $i % 4 + 1,
+                    'user_id' => $i % 4 + 2,
                     'username' => 'user' . ($i % 4 + 1),
                     'content' => '<h>hello world</h>',
                     'tag' => $i >= 8 ? 'dog' : 'cat',
