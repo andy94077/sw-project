@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
@@ -61,6 +61,10 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUpPage() {
   const [modalShow, setModalShow] = useState(false);
   const classes = useStyles();
+
+  useEffect(() => {
+    document.title = "賭ケグルイ";
+  }, []);
 
   return (
     <div className={classes.Background}>

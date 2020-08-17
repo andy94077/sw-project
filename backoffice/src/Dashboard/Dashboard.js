@@ -31,6 +31,10 @@ export default function Dashboard() {
   const [isListLoading, setIsListLoading] = useState(false);
   const [onlineUser, setOnlineUser] = useState({});
 
+  useEffect(() => {
+    document.title = "Dashboard";
+  }, []);
+
   // Broadcast
   useEffect(() => {
     window.io = io;

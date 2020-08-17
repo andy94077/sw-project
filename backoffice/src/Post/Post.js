@@ -56,6 +56,10 @@ export default function Post() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    document.title = "Post";
+  }, []);
+
+  useEffect(() => {
     setMotion(false);
     setLoading(true);
 

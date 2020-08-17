@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MyQuill from "../components/MyQuill";
 import { Button, Input, Modal } from "antd";
@@ -7,6 +7,10 @@ import { CONCAT_SERVER_URL } from "../utils";
 export default function Announcement() {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
+
+  useEffect(() => {
+    document.title = "Announcement";
+  }, []);
 
   const handleSetTitle = (event) => {
     setTitle(event.target.value);
