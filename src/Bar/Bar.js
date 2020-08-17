@@ -3,28 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import {
-  AppBar,
-  Badge,
-  ClickAwayListener,
-  IconButton,
-  InputBase,
-  Menu,
-  MenuItem,
-  Popper,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
-import MoreIcon from "@material-ui/icons/MoreVert";
-import NotificationsIcon from "@material-ui/icons/Notifications";
+import { AppBar, InputBase, Toolbar, Typography } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 
 import { format } from "date-fns";
-import Content from "./Content";
-import RightDrawer from "./RightDrawer";
-import AnnouncementGrid from "../components/AnnouncementGrid";
+import DesktopMenu from "./DesktopMenu";
+import MobileMenu from "./MobileMenu";
 import { selectUser, setAvatar } from "../redux/userSlice";
 import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
@@ -35,13 +19,6 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     zIndex: 1000,
-  },
-  rounded: {
-    width: "32px",
-    borderRadius: "16px",
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
   },
   title: {
     color: "white",
@@ -94,23 +71,11 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
-  sectionDesktop: {
-    display: "none",
-    [theme.breakpoints.up("md")]: {
-      display: "flex",
-    },
-  },
-  sectionMobile: {
-    display: "flex",
-    [theme.breakpoints.up("md")]: {
-      display: "none",
-    },
-  },
   offset: theme.mixins.toolbar,
 }));
 
 export default function Bar() {
-  const { username, userId, userAvatar } = useSelector(selectUser);
+  const { username, userId } = useSelector(selectUser);
   const [, page, tag] = window.location.pathname.split("/");
 
   // Classes & States
@@ -122,19 +87,21 @@ export default function Bar() {
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [contentCheck, setContentCheck] = useState(null);
+
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [mobileContentType, setMobileContentType] = useState("");
-
   const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
+
   const [isAdOpen, setIsAdOpen] = useState(false);
   const [adMessage, setAdMessage] = useState("");
 
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(contentAnchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   useEffect(() => {
     if (username !== null) {
@@ -207,7 +174,7 @@ export default function Bar() {
       "NotificationChanged",
       pullNotes
     );
-    
+
     return () =>
       window.Echo.channel("Notifications")
         .stopListening("AdPosted")
@@ -242,6 +209,7 @@ export default function Bar() {
 
   // Toggle functions
   const handleMobileMenuClose = () => {
+    setMobileContentType("");
     setMobileMoreAnchorEl(null);
   };
 
@@ -313,80 +281,6 @@ export default function Bar() {
     setDrawerOpen(isOpen);
   };
 
-  // Toggled components
-  const renderContent = (
-    <Popper
-      anchorEl={contentAnchorEl}
-      className={classes.sectionDesktop}
-      keepMounted
-      open={isContentOpen}
-    >
-      <Content text={contentText} check={contentCheck} />
-    </Popper>
-  );
-
-  const renderMobileContent = (
-    <Content text={contentText} check={contentCheck} />
-  );
-
-  const renderAnnouncementGrid = (
-    <AnnouncementGrid
-      isAdOpen={isAdOpen}
-      handleAdClose={handleAdClose}
-      adMessage={adMessage}
-    />
-  );
-
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      className={classes.sectionMobile}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem
-        onClick={handleMobileContentOpen("mails")}
-        style={{ width: "320px" }}
-      >
-        <IconButton color="inherit" component="span">
-          <Badge badgeContent={0} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Mails</p>
-      </MenuItem>
-      {mobileContentType === "mails" && (
-        <MenuItem>{renderMobileContent}</MenuItem>
-      )}
-      <MenuItem onClick={handleMobileContentOpen("notes")}>
-        <IconButton color="inherit" component="span">
-          <Badge badgeContent={notesCount} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      {mobileContentType === "notes" && (
-        <MenuItem>{renderMobileContent}</MenuItem>
-      )}
-      <MenuItem onClick={toggleDrawer(true)}>
-        <IconButton color="inherit" component="span">
-          <img alt="Avatar" className={classes.rounded} src={userAvatar} />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
-
   // The bar
   return (
     <div className={classes.grow}>
@@ -413,92 +307,38 @@ export default function Bar() {
             />
           </div>
           <div className={classes.grow} />
-          <div className={classes.sectionDesktop}>
-            <ClickAwayListener onClickAway={handleContentClose}>
-              <div style={{ display: "flex" }}>
-                {username === null ? null : (
-                  <IconButton
-                    onClick={handleContentOpen("mails")}
-                    color="inherit"
-                    component="span"
-                  >
-                    <Badge badgeContent={0} color="secondary">
-                      <MailIcon />
-                    </Badge>
-                  </IconButton>
-                )}
-                {username === null ? null : (
-                  <IconButton
-                    onClick={handleContentOpen("notes")}
-                    color="inherit"
-                    component="span"
-                  >
-                    <Badge badgeContent={notesCount} color="secondary">
-                      <NotificationsIcon />
-                    </Badge>
-                  </IconButton>
-                )}
-                {renderContent}
-                {renderAnnouncementGrid}
-              </div>
-            </ClickAwayListener>
-            <RightDrawer
-              open={drawerOpen}
-              toggleDrawer={toggleDrawer}
-              button={
-                <IconButton
-                  edge="end"
-                  onClick={toggleDrawer(true)}
-                  color="inherit"
-                  component="span"
-                >
-                  {username === null ? (
-                    <AccountCircleIcon />
-                  ) : (
-                    <img
-                      alt="Avatar"
-                      className={classes.rounded}
-                      src={userAvatar}
-                    />
-                  )}
-                </IconButton>
-              }
-              avatar={userAvatar}
-            />
-          </div>
-          <div className={classes.sectionMobile}>
-            {username == null ? (
-              <RightDrawer
-                open={drawerOpen}
-                toggleDrawer={toggleDrawer}
-                button={
-                  <IconButton
-                    edge="end"
-                    onClick={toggleDrawer(true)}
-                    color="inherit"
-                    component="span"
-                  >
-                    <AccountCircleIcon />
-                  </IconButton>
-                }
-                avatar={userAvatar}
-              />
-            ) : (
-              <IconButton
-                onClick={handleMobileMenuOpen}
-                color="inherit"
-                component="span"
-              >
-                <Badge badgeContent={notesCount} color="secondary">
-                  <MoreIcon />
-                </Badge>
-              </IconButton>
-            )}
-            {renderAnnouncementGrid}
-          </div>
+          <DesktopMenu
+            adMessage={adMessage}
+            contentAnchorEl={contentAnchorEl}
+            contentCheck={contentCheck}
+            contentText={contentText}
+            drawerOpen={drawerOpen}
+            handleAdClose={handleAdClose}
+            handleContentClose={handleContentClose}
+            handleContentOpen={handleContentOpen}
+            isAdOpen={isAdOpen}
+            isContentOpen={isContentOpen}
+            notesCount={notesCount}
+            toggleDrawer={toggleDrawer}
+          />
+          <MobileMenu
+            adMessage={adMessage}
+            contentCheck={contentCheck}
+            contentText={contentText}
+            drawerOpen={drawerOpen}
+            handleAdClose={handleAdClose}
+            handleMobileContentOpen={handleMobileContentOpen}
+            handleMobileMenuClose={handleMobileMenuClose}
+            handleMobileMenuOpen={handleMobileMenuOpen}
+            isAdOpen={isAdOpen}
+            isMobileMenuOpen={isMobileMenuOpen}
+            mobileContentType={mobileContentType}
+            mobileMoreAnchorEl={mobileMoreAnchorEl}
+            notesCount={notesCount}
+            toggleDrawer={toggleDrawer}
+          />
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
       <div className={classes.offset} />
     </div>
   );
