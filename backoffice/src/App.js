@@ -12,7 +12,7 @@ import Loading from "./components/Loading";
 import Bar from "./Bar/Bar";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
-import { CONCAT_SERVER_URL } from "./constants";
+import { CONCAT_SERVER_URL } from "./utils";
 import Announcement from "./Announcement/Announcement";
 
 export default function App() {

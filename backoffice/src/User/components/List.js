@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { CONCAT_SERVER_URL } from "../../constants";
+import { CONCAT_SERVER_URL } from "../../utils";
 import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";

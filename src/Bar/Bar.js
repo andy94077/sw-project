@@ -29,7 +29,8 @@ import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { REDIS_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -124,7 +125,7 @@ export default function Bar() {
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [notes, setNotes] = useState([]);
-  const [noteCount, setNoteCount] = useState([]);
+  const [notesCount, setNotesCount] = useState([]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
@@ -221,11 +222,11 @@ export default function Bar() {
 
   useEffect(() => {
     setContentText(notes);
-    const noteCheck = getCookie("noteCheck");
-    const nc = notes.filter((note) => note.created_at > noteCheck).length;
-    setNoteCount(nc);
+    const notesCheck = getCookie(`notesCheck${userId}`);
+    const nc = notes.filter((note) => note.created_at > notesCheck).length;
+    setNotesCount(nc);
     if (nc > 9) {
-      setNoteCount("10+");
+      setNotesCount("10+");
     }
   }, [notes]);
 
@@ -256,16 +257,21 @@ export default function Bar() {
 
   const handleContentClose = () => {
     setContentAnchorEl(null);
-    setCookie("noteCheck", Date.now(), 60);
+    setCookie(`notesCheck${userId}`, Date.now(), 60);
   };
 
   const handleContentOpen = (text) => (event) => {
     if (contentAnchorEl === event.currentTarget) {
       handleContentClose();
     } else {
+      if (contentAnchorEl !== null) {
+        if (text === mails) {
+          setCookie(`notesCheck${userId}`, Date.now(), 60);
+        }
+      }
       setContentText(text);
       setContentAnchorEl(event.currentTarget);
-      if (text === notes) setNoteCount(0);
+      if (text === notes) setNotesCount(0);
     }
   };
 
@@ -329,7 +335,7 @@ export default function Bar() {
       </MenuItem>
       <MenuItem onClick={handleContentOpen(notes)}>
         <IconButton color="inherit" component="span">
-          <Badge badgeContent={noteCount} color="secondary">
+          <Badge badgeContent={notesCount} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -398,7 +404,7 @@ export default function Bar() {
                     color="inherit"
                     component="span"
                   >
-                    <Badge badgeContent={noteCount} color="secondary">
+                    <Badge badgeContent={notesCount} color="secondary">
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>

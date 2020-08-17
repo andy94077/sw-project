@@ -10,7 +10,7 @@ import Errormsg from "../components/ErrorMsg";
 import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
@@ -121,6 +121,10 @@ export default function Profile(props) {
   const isBucket = checkBucket(bucketTime);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = `${name}のホームページ`;
+  });
 
   useEffect(() => {
     setIsLoading(true);
