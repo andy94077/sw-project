@@ -209,4 +209,17 @@ class UserController extends BaseController
         $img_location = $user->avatar_url;
         return response()->json($img_location);
     }
+
+    public function setIntro(Request $request){
+        $user = User::find($request['user_id']);
+        $user->intro = $request['intro'];
+        $user->save();
+        return response()->json($user);
+    }
+
+    public function getIntro(Request $request){
+        $user = User::find($request['user_id']);
+        $res['intro'] = $user->intro;
+        return response()->json($res);
+    }
 }

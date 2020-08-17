@@ -50,9 +50,9 @@ class PostController extends BaseController
     public function getPictureFromTag(Request $request)
     {
         if ($request->has('tag'))
-            $posts = Post::where("tag", $request['tag'])->select("id", "url")->limit($request['number'])->get();
+            $posts = Post::where("tag", $request['tag'])->select("id", "url")->orderBy($request['order'], $request['sequence'])->limit($request['number'])->get();
         else
-            $posts = Post::select("id", "url")->limit($request['number'])->get();
+            $posts = Post::select("id", "url")->orderBy($request['order'], $request['sequence'])->limit($request['number'])->get();
         return response()->json(["imageListWithId" => $posts]);
     }
 

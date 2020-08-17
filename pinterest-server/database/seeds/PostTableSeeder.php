@@ -21,6 +21,7 @@ class PostTableSeeder extends Seeder
                     'username' => 'user' . ($i % 4 + 1),
                     'content' => '<h>hello world</h>',
                     'tag' => $i >= 8 ? 'dog' : 'cat',
+                    'like' => $i + 1,
                     'publish_time' => date('Y-m-d H:i:s'),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
