@@ -124,6 +124,7 @@ export default function Bar() {
 
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
+  const [contentCheck, setContentCheck] = useState(null);
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
 
@@ -257,21 +258,20 @@ export default function Bar() {
 
   const handleContentClose = () => {
     setContentAnchorEl(null);
-    setCookie(`notesCheck${userId}`, Date.now(), 60);
   };
 
   const handleContentOpen = (text) => (event) => {
+    // Close itself:
     if (contentAnchorEl === event.currentTarget) {
       handleContentClose();
     } else {
-      if (contentAnchorEl !== null) {
-        if (text === mails) {
-          setCookie(`notesCheck${userId}`, Date.now(), 60);
-        }
-      }
       setContentText(text);
       setContentAnchorEl(event.currentTarget);
-      if (text === notes) setNotesCount(0);
+      if (text === notes) {
+        setNotesCount(0);
+        setContentCheck(getCookie(`notesCheck${userId}`));
+        setCookie(`notesCheck${userId}`, Date.now(), 60);
+      } else setContentCheck(9999999999999); // mails not implemented yet.
     }
   };
 
@@ -300,13 +300,8 @@ export default function Bar() {
 
   // Toggled components
   const renderContent = (
-    <Popper
-      anchorEl={contentAnchorEl}
-      keepMounted
-      open={isContentOpen}
-      onClose={handleContentClose}
-    >
-      <Content text={contentText} />
+    <Popper anchorEl={contentAnchorEl} keepMounted open={isContentOpen}>
+      <Content text={contentText} check={contentCheck} />
     </Popper>
   );
 
