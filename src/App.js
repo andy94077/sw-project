@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
-import { addHours, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { Switch, Route, useHistory, useLocation } from "react-router-dom";
 
@@ -21,20 +20,17 @@ import { CONCAT_SERVER_URL } from "./utils";
 import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
+import { closeDialog, selectDialog } from "./redux/dialogSlice";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const location = useLocation();
   const history = useHistory();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, []);
   const user = useSelector(selectUser);
-
-  function handleClose() {
-    setIsDialogOpen(false);
-  }
+  const dialog = useSelector(selectDialog);
 
   useEffect(() => {
     document.title = "賭ケグルイ";
@@ -46,7 +42,7 @@ export default function App() {
     if (user.apiToken !== null) {
       window.Echo = new Echo({
         broadcaster: "socket.io",
-        host: REDIS_URL, // this is laravel-echo-server host
+        host: REDIS_URL, // this is the laravel-echo-server host
         auth: {
           headers: {
             Authorization: `Bearer ${user.apiToken}`,
@@ -54,6 +50,7 @@ export default function App() {
         },
       });
       window.Echo.join("Online");
+      window.Echo.channel("Notifications");
     }
   }, [user.apiToken]);
 
@@ -137,7 +134,7 @@ export default function App() {
     }
     return (
       <div>
-        {window.location.pathname !== "/" && <Bar />}
+        {location.pathname !== "/" && <Bar />}
         <Switch>
           <Route exact path="/" component={SignUpPage} />
           <Route exact path="/home" component={Homepage} />
@@ -156,18 +153,23 @@ export default function App() {
           <Route exact path="/logout" component={() => <>logout</>} />
         </Switch>
         <AlertDialog
-          open={isDialogOpen}
-          alertTitle="You are during bucket"
-          alertDesciption={`End: ${format(
-            addHours(new Date(user.BucketTime), 8),
-            "yyyy-MM-dd hh:mm:ss"
-          )}`}
+          open={dialog.isOpen}
+          alertTitle={dialog.title}
+          alertDesciption={dialog.message}
           alertButton={
             <>
-              <Button onClick={handleClose}>Got it!</Button>
+              <Button
+                onClick={() => {
+                  dispatch(closeDialog());
+                }}
+              >
+                Got it!
+              </Button>
             </>
           }
-          onClose={handleClose}
+          onClose={() => {
+            dispatch(closeDialog());
+          }}
         />
       </div>
     );
