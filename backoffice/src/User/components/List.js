@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { CONCAT_SERVER_URL } from "../../constants";
+import { CONCAT_SERVER_URL } from "../../utils";
 import { format } from "date-fns";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
@@ -273,7 +273,7 @@ export default function List(props) {
       key: "name",
       width: 120,
       render: (name) => (
-        <a href={`http://localhost:3000/profile/${name}`}>{name}</a>
+        <a href={CONCAT_SERVER_URL(`/profile/${name}`)}>{name}</a>
       ),
       sorter: (a, b) => a.name.localeCompare(b.name),
     },

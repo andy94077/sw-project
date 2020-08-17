@@ -7,7 +7,7 @@ import Loading from "./Loading";
 import Photo from "./Photo";
 import ErrorMsg from "./ErrorMsg";
 import "./PhotoGrid.css";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 const useStyles = makeStyles(() => ({
   loading: {

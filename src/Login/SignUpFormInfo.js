@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import Loading from "../components/Loading";
 import { setCookie } from "../cookieHelper";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 const keyNote = {
   "name.required": "Username can't be empty",

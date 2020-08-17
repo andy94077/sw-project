@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./LoginPage.css";
 
 import LoginForm from "./LoginForm";
-import { CONCAT_BACKOFFICE_URL } from "../constants";
+import { CONCAT_BACKOFFICE_URL } from "../utils";
 
 export default function LoginPage() {
+  useEffect(() => {
+    document.title = "Login";
+  }, []);
   return (
     <div
       className="login-page"

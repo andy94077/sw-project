@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 
@@ -10,6 +10,10 @@ export default function BOUser(props) {
   const [refresh, setRefresh] = useState(false);
   const handleVisible = (_visible) => () => setVisible(_visible);
   const handleSetRefresh = () => setRefresh((_refresh) => !_refresh);
+
+  useEffect(() => {
+    document.title = "BO User";
+  }, []);
 
   return (
     <div>

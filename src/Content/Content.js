@@ -10,7 +10,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
 import Loading from "../components/Loading";
 import ErrorGrid from "../components/ErrorGrid";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
 
 const useStyles = makeStyles(() => ({
@@ -72,6 +72,10 @@ export default function Content(props) {
         }
       });
   }
+
+  useEffect(() => {
+    document.title = `賭ケグルイ-写真No.${pictureId}-`;
+  });
 
   useEffect(() => {
     const { CancelToken } = Axios;

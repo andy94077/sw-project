@@ -18,7 +18,7 @@ import {
   UndoOutlined,
 } from "@ant-design/icons";
 import { format } from "date-fns";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import Comment from "./Comment";
 
 export default function Post() {
@@ -54,6 +54,10 @@ export default function Post() {
   });
   const [motion, setMotion] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = "Post";
+  }, []);
 
   useEffect(() => {
     setMotion(false);
@@ -170,7 +174,7 @@ export default function Post() {
           ]
         : [
             loading === false ? (
-              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                   searchWords={[filter[dataIndex]]}
@@ -179,7 +183,7 @@ export default function Post() {
                 />
               </a>
             ) : (
-              <a key={dataIndex} href={`http://localhost:3000/profile/${text}`}>
+              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
                 {text}
               </a>
             ),

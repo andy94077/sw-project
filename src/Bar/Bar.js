@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import { fade, makeStyles } from "@material-ui/core/styles";
@@ -28,8 +28,9 @@ import { format } from "date-fns";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
-import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL, REDIS_URL } from "../constants";
+import { selectUser, setAvatar } from "../redux/userSlice";
+import { REDIS_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -113,25 +114,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Bar() {
-  const { username, userId } = useSelector(selectUser);
+  const { username, userId, userAvatar } = useSelector(selectUser);
   const [, page, tag] = window.location.pathname.split("/");
 
   // Classes & States
   const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
   const [contentText, setContentText] = useState([{ id: 1 }]);
+  const [contentCheck, setContentCheck] = useState(null);
   const [notes, setNotes] = useState([]);
-  const [noteCount, setNoteCount] = useState([]);
+  const [notesCount, setNotesCount] = useState([]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
   const [isAdOpen, setIsAdOpen] = useState(false);
   const [adMessage, setAdMessage] = useState("");
-
-  const [avatar, setAvatar] = useState(null);
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isContentOpen = Boolean(contentAnchorEl);
@@ -145,10 +147,14 @@ export default function Bar() {
           data: { name: username },
         })
         .then((response) => {
-          setAvatar(CONCAT_SERVER_URL(`${response.data}`));
+          stableDispatch(
+            setAvatar({
+              userAvatar: CONCAT_SERVER_URL(`${response.data}`),
+            })
+          );
         });
     }
-  }, []);
+  }, [username, stableDispatch]);
 
   // Broadcast
   useEffect(() => {
@@ -221,11 +227,11 @@ export default function Bar() {
 
   useEffect(() => {
     setContentText(notes);
-    const noteCheck = getCookie("noteCheck");
-    const nc = notes.filter((note) => note.created_at > noteCheck).length;
-    setNoteCount(nc);
+    const notesCheck = getCookie(`notesCheck${userId}`);
+    const nc = notes.filter((note) => note.created_at > notesCheck).length;
+    setNotesCount(nc);
     if (nc > 9) {
-      setNoteCount("10+");
+      setNotesCount("10+");
     }
   }, [notes]);
 
@@ -256,16 +262,20 @@ export default function Bar() {
 
   const handleContentClose = () => {
     setContentAnchorEl(null);
-    setCookie("noteCheck", Date.now(), 60);
   };
 
   const handleContentOpen = (text) => (event) => {
+    // Close itself:
     if (contentAnchorEl === event.currentTarget) {
       handleContentClose();
     } else {
       setContentText(text);
       setContentAnchorEl(event.currentTarget);
-      if (text === notes) setNoteCount(0);
+      if (text === notes) {
+        setNotesCount(0);
+        setContentCheck(getCookie(`notesCheck${userId}`));
+        setCookie(`notesCheck${userId}`, Date.now(), 60);
+      } else setContentCheck(9999999999999); // mails not implemented yet.
     }
   };
 
@@ -294,13 +304,8 @@ export default function Bar() {
 
   // Toggled components
   const renderContent = (
-    <Popper
-      anchorEl={contentAnchorEl}
-      keepMounted
-      open={isContentOpen}
-      onClose={handleContentClose}
-    >
-      <Content text={contentText} />
+    <Popper anchorEl={contentAnchorEl} keepMounted open={isContentOpen}>
+      <Content text={contentText} check={contentCheck} />
     </Popper>
   );
 
@@ -329,7 +334,7 @@ export default function Bar() {
       </MenuItem>
       <MenuItem onClick={handleContentOpen(notes)}>
         <IconButton color="inherit" component="span">
-          <Badge badgeContent={noteCount} color="secondary">
+          <Badge badgeContent={notesCount} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -337,7 +342,7 @@ export default function Bar() {
       </MenuItem>
       <MenuItem onClick={toggleDrawer(true)}>
         <IconButton color="inherit" component="span">
-          <img alt="Avatar" className={classes.rounded} src={avatar} />
+          <img alt="Avatar" className={classes.rounded} src={userAvatar} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -398,7 +403,7 @@ export default function Bar() {
                     color="inherit"
                     component="span"
                   >
-                    <Badge badgeContent={noteCount} color="secondary">
+                    <Badge badgeContent={notesCount} color="secondary">
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>
@@ -423,12 +428,12 @@ export default function Bar() {
                     <img
                       alt="Avatar"
                       className={classes.rounded}
-                      src={avatar}
+                      src={userAvatar}
                     />
                   )}
                 </IconButton>
               }
-              avatar={avatar}
+              avatar={userAvatar}
             />
           </div>
           <div className={classes.sectionMobile}>
@@ -446,7 +451,7 @@ export default function Bar() {
                     <AccountCircleIcon />
                   </IconButton>
                 }
-                avatar={avatar}
+                avatar={userAvatar}
               />
             ) : (
               <IconButton

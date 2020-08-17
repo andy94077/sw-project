@@ -1,13 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     username: null,
     userId: null,
+    userAvatar: "/img/avatar.jpeg",
     BucketTime: null,
     apiToken: null,
   },
@@ -27,11 +28,15 @@ export const userSlice = createSlice({
       }
       state.username = action.payload.username;
       state.userId = action.payload.user_id;
+      state.userAvatar = action.payload.userAvatar;
       state.BucketTime = action.payload.bucket_time;
       state.apiToken = action.payload.api_token;
     },
+    setAvatar: (state, action) => {
+      state.userAvatar = action.payload.userAvatar;
+    },
   },
 });
-export const { setData } = userSlice.actions;
+export const { setData, setAvatar } = userSlice.actions;
 export default userSlice.reducer;
 export const selectUser = (state) => state.user;

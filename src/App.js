@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +15,8 @@ import Profile from "./Profile/Profile";
 import { getCookie } from "./cookieHelper";
 import { setData, selectUser } from "./redux/userSlice";
 
-import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
+import { REDIS_URL } from "./constants";
+import { CONCAT_SERVER_URL } from "./utils";
 import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
@@ -27,8 +28,13 @@ export default function App() {
   const location = useLocation();
   const history = useHistory();
   const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const user = useSelector(selectUser);
   const dialog = useSelector(selectDialog);
+
+  useEffect(() => {
+    document.title = "賭ケグルイ";
+  }, []);
 
   // Broadcast
   useEffect(() => {
@@ -58,10 +64,11 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            dispatch(
+            stableDispatch(
               setData({
                 username: res.data.username,
                 user_id: res.data.user_id,
+                userAvatar: res.data.avatar_url,
                 bucket_time: res.data.bucket_time,
                 api_token: res.data.api_token,
               })
@@ -69,10 +76,11 @@ export default function App() {
 
             if (location.pathname === "/") history.push("/home");
           } else {
-            dispatch(
+            stableDispatch(
               setData({
                 username: null,
                 user_id: null,
+                userAvatar: null,
                 bucket_time: null,
                 api_token: null,
               })
@@ -87,16 +95,17 @@ export default function App() {
         })
         .finally(() => setIsReady(true));
     } else {
-      dispatch(
+      stableDispatch(
         setData({
           username: null,
           user_id: null,
+          userAvatar: null,
           bucket_time: null,
           api_token: null,
         })
       );
     }
-  }, [location, history]);
+  }, [location, history, stableDispatch]);
 
   useEffect(() => {
     const timer = setInterval(() => {

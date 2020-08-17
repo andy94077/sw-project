@@ -1,7 +1,7 @@
 import React from "react";
 import { message, Form, InputNumber, Modal } from "antd";
 import axios from "axios";
-import { CONCAT_SERVER_URL } from "../../constants";
+import { CONCAT_SERVER_URL } from "../../utils";
 
 export default function BucketForm(props) {
   const [form] = Form.useForm();
