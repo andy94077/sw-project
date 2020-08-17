@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { GridListTileBar, makeStyles, Button } from "@material-ui/core";
@@ -109,6 +109,7 @@ export default function Profile(props) {
 
   const [image, setImage] = useState("");
   const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const [isUpload, setIsUpload] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [modalShow, setModalShow] = useState(false);
@@ -135,12 +136,12 @@ export default function Profile(props) {
         data: { name },
       })
       .then((response) => {
-        dispatch(
+        stableDispatch(
           setAvatar({ userAvatar: CONCAT_SERVER_URL(`${response.data}`) })
         );
       })
       .finally(() => setIsLoading(false));
-  }, [isUpload]);
+  }, [name, isUpload, stableDispatch]);
 
   useEffect(() => {
     setIsReady("Loading");

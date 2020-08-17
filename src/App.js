@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
 import { addHours, format } from "date-fns";
@@ -29,6 +29,7 @@ export default function App() {
   const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const user = useSelector(selectUser);
 
   function handleClose() {
@@ -67,7 +68,7 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            dispatch(
+            stableDispatch(
               setData({
                 username: res.data.username,
                 user_id: res.data.user_id,
@@ -79,7 +80,7 @@ export default function App() {
 
             if (location.pathname === "/") history.push("/home");
           } else {
-            dispatch(
+            stableDispatch(
               setData({
                 username: null,
                 user_id: null,
@@ -98,7 +99,7 @@ export default function App() {
         })
         .finally(() => setIsReady(true));
     } else {
-      dispatch(
+      stableDispatch(
         setData({
           username: null,
           user_id: null,
@@ -108,7 +109,7 @@ export default function App() {
         })
       );
     }
-  }, [location, history]);
+  }, [location, history, stableDispatch]);
 
   useEffect(() => {
     const timer = setInterval(() => {

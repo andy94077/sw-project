@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
@@ -121,6 +121,7 @@ export default function Bar() {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
@@ -146,14 +147,14 @@ export default function Bar() {
           data: { name: username },
         })
         .then((response) => {
-          dispatch(
+          stableDispatch(
             setAvatar({
               userAvatar: CONCAT_SERVER_URL(`${response.data}`),
             })
           );
         });
     }
-  }, []);
+  }, [username, stableDispatch]);
 
   // Broadcast
   useEffect(() => {
