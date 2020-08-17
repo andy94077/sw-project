@@ -47,6 +47,7 @@ export default function AlertDialog(props) {
         open={open}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        disableBackdropClick
         classes={{ paper: classes.frame }}
         onClose={onClose}
       >
