@@ -16,7 +16,8 @@ import Profile from "./Profile/Profile";
 import { getCookie } from "./cookieHelper";
 import { setData, selectUser } from "./redux/userSlice";
 
-import { CONCAT_SERVER_URL, REDIS_URL } from "./constants";
+import { REDIS_URL } from "./constants";
+import { CONCAT_SERVER_URL } from "./utils";
 import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";

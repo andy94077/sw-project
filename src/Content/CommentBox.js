@@ -7,7 +7,7 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import IconButton from "@material-ui/core/IconButton";
 import Axios from "axios";
 
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import AlertDialog from "../components/AlertDialog";
 
 const useStyles = makeStyles(() => ({

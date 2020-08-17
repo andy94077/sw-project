@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Avatar from "react-avatar-edit";
 import { Button } from "@material-ui/core";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import AlertDialog from "../components/AlertDialog";
 
 export default function AvatarUpload(props) {

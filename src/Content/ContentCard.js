@@ -24,7 +24,7 @@ import { Link, Redirect } from "react-router-dom";
 import ScrollToBottom from "react-scroll-to-bottom";
 import CommentBox from "./CommentBox";
 import Loading from "../components/Loading";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 import AlertDialog from "../components/AlertDialog";
 import MyQuill from "../components/MyQuill";
 import ErrorMsg from "../components/ErrorMsg";

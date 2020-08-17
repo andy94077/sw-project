@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import MyQuill from "../components/MyQuill";
 import { Button, Input, Modal } from "antd";
-import { CONCAT_SERVER_URL } from "../constants";
+import { CONCAT_SERVER_URL } from "../utils";
 
 export default function Announcement() {
   const [title, setTitle] = useState("");
