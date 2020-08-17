@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { GridListTileBar, makeStyles, Button } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
@@ -11,9 +11,10 @@ import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
 import Upload from "./Upload";
 import { CONCAT_SERVER_URL } from "../utils";
-import { selectUser } from "../redux/userSlice";
+import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
+import { setDialog } from "../redux/dialogSlice";
 import "./Profile.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -108,7 +109,8 @@ export default function Profile(props) {
   const intro = "hi";
 
   const [image, setImage] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const dispatch = useDispatch();
+  const stableDispatch = useCallback(dispatch, []);
   const [isUpload, setIsUpload] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [modalShow, setModalShow] = useState(false);
@@ -117,7 +119,7 @@ export default function Profile(props) {
   const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
   const [avatarVisibility, setUploadVisibility] = useState(false);
-  const { username, userId, bucketTime } = useSelector(selectUser);
+  const { username, userId, userAvatar, bucketTime } = useSelector(selectUser);
   const isBucket = checkBucket(bucketTime);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,10 +137,12 @@ export default function Profile(props) {
         data: { name },
       })
       .then((response) => {
-        setAvatar(CONCAT_SERVER_URL(`${response.data}`));
+        stableDispatch(
+          setAvatar({ userAvatar: CONCAT_SERVER_URL(`${response.data}`) })
+        );
       })
       .finally(() => setIsLoading(false));
-  }, [isUpload]);
+  }, [name, isUpload, stableDispatch]);
 
   useEffect(() => {
     setIsReady("Loading");
@@ -175,6 +179,7 @@ export default function Profile(props) {
 
     const formData = new FormData();
     formData.append("imageupload", event.target.files[0]);
+    formData.append("user_id", userId);
 
     axios
       .request({
@@ -183,7 +188,18 @@ export default function Profile(props) {
         data: formData,
       })
       .then((res) => setImageURL(res.data.url))
-      .catch(() => setImageURL("Error"));
+      .catch((e) => {
+        if (e.message === "Request failed with status code 403") {
+          dispatch(
+            setDialog({
+              title: "Bucket Error",
+              message: "You cannot send comment when you in the bucket",
+            })
+          );
+        } else {
+          setImageURL("Error");
+        }
+      });
   };
 
   const handleUploadCancel = () => {
@@ -283,7 +299,7 @@ export default function Profile(props) {
               <img
                 alt="Avatar"
                 className={`${classes.central} ${classes.rounded}`}
-                src={avatar}
+                src={userAvatar}
               />
             )}
             {avatarVisibility && (
@@ -306,7 +322,7 @@ export default function Profile(props) {
           <img
             alt="Avatar"
             className={`${classes.central} ${classes.rounded}`}
-            src={avatar}
+            src={userAvatar}
           />
         )}
         <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
