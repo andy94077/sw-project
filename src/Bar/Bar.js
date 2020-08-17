@@ -207,7 +207,7 @@ export default function Bar() {
       "NotificationChanged",
       pullNotes
     );
-    
+
     return () =>
       window.Echo.channel("Notifications")
         .stopListening("AdPosted")

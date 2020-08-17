@@ -27,8 +27,7 @@ export default function Dashboard() {
   const [latestPosts, setLatestPosts] = useState([]);
   const [latestComments, setLatestComments] = useState([]);
   const [latestLikes, setLatestLikes] = useState([]);
-  const [isCardLoading, setIsCardLoading] = useState(false);
-  const [isListLoading, setIsListLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [onlineUser, setOnlineUser] = useState({});
 
   useEffect(() => {
@@ -46,6 +45,7 @@ export default function Dashboard() {
           Authorization: `Bearer ${sha256("admin")}`,
         },
       },
+      socketio: { pingTimeout: 30000 },
     });
 
     window.Echo.join("Online")
@@ -67,87 +67,83 @@ export default function Dashboard() {
       );
 
     window.Echo.channel("Dashboard").listen("PostChanged", () => {
-      const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
+      const timer = setTimeout(() => setIsLoading(true), 1000);
       axios
-        .get(CONCAT_SERVER_URL("/api/v1/posts/info"))
-        .then((res) => {
-          setPostInfo(res.data);
-        })
+        .all([
+          axios.get(CONCAT_SERVER_URL("/api/v1/posts/info")),
+          axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest")),
+        ])
+        .then(
+          axios.spread((postResponse, latestPostResponse) => {
+            setPostInfo(postResponse.data);
+            setLatestPosts(latestPostResponse.data);
+          })
+        )
         .finally(() => {
-          clearTimeout(timer1);
-          setIsCardLoading(false);
-        });
-
-      const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      axios
-        .get(CONCAT_SERVER_URL("/api/v1/posts/latest"))
-        .then((res) => {
-          setLatestPosts(res.data);
-        })
-        .finally(() => {
-          clearTimeout(timer2);
-          setIsListLoading(false);
+          clearTimeout(timer);
+          setIsLoading(false);
         });
     });
 
     window.Echo.channel("Dashboard").listen("CommentChanged", () => {
-      const timer1 = setTimeout(() => setIsCardLoading(true), 1000);
+      const timer = setTimeout(() => setIsLoading(true), 1000);
       axios
-        .get(CONCAT_SERVER_URL("/api/v1/comments/info"))
-        .then((res) => {
-          setCommentInfo(res.data);
-        })
+        .all([
+          axios.get(CONCAT_SERVER_URL("/api/v1/comments/info")),
+          axios.get(CONCAT_SERVER_URL("/api/v1/comments/latest")),
+        ])
+        .then(
+          axios.spread((commentResponse, latestCommentResponse) => {
+            setCommentInfo(commentResponse.data);
+            setLatestComments(latestCommentResponse.data);
+          })
+        )
         .finally(() => {
-          clearTimeout(timer1);
-          setIsCardLoading(false);
-        });
-
-      const timer2 = setTimeout(() => setIsListLoading(true), 1000);
-      axios
-        .get(CONCAT_SERVER_URL("/api/v1/comments/latest"))
-        .then((res) => {
-          setLatestComments(res.data);
-        })
-        .finally(() => {
-          clearTimeout(timer2);
-          setIsListLoading(false);
+          clearTimeout(timer);
+          setIsLoading(false);
         });
     });
+
+    return () => window.Echo.disconnect();
   }, []);
 
   useEffect(() => {
-    setIsCardLoading(true);
+    setIsLoading(true);
     const user = axios.get(CONCAT_SERVER_URL("/api/v1/users/info"));
     const comment = axios.get(CONCAT_SERVER_URL("/api/v1/comments/info"));
     const post = axios.get(CONCAT_SERVER_URL("/api/v1/posts/info"));
-    Promise.all([user, comment, post])
-      .then((res) => {
-        setUserInfo((info) => ({
-          ...info,
-          valid: res[0].data.valid,
-          new: res[0].data.new,
-        }));
-        setCommentInfo(res[1].data);
-        setPostInfo(res[2].data);
-      })
-      .finally(() => {
-        setIsCardLoading(false);
-      });
-
-    setIsListLoading(true);
     const postLatest = axios.get(CONCAT_SERVER_URL("/api/v1/posts/latest"));
     const commentLatest = axios.get(
       CONCAT_SERVER_URL("/api/v1/comments/latest")
     );
     const likeLatest = axios.get(CONCAT_SERVER_URL("/api/v1/likes/latest"));
-    Promise.all([postLatest, commentLatest, likeLatest])
-      .then((res) => {
-        setLatestPosts(res[0].data);
-        setLatestComments(res[1].data);
-        setLatestLikes(res[2].data);
-      })
+    axios
+      .all([user, comment, post, postLatest, commentLatest, likeLatest])
+      .then(
+        axios.spread(
+          (
+            userResponse,
+            commentResponse,
+            PostResponse,
+            latestPostResponse,
+            latestCommentResponse,
+            latestLikeResponse
+          ) => {
+            setUserInfo((info) => ({
+              ...info,
+              valid: userResponse.data.valid,
+              new: userResponse.data.new,
+            }));
+            setCommentInfo(commentResponse.data);
+            setPostInfo(PostResponse.data);
+            setLatestPosts(latestPostResponse.data);
+            setLatestComments(latestCommentResponse.data);
+            setLatestLikes(latestLikeResponse.data);
+          }
+        )
+      )
       .finally(() => {
-        setIsListLoading(false);
+        setIsLoading(false);
       });
   }, []);
 
@@ -155,7 +151,7 @@ export default function Dashboard() {
     () =>
       setUserInfo((info) => ({
         ...info,
-        online: Math.max(Object.keys(onlineUser).length - 1, 0), // exclude admin user
+        online: Math.max(Object.keys(onlineUser).length - 1, 0), // exclude the admin user
       })),
     [onlineUser]
   );
@@ -163,12 +159,11 @@ export default function Dashboard() {
   return (
     <div style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }}>
       {message.loading({
+        // This component will produce a warning: Cannot update during an existing state transition (such as within `render`)
         key: "loading",
         content: "Loading...",
         duration: 0,
-        style: {
-          display: isCardLoading || isListLoading ? "block" : "none",
-        },
+        style: { display: isLoading === true ? "block" : "none" },
       })}
       <Card style={{ backgroundColor: "rgb(0, 0 , 0, 0.0)" }} bordered={false}>
         <Row gutter={[16, 16]}>
