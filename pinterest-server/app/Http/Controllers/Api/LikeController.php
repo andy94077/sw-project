@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Like;
+use App\Models\Post;
 
 class LikeController extends BaseController
 {
@@ -47,16 +48,25 @@ class LikeController extends BaseController
             $like->post_id = $request['post_id'];
             $like->save();
         }
+        $post = Post::find($request['post_id']);
+        $post->like ++;
+        $post->save();
         return response()->json($like);
     }
 
     public function destroy($id){
         $like = Like::find($id)->delete();
+        $post = Post::find($like->post_id);
+        $post->like --;
+        $post->save();
         return response()->json($like);
     }
 
     public function update($id){
         $like = Like::withTrashed()->find($id)->restore();
+        $post = Post::find($like->post_id);
+        $post->like ++;
+        $post->save();
         return response()->json($like);
     }
 

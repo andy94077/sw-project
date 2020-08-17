@@ -16,7 +16,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function PhotoGrid(props) {
-  const { tag, userId, number = 120, showError = true } = props;
+  const {
+    tag,
+    userId,
+    number = 120,
+    showError = true,
+    order = { order: "id", asc: false },
+  } = props;
   const classes = useStyles();
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState({ message: "", url: "" });
@@ -31,7 +37,13 @@ export default function PhotoGrid(props) {
         : CONCAT_SERVER_URL("/api/v1/post/picture");
     axios
       .get(url, {
-        params: { user_id: userId, number, tag },
+        params: {
+          user_id: userId,
+          number,
+          tag,
+          order: order.order,
+          sequence: order.sequence,
+        },
       })
       .then((res) => {
         if (
@@ -55,7 +67,7 @@ export default function PhotoGrid(props) {
         }
       })
       .finally(() => setIsReady(true));
-  }, [tag, number, userId, showError]);
+  }, [tag, number, userId, showError, order]);
 
   if (isReady) {
     if (error.message !== "") {
