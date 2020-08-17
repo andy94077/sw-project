@@ -10,9 +10,12 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    minWidth: "350px",
+    minWidth: "275px",
     maxWidth: "600px",
     zIndex: "2000",
+    [theme.breakpoints.up("md")]: {
+      minWidth: "400px",
+    },
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
