@@ -216,4 +216,10 @@ class UserController extends BaseController
         $user->save();
         return response()->json($user);
     }
+
+    public function getIntro(Request $request){
+        $user = User::find($request['user_id']);
+        $res['intro'] = $user->intro;
+        return response()->json($res);
+    }
 }

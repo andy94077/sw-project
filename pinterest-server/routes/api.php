@@ -51,6 +51,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('posts', 'PostController');
 
+    Route::post('users/intro', 'UserController@setIntro');
+    Route::get('users/intro', 'UserController@getIntro');
     Route::get('users/info', 'UserController@getUserInfo');
     Route::delete('/user/admin', 'UserController@adminDelete');
     Route::post('/user/admin', 'UserController@adminRecover');
