@@ -96,4 +96,25 @@ class FollowController extends BaseController
         $res['followings'] = Follow::where('follower_id', $request['user_id'])->count();
         return response()->json($res);
     }
+
+    public function getFollowing(Request $request){
+        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
+        return response()->json($followings);
+    }
+
+    public function getFollower(Request $request){
+        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
+        return response()->json($followings);
+    }
+
+    public function getFollowingAdmin(Request $request){
+        echo "hi";
+        $followings = Follow::withTrashed()->LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.*')->get();
+        return response()->json($followings);
+    }
+
+    public function getFollowerAdmin(Request $request){
+        $followings = Follow::withTrashed()->LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $request['user_id'])->select('users.*')->get();
+        return response()->json($followings);
+    }
 }
