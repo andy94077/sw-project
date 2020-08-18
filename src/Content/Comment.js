@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: "20px",
     fontSize: "20px",
     alignItems: "center",
-    padding: "0 0.5em",
+    padding: "3px 0.5em 0 0.5em",
     minHeight: "36px",
     lineHeight: "25px",
     "&:focus": {
@@ -49,7 +49,7 @@ const useStyles = makeStyles(() => ({
 export default function Comment(props) {
   const classes = useStyles();
   const [value, setValue] = useState("");
-  const { author, isBucket, id, setError } = props;
+  const { author, isBucket, id } = props;
   const [comments, setComments] = useState([]);
   const { username, userId } = useSelector(selectUser);
   const [isUpload, setIsUpload] = useState(false);
@@ -90,10 +90,13 @@ export default function Comment(props) {
         })
         .catch((e) => {
           if (e.message === "Network Error") {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
+            dispatch(
+              setDialog({
+                title: "Connection Error",
+                message:
+                  "Network failed. Please check the network cables, modem, and router.",
+              })
+            );
             setIsUpload(false);
           } else if (e.message === "Request failed with status code 404") {
             dispatch(

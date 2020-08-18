@@ -47,7 +47,7 @@ export default function SelfInformation(props) {
       .then((response) => {
         setIntro(response.data.intro);
       });
-  }, []);
+  }, [name]);
 
   const handleEditDialogOpen = () => {
     setIsEditDialogOpen(true);

@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton, Snackbar } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Content from "../Bar/Content";
+import Content from "./Content";
 
 const useStyles = makeStyles(() => ({
   bar: {
@@ -53,7 +53,7 @@ export default function AnnouncementGrid(props) {
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content text={[{ ...adMessage, id: 0 }]} check={null} />
+        <Content text={[{ ...adMessage, id: 0 }]} time={null} />
       </div>
     </Snackbar>
   );
