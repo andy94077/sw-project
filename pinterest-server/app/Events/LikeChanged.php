@@ -10,18 +10,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserChanged implements ShouldBroadcast
+class LikeChanged implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $id;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($id)
+    public function __construct()
     {
-        $this->id = $id;
+
     }
 
     /**
@@ -31,6 +31,6 @@ class UserChanged implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PresenceChannel('Online');
+        return new Channel('Dashboard');
     }
 }

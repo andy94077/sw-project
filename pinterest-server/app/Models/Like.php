@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\LikeChanged;
 
 class Like extends Model
 {
@@ -17,4 +18,10 @@ class Like extends Model
     {
         parent::boot();
     }
+
+    protected $dispatchesEvents = [
+        'saved' => LikeChanged::class,
+        'deleted' => LikeChanged::class,
+        'restored' => LikeChanged::class,
+    ];
 }

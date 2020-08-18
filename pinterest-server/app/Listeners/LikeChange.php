@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\UserChanged;
+use App\Events\LikeChanged;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class UserChange
+class LikeChange
 {
     /**
      * Create the event listener.
@@ -21,10 +21,10 @@ class UserChange
     /**
      * Handle the event.
      *
-     * @param  UserChanged  $event
+     * @param  LikeChanged  $event
      * @return void
      */
-    public function handle(UserChanged $event)
+    public function handle(LikeChanged $event)
     {
         //
     }

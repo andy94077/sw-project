@@ -18,6 +18,12 @@ const useStyles = makeStyles(() => ({
     borderRadius: "20px",
     fontSize: "20px",
     alignItems: "center",
+    padding: "0 0.5em",
+    minHeight: "36px",
+    lineHeight: "25px",
+    "&:focus": {
+      outline: 0,
+    },
   },
   comments: {
     overflow: "auto",
@@ -31,7 +37,12 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     margin: "5px",
     width: "80%",
-    height: "40px",
+    alignItems: "flex-end",
+  },
+  button: {
+    height: 36,
+    borderRadius: 10,
+    marginLeft: 3,
   },
 }));
 
@@ -110,11 +121,12 @@ export default function Comment(props) {
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    if (value !== "") upload();
+    if (/^\s+$/.test(value) === false) upload();
   };
 
   const handleEnter = (e) => {
-    if (e.key === "Enter" && value !== "") upload();
+    if (e.key === "Enter" && !e.shiftKey && /^\s+$/.test(value) === false)
+      upload();
   };
   return (
     <>
