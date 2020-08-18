@@ -30,8 +30,8 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\NotificationChanged' => [
             'App\Listeners\NotificationChange',
         ],
-        'App\Events\UserChanged' => [
-            'App\Listeners\UserChange',
+        'App\Events\LikeChanged' => [
+            'App\Listeners\LikeChange',
         ],
 
     ];

@@ -104,6 +104,17 @@ export default function Dashboard() {
         });
     });
 
+    window.Echo.channel("Dashboard").listen("LikeChanged", () => {
+      const timer = setTimeout(() => setIsLoading(true), 1000);
+      axios
+        .get(CONCAT_SERVER_URL("/api/v1/likes/latest"))
+        .then((res) => setLatestLikes(res.data))
+        .finally(() => {
+          clearTimeout(timer);
+          setIsLoading(false);
+        });
+    });
+
     return () => window.Echo.disconnect();
   }, []);
 

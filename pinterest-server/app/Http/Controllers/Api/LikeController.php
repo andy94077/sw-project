@@ -36,6 +36,7 @@ class LikeController extends BaseController
             return response()->json("user_id or post_id not found", 404);
         }
         $likes = Like::withTrashed()->where('user_id', $request['user_id'])->where('post_id', $request['post_id'])->get();
+
         if($likes->count() !== 0){
             $like = $likes[0];
             if($like->deleted_at !== null){
