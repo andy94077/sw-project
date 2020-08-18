@@ -92,4 +92,5 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     // for broadcasting
    Route::post('/broadcast/adPost', 'BroadcastController@adPost')->name('broadcast.adPost');
    Route::apiResource('notifications', 'NotificationController');
+   Route::resource('chatroom', 'ChatroomController');
 });
