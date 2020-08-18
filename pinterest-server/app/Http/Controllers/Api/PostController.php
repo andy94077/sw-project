@@ -30,21 +30,32 @@ function removeDirectory($path)
 
 class PostController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $post = DB::table('posts')->join('users', 'users.id', '=', 'posts.user_id')->select('posts.*', 'users.name as user_name')->orderBy('updated_at', 'DESC')->get();
-        return response()->json($post, 200);
+        if($request->has('tag'))
+            $query = Post::where('tag', $request['tag']);
+        else if($request->has('user_id'))
+            $query = Post::where('user_id', $request['user_id']);
+        else if(!$request->has('number')){
+            $posts = Post::all();
+            return response()->json($posts, 200);
+        }
+        else{
+            $posts = Post::all()->take($request['number']);
+            return response()->json($posts, 200);
+        }
+        if($request->has('number'))
+            $query = $query->limit($request['number']);
+        if($request->has('order'))
+            $query = $query->orderBy($request['order'], $request['sequence']);
+        $posts = $query->get();
+        return response()->json($posts, 200);
     }
 
     public function show($post)
     {
-        $draft = Post::withTrashed()->where('id', $post)->first();
-        $response = json_decode($draft, true);
-
-        $user = User::find($response['user_id']);
-        $response['user_name'] = ($user !== null) ? $user->name : 'Deleted User';
-        $post = Post::withTrashed()->find($post);
-        return response()->json($response, 200);
+        $post = Post::find($post);
+        return response()->json($post, 200);
     }
 
     public function getPictureFromTag(Request $request)
@@ -63,17 +74,6 @@ class PostController extends BaseController
         else
             $posts = Post::where('user_id', $request['user_id'])->select("id", "url")->get();
         return response()->json(["imageListWithId" => $posts]);
-    }
-
-    public function getPictureFromId(Request $request)
-    {
-        try{
-            $posts = Post::find($request['id']);
-            return response()->json($posts, 200);
-        }
-        catch(QueryException $e){
-            return $this->sendError($e);
-        }
     }
 
     public function uploadImage(Request $request)
