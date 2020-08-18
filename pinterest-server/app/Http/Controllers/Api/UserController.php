@@ -72,6 +72,8 @@ class UserController extends BaseController
                 'isValid' => true,
                 'bucket_time' => $userInfo->bucket_time,
                 'api_token' => $userInfo->api_token,
+                'followers' => $userInfo->followers,
+                'followings' => $userInfo->followings,
             ], 200);
         }
     }

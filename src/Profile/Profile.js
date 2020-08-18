@@ -17,6 +17,7 @@ import AvatarUpload from "./AvatarUpload";
 import { setDialog } from "../redux/dialogSlice";
 import "./Profile.css";
 import SelfInformation from "./SelfInformation";
+import FollowButton from "./FollowButton";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -106,7 +107,6 @@ export default function Profile(props) {
   } = props;
 
   const classes = useStyles();
-  const follow = [123, 456];
   const url = "localhost:3000";
 
   const [image, setImage] = useState("");
@@ -121,6 +121,7 @@ export default function Profile(props) {
   const [id, setId] = useState(0);
   const [avatarVisibility, setUploadVisibility] = useState(false);
   const { username, userId, userAvatar, bucketTime } = useSelector(selectUser);
+  const [follow, setFollow] = useState({ followers: 0, followings: 0 });
   const isBucket = checkBucket(bucketTime);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,31 +146,48 @@ export default function Profile(props) {
       .finally(() => setIsLoading(false));
   }, [name, isUpload, stableDispatch]);
 
-  useEffect(() => {
-    setIsReady("Loading");
+  async function refreshInfo() {
     const jsonData = { name };
-
+    const res = await axios.request({
+      method: "POST",
+      url: CONCAT_SERVER_URL("/api/v1/user/userExist"),
+      data: jsonData,
+    });
+    const userExist = res.data.isValid;
+    // Not existed user
+    if (userExist === false) {
+      setIsReady("NoUser");
+      return;
+    }
+    // My profile
+    if (username === name) {
+      setIsMyself(true);
+    }
+    setId(res.data.id);
     axios
-      .request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/user/userExist"),
-        data: jsonData,
+      .get(CONCAT_SERVER_URL("/api/v1/follows/info"), {
+        params: { user_id: res.data.id },
       })
-      .then((res) => {
-        const userExist = res.data.isValid;
-        // Not existed user
-        if (userExist === false) {
-          setIsReady("NoUser");
-          return;
-        }
-        // My profile
-        if (username === name) {
-          setIsMyself(true);
-        }
-        setId(res.data.id);
-        setIsReady("OK");
+      .then(({ data }) => {
+        setFollow({ followers: data.followers, followings: data.followings });
+      });
+  }
+
+  function refreshFollow() {
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/follows/info"), {
+        params: { user_id: id },
+      })
+      .then(({ data }) => {
+        setFollow({ followers: data.followers, followings: data.followings });
       })
       .catch(() => setIsReady("Error"));
+  }
+
+  useEffect(() => {
+    setIsReady("Loading");
+    refreshInfo().catch(() => setIsReady("Error"));
+    setIsReady("OK");
   }, [username, name]);
 
   const handleUploadImage = (event) => {
@@ -254,14 +272,7 @@ export default function Profile(props) {
   );
 
   const followButton = (
-    <Button
-      className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text}`}
-      variant="contained"
-      color="secondary"
-      component="span"
-    >
-      Follow
-    </Button>
+    <FollowButton id={id} userId={userId} refresh={refreshFollow} />
   );
 
   const onHide = () => {
@@ -333,7 +344,7 @@ export default function Profile(props) {
           </a>
           <SelfInformation />
           <span className={classes.bold}>
-            {follow[0]} followers · {follow[1]} following
+            {follow.followers} followers · {follow.followings} followings
           </span>
         </div>
 

@@ -19,7 +19,6 @@ class BucketMiddleware
     {
         $user = User::find($request['user_id']);
         $now = new DateTime("now");
-        echo $user;
         if($user->bucket_time && $now < new DateTime($user['bucket_time']))
             return response()->json("In Bucket", 403);
         return $next($request);

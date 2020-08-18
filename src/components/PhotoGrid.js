@@ -27,7 +27,6 @@ export default function PhotoGrid(props) {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState({ message: "", url: "" });
   const [imageListWithid, setImageListWithId] = useState([]);
-
   useEffect(() => {
     setIsReady(false);
     setError({ message: "", url: "" });
@@ -49,9 +48,10 @@ export default function PhotoGrid(props) {
         if (
           res.data.imageListWithId instanceof Array &&
           res.data.imageListWithId.length > 0
-        )
+        ) {
           setImageListWithId(res.data.imageListWithId);
-        else {
+          setError({ message: "", url: "" });
+        } else {
           setError({
             message: "No Image Found",
             url: "/pictures/no-image-found.png",

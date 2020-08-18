@@ -55,7 +55,6 @@ class LikeController extends BaseController
     }
 
     public function destroy($id){
-        echo $id;
         $like = Like::find($id);
         $post = Post::find($like->post_id);
         $post->like --;
