@@ -11,7 +11,6 @@ import {
 import CardActions from "@material-ui/core/CardActions";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-import ErrorMsg from "../components/ErrorMsg";
 import "./Content.css";
 import Like from "./Like";
 import Comment from "./Comment";
@@ -115,12 +114,9 @@ const useStyles = makeStyles((theme) => ({
 export default function ContentCard(props) {
   const { src, id, author, content, refresh, timeAgo, isBucket } = props;
   const classes = useStyles();
-  const [error, setError] = useState({ message: "", url: "" });
   const [expand, setExpand] = useState(true);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
-  if (error.message !== "") {
-    return <ErrorMsg message={error.message} imgUrl={error.url} />;
-  }
+
   return (
     <Card className={classes.root}>
       <CardMedia
@@ -140,7 +136,6 @@ export default function ContentCard(props) {
             timeAgo={timeAgo}
             content={content}
             id={id}
-            setError={setError}
             refresh={refresh}
           />
         </CardContent>
@@ -167,12 +162,7 @@ export default function ContentCard(props) {
             wrapperInner: classes.wrapperInner,
           }}
         >
-          <Comment
-            author={author}
-            isBucket={isBucket}
-            id={id}
-            setError={setError}
-          />
+          <Comment author={author} isBucket={isBucket} id={id} />
         </Collapse>
       </div>
     </Card>

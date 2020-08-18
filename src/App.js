@@ -127,7 +127,7 @@ export default function App() {
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [user.userId]);
 
   if (isReady) {
     if (error.message !== "") {

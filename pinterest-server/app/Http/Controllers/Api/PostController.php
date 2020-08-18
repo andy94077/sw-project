@@ -96,7 +96,7 @@ class PostController extends BaseController
     {
         $post = new Post();
         $post->url = $request['url'];
-        $post->user_id = $request['user_id'];
+        $post->user_id = intval($request['user_id']);
         $post->username = $request['username'];
         $post->content = $request['content'];
         $post->tag = $request['tag'];

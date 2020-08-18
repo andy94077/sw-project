@@ -52,7 +52,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function Post(props) {
-  const { author, timeAgo, content, id, setError, refresh } = props;
+  const { author, timeAgo, content, id, refresh } = props;
   const classes = useStyles();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -75,7 +75,7 @@ export default function Post(props) {
         setPostUserAvatar(CONCAT_SERVER_URL(`${response.data}`));
       })
       .finally();
-  }, []);
+  }, [author]);
 
   const handleClick = (event) => {
     setMenu(event.currentTarget);
@@ -132,10 +132,13 @@ export default function Post(props) {
           refresh();
         })
         .catch(() => {
-          setError({
-            message: "Connection Error",
-            url: "/pictures/connection-error.svg",
-          });
+          dispatch(
+            setDialog({
+              title: "Connection Error",
+              message:
+                "Network failed. Please check the network cables, modem, and router.",
+            })
+          );
         })
         .finally(() => {
           setOnEdit(0);
