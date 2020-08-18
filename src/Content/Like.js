@@ -12,10 +12,16 @@ import { selectUser } from "../redux/userSlice";
 import ErrorMsg from "../components/ErrorMsg";
 
 const useStyles = makeStyles(() => ({
+  none: {},
   red: {
     color: "red",
   },
-  none: {},
+  likeButton: {
+    outline: 0,
+    "&:focus": {
+      outline: 0,
+    },
+  },
   cardActions: {
     padding: "0px",
   },
@@ -136,8 +142,8 @@ export default function Like(props) {
       setError({ message: "", url: "" });
       Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
         params: {
-          user_id: userId,
-          post_id: id,
+          user_id: Number(userId),
+          post_id: Number(id),
         },
       })
         .then((res) => {
@@ -198,8 +204,8 @@ export default function Like(props) {
       }
     } else {
       Axios.post(CONCAT_SERVER_URL("/api/v1/likes"), {
-        user_id: userId,
-        post_id: id,
+        user_id: Number(userId),
+        post_id: Number(id),
       })
         .then((res) => {
           setLikeInfo({
@@ -208,7 +214,8 @@ export default function Like(props) {
           });
           refreshLikeCount();
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err);
           setError({
             message: "Connection Error",
             url: "/pictures/connection-error.svg",
@@ -222,7 +229,7 @@ export default function Like(props) {
   return (
     <>
       {userId ? (
-        <IconButton onClick={handleLike}>
+        <IconButton className={classes.likeButton} onClick={handleLike}>
           <FavoriteIcon
             className={clsx(classes.none, {
               [classes.red]: likeInfo.red,
