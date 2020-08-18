@@ -55,18 +55,21 @@ class LikeController extends BaseController
     }
 
     public function destroy($id){
-        $like = Like::find($id)->delete();
+        echo $id;
+        $like = Like::find($id);
         $post = Post::find($like->post_id);
         $post->like --;
         $post->save();
+        $like->delete();
         return response()->json($like);
     }
 
     public function update($id){
-        $like = Like::withTrashed()->find($id)->restore();
+        $like = Like::withTrashed()->find($id);
         $post = Post::find($like->post_id);
         $post->like ++;
         $post->save();
+        $like->restore();
         return response()->json($like);
     }
 

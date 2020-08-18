@@ -21,7 +21,7 @@ export default function PhotoGrid(props) {
     userId,
     number = 120,
     showError = true,
-    order = { order: "id", sequence: "desc" },
+    order = { order: "id", sequence: "asc" },
   } = props;
   const classes = useStyles();
   const [isReady, setIsReady] = useState(false);
