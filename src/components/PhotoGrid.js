@@ -32,8 +32,8 @@ export default function PhotoGrid(props) {
     setError({ message: "", url: "" });
     const url =
       userId !== undefined && userId !== null
-        ? CONCAT_SERVER_URL("/api/v1/post/user")
-        : CONCAT_SERVER_URL("/api/v1/post/picture");
+        ? CONCAT_SERVER_URL("/api/v1/posts")
+        : CONCAT_SERVER_URL("/api/v1/posts");
     axios
       .get(url, {
         params: {
@@ -45,11 +45,8 @@ export default function PhotoGrid(props) {
         },
       })
       .then((res) => {
-        if (
-          res.data.imageListWithId instanceof Array &&
-          res.data.imageListWithId.length > 0
-        ) {
-          setImageListWithId(res.data.imageListWithId);
+        if (res.data instanceof Array && res.data.length > 0) {
+          setImageListWithId(res.data);
           setError({ message: "", url: "" });
         } else {
           setError({

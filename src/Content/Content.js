@@ -52,9 +52,7 @@ export default function Content(props) {
   async function refresh() {
     setPageState("Loading");
     setError({ message: "", url: "" });
-    Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
-      params: { id: pictureId },
-    })
+    Axios.get(CONCAT_SERVER_URL(`/api/v1/posts/${pictureId}`))
       .then((res) => {
         if (res.data.length === 0) {
           throw new Error("Post not found");
