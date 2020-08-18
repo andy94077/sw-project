@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
 
-
+    Route::get('follows/followers/admin', 'FollowController@getFollowerAdmin');
+    Route::get('follows/followers', 'FollowController@getFollower');
+    Route::get('follows/followings/admin', 'FollowController@getFollowingAdmin');
+    Route::get('follows/followings', 'FollowController@getFollowing');
     Route::get('/follows/info', 'FollowController@getFollowInfo');
     Route::delete('/follows/user', 'FollowController@destroyByUser');
     Route::apiResource('follows', 'FollowController');

@@ -186,8 +186,11 @@ export default function Profile(props) {
 
   useEffect(() => {
     setIsReady("Loading");
-    refreshInfo().catch(() => setIsReady("Error"));
-    setIsReady("OK");
+    refreshInfo()
+      .catch(() => setIsReady("Error"))
+      .finally(() => {
+        setIsReady("OK");
+      });
   }, [username, name]);
 
   const handleUploadImage = (event) => {
