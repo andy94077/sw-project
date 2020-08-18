@@ -8,12 +8,12 @@ import {
   Popper,
 } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
+import ChatIcon from "@material-ui/icons/Chat";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
-import AnnouncementGrid from "../components/AnnouncementGrid";
+import AnnouncementGrid from "./AnnouncementGrid";
 
 import { selectUser } from "../redux/userSlice";
 import { setCookie } from "../cookieHelper";
@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
   rounded: {
     width: "32px",
     borderRadius: "16px",
+  },
+  iconLight: {
+    color: "#fff8e5",
   },
   sectionDesktop: {
     display: "none",
@@ -38,10 +41,12 @@ export default function DesktopMenu(props) {
     adMessage,
     contentTime,
     contentText,
+    contentType,
     handleSetContent,
     isAdOpen,
     setIsAdOpen,
     notesCount,
+    setContentType,
     setNotesCount,
   } = props;
 
@@ -56,6 +61,7 @@ export default function DesktopMenu(props) {
   }
 
   const handleContentClickAway = () => {
+    setContentType("");
     setContentAnchorEl(null);
   };
 
@@ -67,11 +73,15 @@ export default function DesktopMenu(props) {
   };
 
   const handleContentOpen = (text) => (event) => {
-    // Close itself:
     if (contentAnchorEl === event.currentTarget) {
+      // Close itself:
       handleContentClose(text);
       handleContentClickAway();
     } else {
+      if (contentAnchorEl !== null) {
+        // Switch from another:
+        handleContentClose(text === "chat" ? "notes" : "chat");
+      }
       handleSetContent(text);
       setContentAnchorEl(event.currentTarget);
     }
@@ -94,13 +104,13 @@ export default function DesktopMenu(props) {
       <ClickAwayListener onClickAway={handleContentClickAway}>
         <div style={{ display: "flex" }}>
           {username === null ? null : (
-            <IconButton
-              onClick={handleContentOpen("mails")}
-              color="inherit"
-              component="span"
-            >
+            <IconButton onClick={handleContentOpen("chat")} component="span">
               <Badge badgeContent={0} color="secondary">
-                <MailIcon />
+                <ChatIcon
+                  style={{
+                    color: contentType === "chat" ? "#5ace5a" : "white",
+                  }}
+                />
               </Badge>
             </IconButton>
           )}
@@ -111,7 +121,11 @@ export default function DesktopMenu(props) {
               component="span"
             >
               <Badge badgeContent={notesCount} color="secondary">
-                <NotificationsIcon />
+                <NotificationsIcon
+                  style={{
+                    color: contentType === "notes" ? "ffde4c" : "white",
+                  }}
+                />
               </Badge>
             </IconButton>
           )}

@@ -89,6 +89,8 @@ export default function Bar() {
 
   const [contentText, setContentText] = useState([{ id: 1 }]);
   const [contentTime, setContentTime] = useState(null);
+  const [contentType, setContentType] = useState("");
+  const [mobileContentType, setMobileContentType] = useState("");
 
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
@@ -174,7 +176,9 @@ export default function Bar() {
   }, [userId]);
 
   useEffect(() => {
-    setContentText(notes);
+    if (contentType === "notes") {
+      setContentText(notes);
+    }
     const notesTime = getCookie(`notesTime${userId}`);
     const nc = notes.filter((note) => note.created_at > notesTime).length;
     setNotesCount(nc);
@@ -184,16 +188,16 @@ export default function Bar() {
   }, [notes, userId]);
 
   // Static contents
-  const mails = [
+  const chat = [
     {
       id: 1,
-      header: "Mail 1",
+      header: "Chat 1",
       secondary: "from Andy Chen",
       content: "How are you?",
     },
     {
       id: 2,
-      header: "Mail 2",
+      header: "Chat 2",
       secondary: "from Jason Hung",
       content: "How do you do?",
     },
@@ -201,9 +205,12 @@ export default function Bar() {
 
   // Toggle functions
   const handleSetContent = (text) => {
-    // mails not implemented yet.
-    if (text === "mails") {
-      setContentText(mails);
+    setContentType(text);
+    setMobileContentType(text);
+
+    // chat not implemented yet.
+    if (text === "chat") {
+      setContentText(chat);
       setContentTime(9999999999999);
     } else {
       setNotesCount(0);
@@ -251,9 +258,11 @@ export default function Bar() {
             adMessage={adMessage}
             contentTime={contentTime}
             contentText={contentText}
+            contentType={contentType}
             handleSetContent={handleSetContent}
             isAdOpen={isAdOpen}
             notesCount={notesCount}
+            setContentType={setContentType}
             setIsAdOpen={setIsAdOpen}
             setNotesCount={setNotesCount}
           />
@@ -263,8 +272,10 @@ export default function Bar() {
             contentText={contentText}
             handleSetContent={handleSetContent}
             isAdOpen={isAdOpen}
+            mobileContentType={mobileContentType}
             notesCount={notesCount}
             setIsAdOpen={setIsAdOpen}
+            setMobileContentType={setMobileContentType}
             setNotesCount={setNotesCount}
           />
         </Toolbar>
