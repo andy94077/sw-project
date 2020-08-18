@@ -373,37 +373,35 @@ export default function Post() {
     },
   ];
 
-  const searchFields = Object.keys(columnObj).map((key) =>
-    columnObj[key] instanceof Array ? (
-      <DatePicker.RangePicker
-        key={key}
-        placeholder={["Search", columnTitle[key]]}
-        allowEmpty={[true, true]}
-        value={searchText[key]}
-        onChange={handleSearchDateChange(key)}
-        showTime
-        style={{
-          width: 250,
-          margin: 8,
-          borderRadius: "15px",
-        }}
-      />
-    ) : (
-      <Input
-        key={key}
-        placeholder={`Search ${columnTitle[key]}`}
-        value={searchText[key]}
-        onChange={handleSetSearchText(key)}
-        onPressEnter={handleSearch}
-        style={{ width: 188, margin: 8, borderRadius: 15 }}
-      />
-    )
-  );
-
   return (
     <div>
       <div style={{ padding: 8 }}>
-        {searchFields}
+        {Object.keys(columnObj).map((key) =>
+          columnObj[key] instanceof Array ? (
+            <DatePicker.RangePicker
+              key={key}
+              placeholder={["Search", columnTitle[key]]}
+              allowEmpty={[true, true]}
+              value={searchText[key]}
+              onChange={handleSearchDateChange(key)}
+              showTime
+              style={{
+                width: 250,
+                margin: 8,
+                borderRadius: "15px",
+              }}
+            />
+          ) : (
+            <Input
+              key={key}
+              placeholder={`Search ${columnTitle[key]}`}
+              value={searchText[key]}
+              onChange={handleSetSearchText(key)}
+              onPressEnter={handleSearch}
+              style={{ width: 188, margin: 8, borderRadius: 15 }}
+            />
+          )
+        )}
         <Space style={{ margin: 8 }}>
           <Button
             onClick={handleReset}
