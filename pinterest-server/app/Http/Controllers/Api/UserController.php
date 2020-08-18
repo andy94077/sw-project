@@ -218,7 +218,7 @@ class UserController extends BaseController
     }
 
     public function getIntro(Request $request){
-        $user = User::find($request['user_id']);
+        $user = User::where('name', $request['name'])->first();
         $res['intro'] = $user->intro;
         return response()->json($res);
     }
