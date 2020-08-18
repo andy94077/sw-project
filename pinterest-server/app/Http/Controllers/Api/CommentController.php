@@ -28,15 +28,14 @@ class CommentController extends BaseController{
     public function upload(Request $request){
         try{
             if($request['user'] !== null && Post::find($request['post_id']) === null){
-                echo "fuck";
                 return response()->json("Post is deleted", 404);
             }
             DB::beginTransaction();
             $comment = Comment::create(
                 [
-                    'post_id' => $request['post_id'],
+                    'post_id' => intval($request['post_id']),
                     'content' => $request['content'],
-                    'user_id' => $request['user_id'],
+                    'user_id' => intval($request['user_id']),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]

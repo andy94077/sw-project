@@ -8,6 +8,7 @@ import { formatDistanceToNow, addHours, compareAsc } from "date-fns";
 import Axios from "axios";
 import PhotoGrid from "../components/PhotoGrid";
 import ContentCard from "./ContentCard";
+import ErrorMsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
 import ErrorGrid from "../components/ErrorGrid";
 import { CONCAT_SERVER_URL } from "../utils";
@@ -44,11 +45,13 @@ export default function Content(props) {
     timeAgo: "",
   });
   const [pageState, setPageState] = useState("Loading");
+  const [error, setError] = useState({ message: "", url: "" });
   const { bucketTime } = useSelector(selectUser);
 
   const isBucket = checkBucket(bucketTime);
   async function refresh() {
     setPageState("Loading");
+    setError({ message: "", url: "" });
     Axios.get(CONCAT_SERVER_URL("/api/v1/post/id"), {
       params: { id: pictureId },
     })
@@ -62,11 +65,15 @@ export default function Content(props) {
           content: res.data.content,
           timeAgo: formatDistanceToNow(new Date(res.data.created_at)),
         });
+        setError({ message: "", url: "" });
         setPageState("Done");
       })
       .catch((e) => {
         if (e.message === "Network Error") {
-          /// 彈出顯示連線失敗請重新整理
+          setError({
+            message: "Connection Error",
+            url: "/pictures/connection-error.svg",
+          });
         } else {
           setPageState("invalid");
         }
@@ -83,11 +90,13 @@ export default function Content(props) {
     refresh();
     return source.cancel();
   }, [pictureId]);
-  if (pageState === "Loading") {
-    return <Loading />;
-  }
+
   if (pageState === "invalid") {
     return <ErrorGrid mes="picture" />;
+  }
+
+  if (error.message !== "") {
+    return <ErrorMsg message={error.message} imgUrl={error.url} />;
   }
 
   if (pageState === "Done") {
@@ -112,5 +121,5 @@ export default function Content(props) {
       </>
     );
   }
-  return <>Wrong</>;
+  return <Loading />;
 }

@@ -5,11 +5,11 @@ import Axios from "axios";
 import { IconButton } from "@material-ui/core";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
-import ErrorMsg from "../components/ErrorMsg";
+import { setDialog } from "../redux/dialogSlice";
 
 const useStyles = makeStyles(() => ({
   none: {},
@@ -38,12 +38,11 @@ export default function Like(props) {
   });
   const [likeCount, setLikeCount] = useState({ sum: 0, likers: "" });
   const classes = useStyles();
-  const [error, setError] = useState({ message: "", url: "" });
   const { id } = props;
   const { userId } = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   function refreshLikeCount() {
-    setError({ message: "", url: "" });
     Axios.get(CONCAT_SERVER_URL("/api/v1/likes/sum"), {
       params: { post_id: id },
     })
@@ -130,20 +129,22 @@ export default function Like(props) {
         setLikeCount({ sum: res.data.sum, likers: likerString });
       })
       .catch(() => {
-        setError({
-          message: "Connection Error",
-          url: "/pictures/connection-error.svg",
-        });
+        dispatch(
+          setDialog({
+            title: "Connection Error",
+            message:
+              "Network failed. Please check the network cables, modem, and router.",
+          })
+        );
       });
   }
 
   const refreshLike = () => {
     if (userId) {
-      setError({ message: "", url: "" });
       Axios.get(CONCAT_SERVER_URL("/api/v1/likes"), {
         params: {
-          user_id: Number(userId),
-          post_id: Number(id),
+          user_id: userId,
+          post_id: id,
         },
       })
         .then((res) => {
@@ -155,10 +156,13 @@ export default function Like(props) {
           }
         })
         .catch(() => {
-          setError({
-            message: "Connection Error",
-            url: "/pictures/connection-error.svg",
-          });
+          dispatch(
+            setDialog({
+              title: "Connection Error",
+              message:
+                "Network failed. Please check the network cables, modem, and router.",
+            })
+          );
         });
     }
   };
@@ -169,7 +173,6 @@ export default function Like(props) {
   }, [id]);
 
   const handleLike = () => {
-    setError({ message: "", url: "" });
     if (likeInfo.id !== null) {
       if (likeInfo.red) {
         Axios.delete(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
@@ -181,10 +184,13 @@ export default function Like(props) {
             refreshLikeCount();
           })
           .catch(() => {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
+            dispatch(
+              setDialog({
+                title: "Connection Error",
+                message:
+                  "Network failed. Please check the network cables, modem, and router.",
+              })
+            );
           });
       } else {
         Axios.put(CONCAT_SERVER_URL(`/api/v1/likes/${likeInfo.id}`))
@@ -196,16 +202,19 @@ export default function Like(props) {
             refreshLikeCount();
           })
           .catch(() => {
-            setError({
-              message: "Connection Error",
-              url: "/pictures/connection-error.svg",
-            });
+            dispatch(
+              setDialog({
+                title: "Connection Error",
+                message:
+                  "Network failed. Please check the network cables, modem, and router.",
+              })
+            );
           });
       }
     } else {
       Axios.post(CONCAT_SERVER_URL("/api/v1/likes"), {
-        user_id: Number(userId),
-        post_id: Number(id),
+        user_id: userId,
+        post_id: id,
       })
         .then((res) => {
           setLikeInfo({
@@ -214,18 +223,18 @@ export default function Like(props) {
           });
           refreshLikeCount();
         })
-        .catch((err) => {
-          console.log(err);
-          setError({
-            message: "Connection Error",
-            url: "/pictures/connection-error.svg",
-          });
+        .catch(() => {
+          dispatch(
+            setDialog({
+              title: "Connection Error",
+              message:
+                "Network failed. Please check the network cables, modem, and router.",
+            })
+          );
         });
     }
   };
-  if (error.message !== "") {
-    return <ErrorMsg message={error.message} imgUrl={error.url} />;
-  }
+
   return (
     <>
       {userId ? (

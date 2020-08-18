@@ -11,13 +11,13 @@ use App\Models\Post;
 class LikeController extends BaseController
 {
     public function index(Request $request){
-        if($request['user_id'] != null && $request['post_id'] != null){
+        if($request['user_id'] !== null && $request['post_id'] !== null){
             $likes = Like::where('user_id', $request['user_id'])->where('post_id', $request['post_id'])->get();
         }
-        else if($request['user_id'] != null){
+        else if($request['user_id'] !== null){
             $likes = Like::where('user_id', $request['user_id'])->get();
         }
-        else if($request['post_id'] != null){
+        else if($request['post_id'] !== null){
             $likes = Like::where('post_id', $request['post_id'])->get();
         }
         else{
@@ -45,8 +45,8 @@ class LikeController extends BaseController
         }
         else{
             $like = new Like();
-            $like->user_id = $request['user_id'];
-            $like->post_id = $request['post_id'];
+            $like->user_id = intval($request['user_id']);
+            $like->post_id = intval($request['post_id']);
             $like->save();
         }
         $post = Post::find($request['post_id']);
