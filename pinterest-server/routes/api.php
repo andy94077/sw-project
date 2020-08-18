@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
 
+
+    Route::get('/follows/info', 'FollowController@getFollowInfo');
+    Route::delete('/follows/user', 'FollowController@destroyByUser');
+    Route::apiResource('follows', 'FollowController');
+
     Route::get('/likes/latest', 'LikeController@getLatest');
     Route::get('/likes/sum', 'LikeController@sum');
     Route::apiResource('likes', 'LikeController');
