@@ -3,13 +3,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
+import ChatIcon from "@material-ui/icons/Chat";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
-import AnnouncementGrid from "../components/AnnouncementGrid";
+import AnnouncementGrid from "./AnnouncementGrid";
 
 import { selectUser } from "../redux/userSlice";
 import { setCookie } from "../cookieHelper";
@@ -36,15 +36,16 @@ export default function MobileMenu(props) {
     contentText,
     handleSetContent,
     isAdOpen,
+    mobileContentType,
     notesCount,
     setIsAdOpen,
+    setMobileContentType,
     setNotesCount,
   } = props;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const [mobileContentType, setMobileContentType] = useState("");
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   // Toggle functions
@@ -65,13 +66,12 @@ export default function MobileMenu(props) {
     if (text === mobileContentType) {
       handleMobileContentClose(text);
     } else {
-      setMobileContentType(text);
       handleSetContent(text);
     }
   };
 
   const handleMobileMenuClose = () => {
-    setMobileContentType("");
+    handleMobileContentClose(mobileContentType);
     setMobileMoreAnchorEl(null);
   };
 
@@ -139,17 +139,21 @@ export default function MobileMenu(props) {
         style={{ zIndex: 500, top: "40px" }}
       >
         <MenuItem
-          onClick={handleMobileContentOpen("mails")}
+          onClick={handleMobileContentOpen("chat")}
           style={{ width: "325px" }}
         >
           <IconButton color="inherit" component="span">
             <Badge badgeContent={0} color="secondary">
-              <MailIcon />
+              <ChatIcon
+                style={{
+                  color: mobileContentType === "chat" ? "#5ace5a" : "black",
+                }}
+              />
             </Badge>
           </IconButton>
-          <p>Mails</p>
+          <p>Messages</p>
         </MenuItem>
-        {mobileContentType === "mails" && (
+        {mobileContentType === "chat" && (
           <MenuItem>
             <Content text={contentText} time={contentTime} />
           </MenuItem>
@@ -157,7 +161,11 @@ export default function MobileMenu(props) {
         <MenuItem onClick={handleMobileContentOpen("notes")}>
           <IconButton color="inherit" component="span">
             <Badge badgeContent={notesCount} color="secondary">
-              <NotificationsIcon />
+              <NotificationsIcon
+                style={{
+                  color: mobileContentType === "notes" ? "ffde4c" : "black",
+                }}
+              />
             </Badge>
           </IconButton>
           <p>Notifications</p>
