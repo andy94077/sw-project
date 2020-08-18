@@ -18,7 +18,7 @@ import {
   UndoOutlined,
 } from "@ant-design/icons";
 import { format } from "date-fns";
-import { CONCAT_SERVER_URL } from "../utils";
+import { CONCAT_SERVER_URL, CONCAT_FRONTOFFICE_URL } from "../utils";
 import Comment from "./Comment";
 
 export default function Post() {
@@ -152,13 +152,13 @@ export default function Post() {
     });
   };
 
-  const getLinkRenderProps = (dataIndex) => ({
+  const getLinkRenderProps = (dataIndex, linkFunc) => ({
     // for "url" & "username"
     render: (text) =>
       dataIndex === "url"
         ? [
             loading === false ? (
-              <a key={dataIndex} href={CONCAT_SERVER_URL(text)}>
+              <a key={dataIndex} href={linkFunc(text)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                   searchWords={[filter[dataIndex]]}
@@ -167,14 +167,14 @@ export default function Post() {
                 />
               </a>
             ) : (
-              <a key={dataIndex} href={CONCAT_SERVER_URL(text)}>
+              <a key={dataIndex} href={linkFunc(text)}>
                 {text}
               </a>
             ),
           ]
         : [
             loading === false ? (
-              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
+              <a key={dataIndex} href={linkFunc(`/profile/${text}`)}>
                 <Highlighter
                   highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
                   searchWords={[filter[dataIndex]]}
@@ -183,7 +183,7 @@ export default function Post() {
                 />
               </a>
             ) : (
-              <a key={dataIndex} href={CONCAT_SERVER_URL(`/profile/${text}`)}>
+              <a key={dataIndex} href={linkFunc(`/profile/${text}`)}>
                 {text}
               </a>
             ),
@@ -234,7 +234,7 @@ export default function Post() {
       title: "Post",
       dataIndex: "id",
       render: (id, row) => (
-        <a href={`http://localhost:3000/picture/${id}`}>
+        <a href={CONCAT_FRONTOFFICE_URL(`/picture/${id}`)}>
           <Avatar shape="square" src={CONCAT_SERVER_URL(row.url)} />
         </a>
       ),
@@ -246,7 +246,7 @@ export default function Post() {
       sorter: (a, b) => a.id - b.id,
     },
     {
-      ...getLinkRenderProps("url"),
+      ...getLinkRenderProps("url", CONCAT_SERVER_URL),
       title: "Position",
       dataIndex: "url",
       onCell: () => ({
@@ -262,7 +262,7 @@ export default function Post() {
       sorter: (a, b) => a.user_id - b.user_id,
     },
     {
-      ...getLinkRenderProps("username"),
+      ...getLinkRenderProps("username", CONCAT_FRONTOFFICE_URL),
       title: "Username",
       dataIndex: "username",
       sorter: (a, b) => a.username.localeCompare(b.username),

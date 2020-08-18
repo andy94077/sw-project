@@ -48,6 +48,7 @@ export default function App() {
             Authorization: `Bearer ${user.apiToken}`,
           },
         },
+        socketio: { pingTimeout: 30000 },
       });
       window.Echo.join("Online");
       window.Echo.channel("Notifications");
