@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 
 export default function RightDrawer(props) {
   const classes = useStyles();
-  const { open, toggleDrawer, button, avatar } = props;
+  const { open, toggleDrawer, avatar } = props;
   const { username } = useSelector(selectUser);
   const [modalShow, setModalShow] = useState(false);
 
@@ -90,36 +90,31 @@ export default function RightDrawer(props) {
     },
   ];
 
-  const menu = menuList.map((page) => (
-    <Link
-      to={page.link}
-      className={page.user ? null : classes.user}
-      key={page.label}
-      onClick={page.event}
-    >
-      <ListItem button>
-        <ListItemIcon>{page.icon}</ListItemIcon>
-        <ListItemText primary={page.label} />
-      </ListItem>
-    </Link>
-  ));
-
-  const list = () => (
-    <div
-      className={classes.list}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>{menu}</List>
-    </div>
-  );
-
   return (
     <div>
-      {button}
       <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-        {list()}
+        <div
+          className={classes.list}
+          role="presentation"
+          onClick={toggleDrawer(false)}
+          onKeyDown={toggleDrawer(false)}
+        >
+          <List>
+            {menuList.map((page) => (
+              <Link
+                to={page.link}
+                className={page.user ? null : classes.user}
+                key={page.label}
+                onClick={page.event}
+              >
+                <ListItem button>
+                  <ListItemIcon>{page.icon}</ListItemIcon>
+                  <ListItemText primary={page.label} />
+                </ListItem>
+              </Link>
+            ))}
+          </List>
+        </div>
       </Drawer>
       <LoginForm
         show={modalShow}

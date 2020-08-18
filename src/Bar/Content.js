@@ -34,17 +34,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Content(props) {
   const classes = useStyles();
-  const { text, check } = props;
+  const { text, time } = props;
 
   return (
     <div className={classes.root}>
       {text.map((value) => {
         const background =
-          check === null || check < value.created_at ? "#fff8e5" : "white";
+          time === null || time < value.created_at ? "#fff8e5" : "white";
 
         return (
           <Accordion
-            key={check + value.id}
+            key={time + value.id}
             defaultExpanded={background === "#fff8e5"}
             style={{
               margin: 0,

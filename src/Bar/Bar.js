@@ -84,24 +84,16 @@ export default function Bar() {
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, []);
 
-  const [contentAnchorEl, setContentAnchorEl] = useState(null);
+  const [adMessage, setAdMessage] = useState("");
+  const [isAdOpen, setIsAdOpen] = useState(false);
+
   const [contentText, setContentText] = useState([{ id: 1 }]);
-  const [contentCheck, setContentCheck] = useState(null);
+  const [contentTime, setContentTime] = useState(null);
 
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
 
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const [mobileContentType, setMobileContentType] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
-
-  const [isAdOpen, setIsAdOpen] = useState(false);
-  const [adMessage, setAdMessage] = useState("");
-
-  const isContentOpen = Boolean(contentAnchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   useEffect(() => {
     if (username !== null) {
@@ -183,8 +175,8 @@ export default function Bar() {
 
   useEffect(() => {
     setContentText(notes);
-    const notesCheck = getCookie(`notesCheck${userId}`);
-    const nc = notes.filter((note) => note.created_at > notesCheck).length;
+    const notesTime = getCookie(`notesTime${userId}`);
+    const nc = notes.filter((note) => note.created_at > notesTime).length;
     setNotesCount(nc);
     if (nc > 9) {
       setNotesCount("10+");
@@ -208,59 +200,18 @@ export default function Bar() {
   ];
 
   // Toggle functions
-  const handleMobileMenuClose = () => {
-    setMobileContentType("");
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
   const handleSetContent = (text) => {
     // mails not implemented yet.
     if (text === "mails") {
       setContentText(mails);
-      setContentCheck(9999999999999);
+      setContentTime(9999999999999);
     } else {
       setNotesCount(0);
       setContentText(notes);
-      setContentCheck(getCookie(`notesCheck${userId}`));
-      setCookie(`notesCheck${userId}`, Date.now(), 60);
+      setContentTime(getCookie(`notesTime${userId}`));
+      setCookie(`notesTime${userId}`, Date.now(), 60);
     }
   };
-
-  const handleContentClose = () => {
-    setContentAnchorEl(null);
-  };
-
-  const handleContentOpen = (text) => (event) => {
-    // Close itself:
-    if (contentAnchorEl === event.currentTarget) {
-      if (text === "notes") setNotesCount(0);
-      handleContentClose();
-    } else {
-      handleSetContent(text);
-      setContentAnchorEl(event.currentTarget);
-    }
-  };
-
-  const handleMobileContentClose = () => {
-    setMobileContentType("");
-  };
-
-  const handleMobileContentOpen = (text) => () => {
-    // Close itself:
-    if (text === mobileContentType) handleMobileContentClose();
-    else {
-      setMobileContentType(text);
-      handleSetContent(text);
-    }
-  };
-
-  function handleAdClose() {
-    setIsAdOpen(false);
-  }
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
@@ -268,17 +219,6 @@ export default function Bar() {
 
   const handleSetSearchValue = (event) => {
     setSearchValue(event.target.value);
-  };
-
-  const toggleDrawer = (isOpen) => (event) => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-
-    setDrawerOpen(isOpen);
   };
 
   // The bar
@@ -309,33 +249,23 @@ export default function Bar() {
           <div className={classes.grow} />
           <DesktopMenu
             adMessage={adMessage}
-            contentAnchorEl={contentAnchorEl}
-            contentCheck={contentCheck}
+            contentTime={contentTime}
             contentText={contentText}
-            drawerOpen={drawerOpen}
-            handleAdClose={handleAdClose}
-            handleContentClose={handleContentClose}
-            handleContentOpen={handleContentOpen}
+            handleSetContent={handleSetContent}
             isAdOpen={isAdOpen}
-            isContentOpen={isContentOpen}
             notesCount={notesCount}
-            toggleDrawer={toggleDrawer}
+            setIsAdOpen={setIsAdOpen}
+            setNotesCount={setNotesCount}
           />
           <MobileMenu
             adMessage={adMessage}
-            contentCheck={contentCheck}
+            contentTime={contentTime}
             contentText={contentText}
-            drawerOpen={drawerOpen}
-            handleAdClose={handleAdClose}
-            handleMobileContentOpen={handleMobileContentOpen}
-            handleMobileMenuClose={handleMobileMenuClose}
-            handleMobileMenuOpen={handleMobileMenuOpen}
+            handleSetContent={handleSetContent}
             isAdOpen={isAdOpen}
-            isMobileMenuOpen={isMobileMenuOpen}
-            mobileContentType={mobileContentType}
-            mobileMoreAnchorEl={mobileMoreAnchorEl}
             notesCount={notesCount}
-            toggleDrawer={toggleDrawer}
+            setIsAdOpen={setIsAdOpen}
+            setNotesCount={setNotesCount}
           />
         </Toolbar>
       </AppBar>

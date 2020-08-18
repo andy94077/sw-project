@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
@@ -12,6 +12,7 @@ import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "../components/AnnouncementGrid";
 
 import { selectUser } from "../redux/userSlice";
+import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   rounded: {
@@ -28,105 +29,87 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MobileMenu(props) {
   const classes = useStyles();
-  const { username, userAvatar } = useSelector(selectUser);
+  const { username, userId, userAvatar } = useSelector(selectUser);
   const {
     adMessage,
-    contentCheck,
+    contentTime,
     contentText,
-    drawerOpen,
-    handleAdClose,
-    handleMobileContentOpen,
-    handleMobileMenuClose,
-    handleMobileMenuOpen,
+    handleSetContent,
     isAdOpen,
-    isMobileMenuOpen,
-    mobileContentType,
-    mobileMoreAnchorEl,
     notesCount,
-    toggleDrawer,
+    setIsAdOpen,
+    setNotesCount,
   } = props;
 
-  // Toggled components
-  const renderAnnouncementGrid = (
-    <AnnouncementGrid
-      isAdOpen={isAdOpen}
-      handleAdClose={handleAdClose}
-      adMessage={adMessage}
-    />
-  );
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const renderMobileContent = (
-    <Content text={contentText} check={contentCheck} />
-  );
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [mobileContentType, setMobileContentType] = useState("");
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      className={classes.sectionMobile}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem
-        onClick={handleMobileContentOpen("mails")}
-        style={{ width: "320px" }}
-      >
-        <IconButton color="inherit" component="span">
-          <Badge badgeContent={0} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Mails</p>
-      </MenuItem>
-      {mobileContentType === "mails" && (
-        <MenuItem>{renderMobileContent}</MenuItem>
-      )}
-      <MenuItem onClick={handleMobileContentOpen("notes")}>
-        <IconButton color="inherit" component="span">
-          <Badge badgeContent={notesCount} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      {mobileContentType === "notes" && (
-        <MenuItem>{renderMobileContent}</MenuItem>
-      )}
-      <MenuItem onClick={toggleDrawer(true)}>
-        <IconButton color="inherit" component="span">
-          <img alt="Avatar" className={classes.rounded} src={userAvatar} />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
+  // Toggle functions
+  function handleAdClose() {
+    setIsAdOpen(false);
+  }
+
+  const handleMobileContentClose = (text) => {
+    if (text === "notes") {
+      setNotesCount(0);
+      setCookie(`notesTime${userId}`, Date.now(), 60);
+    }
+    setMobileContentType("");
+  };
+
+  const handleMobileContentOpen = (text) => () => {
+    // Close itself:
+    if (text === mobileContentType) {
+      handleMobileContentClose(text);
+    } else {
+      setMobileContentType(text);
+      handleSetContent(text);
+    }
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileContentType("");
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMobileMenuOpen = (event) => {
+    if (mobileMoreAnchorEl === event.currentTarget) handleMobileMenuClose();
+    else setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const toggleDrawer = (isOpen) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setDrawerOpen(isOpen);
+  };
 
   return (
     <div className={classes.sectionMobile}>
-      {username == null ? (
-        <RightDrawer
-          open={drawerOpen}
-          toggleDrawer={toggleDrawer}
-          button={
-            <IconButton
-              edge="end"
-              onClick={toggleDrawer(true)}
-              color="inherit"
-              component="span"
-            >
-              <AccountCircleIcon />
-            </IconButton>
-          }
-          avatar={userAvatar}
-        />
+      {username === null ? (
+        <div>
+          <IconButton
+            edge="end"
+            onClick={toggleDrawer(true)}
+            color="inherit"
+            component="span"
+          >
+            <AccountCircleIcon />
+          </IconButton>
+          {/* Drawer */}
+          <RightDrawer
+            open={drawerOpen}
+            toggleDrawer={toggleDrawer}
+            avatar={userAvatar}
+          />
+        </div>
       ) : (
         <IconButton
           onClick={handleMobileMenuOpen}
@@ -138,8 +121,71 @@ export default function MobileMenu(props) {
           </Badge>
         </IconButton>
       )}
-      {renderMobileMenu}
-      {renderAnnouncementGrid}
+      {/* Mobile Menu */}
+      <Menu
+        anchorEl={mobileMoreAnchorEl}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        className={classes.sectionMobile}
+        keepMounted
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={isMobileMenuOpen}
+        onClose={handleMobileMenuClose}
+        style={{ zIndex: 500, top: "40px" }}
+      >
+        <MenuItem
+          onClick={handleMobileContentOpen("mails")}
+          style={{ width: "325px" }}
+        >
+          <IconButton color="inherit" component="span">
+            <Badge badgeContent={0} color="secondary">
+              <MailIcon />
+            </Badge>
+          </IconButton>
+          <p>Mails</p>
+        </MenuItem>
+        {mobileContentType === "mails" && (
+          <MenuItem>
+            <Content text={contentText} time={contentTime} />
+          </MenuItem>
+        )}
+        <MenuItem onClick={handleMobileContentOpen("notes")}>
+          <IconButton color="inherit" component="span">
+            <Badge badgeContent={notesCount} color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <p>Notifications</p>
+        </MenuItem>
+        {mobileContentType === "notes" && (
+          <MenuItem>
+            <Content text={contentText} time={contentTime} />
+          </MenuItem>
+        )}
+        <MenuItem onClick={toggleDrawer(true)}>
+          <IconButton color="inherit" component="span">
+            <img alt="Avatar" className={classes.rounded} src={userAvatar} />
+          </IconButton>
+          <p>Profile</p>
+        </MenuItem>
+        {/* Drawer */}
+        <RightDrawer
+          open={drawerOpen}
+          toggleDrawer={toggleDrawer}
+          avatar={userAvatar}
+        />
+      </Menu>
+      {/* New notification */}
+      <AnnouncementGrid
+        isAdOpen={isAdOpen}
+        handleAdClose={handleAdClose}
+        adMessage={adMessage}
+      />
     </div>
   );
 }
