@@ -1,46 +1,27 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { GridListTileBar, makeStyles, Button } from "@material-ui/core";
-import EditIcon from "@material-ui/icons/Edit";
-import IconButton from "@material-ui/core/IconButton";
+import { makeStyles } from "@material-ui/core";
 import { addHours, compareAsc } from "date-fns";
 import Loading from "../components/Loading";
 import Errormsg from "../components/ErrorMsg";
 import ErrorGrid from "../components/ErrorGrid";
 import PhotoGrid from "../components/PhotoGrid";
-import Upload from "./Upload";
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
-import { setDialog } from "../redux/dialogSlice";
 import "./Profile.css";
-import SelfInformation from "./SelfInformation";
 import FollowButton from "./FollowButton";
+import UploadButton from "./UploadButton";
+import ProfileAvatar from "./ProfileAvatar";
+import ProfileInformation from "./ProfileInformation";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "relative",
-    width: "120px",
-    margin: "auto",
-    outline: "none",
-    borderRadius: "60px",
-  },
   jumpFrame: {
     height: "400px",
     width: "400px",
     borderRadius: "30px",
-  },
-  icon: {
-    position: "absolute",
-    right: "-23px",
-    bottom: "-10px",
-    color: "#eeeeee",
-  },
-  bar: {
-    height: "120px",
-    borderRadius: "60px",
   },
   central: {
     display: "block",
@@ -113,17 +94,13 @@ export default function Profile(props) {
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, []);
   const [isUpload, setIsUpload] = useState(false);
-  const [imageURL, setImageURL] = useState("");
-  const [modalShow, setModalShow] = useState(false);
   const [isReady, setIsReady] = useState("Loading");
   const [isMyself, setIsMyself] = useState(false);
   const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
-  const [avatarVisibility, setUploadVisibility] = useState(false);
-  const { username, userId, userAvatar, bucketTime } = useSelector(selectUser);
+  const { username, userId, bucketTime } = useSelector(selectUser);
   const [follow, setFollow] = useState({ followers: 0, followings: 0 });
   const isBucket = checkBucket(bucketTime);
-  const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -193,85 +170,10 @@ export default function Profile(props) {
       });
   }, [username, name]);
 
-  const handleUploadImage = (event) => {
-    if (image === event.target.value) {
-      return;
-    }
-    setModalShow(true);
-
-    const formData = new FormData();
-    formData.append("imageupload", event.target.files[0]);
-    formData.append("user_id", userId);
-
-    axios
-      .request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/profile/uploadImage"),
-        data: formData,
-      })
-      .then((res) => setImageURL(res.data.url))
-      .catch((e) => {
-        if (e.message === "Request failed with status code 403") {
-          dispatch(
-            setDialog({
-              title: "Bucket Error",
-              message: "You cannot send comment when you in the bucket",
-            })
-          );
-        } else {
-          setImageURL("Error");
-        }
-      });
-  };
-
-  const handleUploadCancel = () => {
-    setImage("");
-    setImageURL("");
-    setModalShow(false);
-
-    const formData = new FormData();
-    formData.append("canceledURL", imageURL);
-
-    if (imageURL !== "Error") {
-      axios.request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/profile/deleteImage"),
-        data: formData,
-      });
-      // No need to catch.
-    }
-  };
-
   const uploadButton = isBucket ? (
     <div className={classes.center}>In Bucket</div>
   ) : (
-    <div className={classes.center}>
-      <label htmlFor="contained-button-file">
-        <input
-          accept="image/*"
-          className={classes.input}
-          id="contained-button-file"
-          type="file"
-          onChange={handleUploadImage}
-          value={image}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          component="span"
-          className={`${classes.rounded} ${classes.text}`}
-        >
-          Upload
-        </Button>
-      </label>
-      <Upload
-        show={modalShow}
-        onHide={handleUploadCancel}
-        userId={userId}
-        username={name}
-        src={imageURL}
-      />
-    </div>
+    <UploadButton image={image} setImage={setImage} />
   );
 
   const followButton = (
@@ -282,80 +184,21 @@ export default function Profile(props) {
     setIsAvatarUpload(false);
   };
 
-  const handleAvatarUpload = () => {
-    setIsAvatarUpload(true);
-  };
-
-  const handleKeyUp = (e) => {
-    if (e.key === "Enter") {
-      handleAvatarUpload();
-    }
-  };
-
   if (isReady === "OK") {
     return (
       <div>
-        {/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
-        {isMyself ? (
-          <div
-            className={classes.root}
-            onMouseEnter={changeUploadVisibility}
-            onMouseLeave={changeUploadVisibility}
-            role="button"
-            tabIndex="0"
-            onClick={handleAvatarUpload}
-            onKeyUp={handleKeyUp}
-          >
-            {isLoading ? (
-              <div style={{ height: "120px" }}>
-                <Loading />
-              </div>
-            ) : (
-              <img
-                alt="Avatar"
-                className={`${classes.central} ${classes.rounded}`}
-                src={userAvatar}
-              />
-            )}
-            {avatarVisibility && (
-              <GridListTileBar
-                className={classes.bar}
-                title={image}
-                actionIcon={
-                  <IconButton
-                    aria-label={`info about ${image}`}
-                    className={classes.icon}
-                    disabled
-                  >
-                    <EditIcon />
-                  </IconButton>
-                }
-              />
-            )}
-          </div>
-        ) : (
-          <img
-            alt="Avatar"
-            className={`${classes.central} ${classes.rounded}`}
-            src={userAvatar}
-          />
-        )}
-        <h2 className={`${classes.center} ${classes.name}`}>{name}</h2>
-        <div className={`${classes.center} ${classes.text}`}>
-          <a className={`${classes.bold} ${classes.url}`} href={url}>
-            {url}
-          </a>
-          <SelfInformation name={name} />
-          <span className={classes.bold}>
-            {follow.followers} followers · {follow.followings} followings
-          </span>
-        </div>
-
+        <ProfileAvatar
+          isMyself={isMyself}
+          image={image}
+          isLoading={isLoading}
+          setIsAvatarUpload={setIsAvatarUpload}
+        />
+        <ProfileInformation name={name} url={url} follow={follow} />
         {username !== null && (isMyself ? uploadButton : followButton)}
-
         <div className={classes.central}>
           <PhotoGrid userId={id} />
         </div>
+
         <CustomModal
           show={isAvatarUpload}
           onHide={onHide}

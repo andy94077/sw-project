@@ -31,7 +31,7 @@ const usestyle = makeStyles(() => ({
   EditIcon: { height: "15px", width: "15px" },
 }));
 
-export default function SelfInformation(props) {
+export default function Introduction(props) {
   const { name } = props;
   const classes = usestyle();
   // Get intro from database
