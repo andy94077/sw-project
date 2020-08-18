@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   CardHeader,
@@ -6,9 +7,9 @@ import {
   Menu,
   MenuItem,
   makeStyles,
+  Avatar,
 } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import Axios from "axios";
 import { Redirect, Link } from "react-router-dom";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
@@ -23,12 +24,18 @@ const useStyles = makeStyles(() => ({
   cardHeader: {
     padding: 0,
   },
+  title: {
+    fontSize: "22px",
+  },
   action: {
     margin: 0,
   },
   subheader: {
     fontWeight: 500,
-    fontSize: "0.875em",
+    fontSize: "0.775em",
+  },
+  avatar: {
+    marginTop: "7px",
   },
   user: {
     flexGrow: "1",
@@ -38,6 +45,7 @@ const useStyles = makeStyles(() => ({
     width: "90%",
   },
   text: {
+    margin: "10px 0 0 10px",
     overflow: "auto",
     flexGrow: "1",
   },
@@ -54,6 +62,20 @@ export default function Post(props) {
   const [onDelete, setOnDelete] = useState(0);
   const [onEdit, setOnEdit] = useState(0);
   const dispatch = useDispatch();
+  const [postUserAvatar, setPostUserAvatar] = useState(null);
+
+  useEffect(() => {
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
+        data: { name: author },
+      })
+      .then((response) => {
+        setPostUserAvatar(CONCAT_SERVER_URL(`${response.data}`));
+      })
+      .finally();
+  }, []);
 
   const handleClick = (event) => {
     setMenu(event.currentTarget);
@@ -72,9 +94,10 @@ export default function Post(props) {
 
   const handleDelete = () => {
     setOnDelete(1);
-    Axios.delete(CONCAT_SERVER_URL("/api/v1/post"), {
-      data: { id },
-    })
+    axios
+      .delete(CONCAT_SERVER_URL("/api/v1/post"), {
+        data: { id },
+      })
       .then(() => {
         setOnDelete(2);
       })
@@ -97,12 +120,13 @@ export default function Post(props) {
   async function handleEdit() {
     if (onEdit === 0) {
       setOnEdit(1);
-      Axios.post(CONCAT_SERVER_URL("/api/v1/post/modification"), {
-        id,
-        content: newPost,
-        user: true,
-        user_id: userId,
-      })
+      axios
+        .post(CONCAT_SERVER_URL("/api/v1/post/modification"), {
+          id,
+          content: newPost,
+          user: true,
+          user_id: userId,
+        })
         .then(() => {
           setIsEditDialogOpen(false);
           refresh();
@@ -130,8 +154,17 @@ export default function Post(props) {
         classes={{
           root: classes.cardHeader,
           action: classes.action,
+          title: classes.title,
           subheader: classes.subheader,
+          avatar: classes.avatar,
         }}
+        avatar={
+          <Avatar
+            alt="Avatar"
+            src={postUserAvatar}
+            style={{ width: "50px", height: "50px" }}
+          />
+        }
         title={
           <Link to={`/profile/${author}`} className={classes.user}>
             {author}
