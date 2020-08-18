@@ -331,7 +331,7 @@ export default function Profile(props) {
           <a className={`${classes.bold} ${classes.url}`} href={url}>
             {url}
           </a>
-          <SelfInformation />
+          <SelfInformation name={name} />
           <span className={classes.bold}>
             {follow[0]} followers · {follow[1]} following
           </span>

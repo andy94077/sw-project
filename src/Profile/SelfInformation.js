@@ -31,17 +31,18 @@ const usestyle = makeStyles(() => ({
   EditIcon: { height: "15px", width: "15px" },
 }));
 
-export default function SelfInformation() {
+export default function SelfInformation(props) {
+  const { name } = props;
   const classes = usestyle();
   // Get intro from database
-  const { userId } = useSelector(selectUser);
+  const { username, userId } = useSelector(selectUser);
   const [intro, setIntro] = useState("Hi");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     axios
       .get(CONCAT_SERVER_URL("/api/v1/users/intro"), {
-        params: { user_id: userId },
+        params: { name },
       })
       .then((response) => {
         setIntro(response.data.intro);
@@ -80,13 +81,17 @@ export default function SelfInformation() {
             <div dangerouslySetInnerHTML={{ __html: intro }} />
           </span>
         </div>
-        <IconButton
-          component="span"
-          className={classes.Icon}
-          onClick={handleEditDialogOpen}
-        >
-          <EditIcon className={classes.EditIcon} />
-        </IconButton>
+        {name === username ? (
+          <IconButton
+            component="span"
+            className={classes.Icon}
+            onClick={handleEditDialogOpen}
+          >
+            <EditIcon className={classes.EditIcon} />
+          </IconButton>
+        ) : (
+          ""
+        )}
       </div>
       <AlertDialog
         open={isEditDialogOpen}
