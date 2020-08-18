@@ -93,8 +93,12 @@ export default function SelfInformation() {
         alertTitle="Edit Information"
         alertButton={
           <div style={{ marginRight: "15px" }}>
-            <Button onClick={handleEdit}>OK</Button>
-            <Button onClick={handleEditDialogClose}>Cancel</Button>
+            <Button component="span" onClick={handleEdit}>
+              OK
+            </Button>
+            <Button component="span" onClick={handleEditDialogClose}>
+              Cancel
+            </Button>
           </div>
         }
         onClose={handleEditDialogClose}

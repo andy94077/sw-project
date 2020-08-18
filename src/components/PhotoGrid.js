@@ -67,7 +67,7 @@ export default function PhotoGrid(props) {
         }
       })
       .finally(() => setIsReady(true));
-  }, [tag, number, userId, showError, order]);
+  }, [tag, number, userId, showError, order.order, order.sequence]);
 
   if (isReady) {
     if (error.message !== "") {
