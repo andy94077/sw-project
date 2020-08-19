@@ -4,9 +4,9 @@ import { GridListTileBar, makeStyles } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import IconButton from "@material-ui/core/IconButton";
 import { useSelector } from "react-redux";
-import { CONCAT_SERVER_URL } from "../utils";
-import Loading from "../components/Loading";
-import { selectUser } from "../redux/userSlice";
+import { CONCAT_SERVER_URL } from "../../utils";
+import Loading from "../../components/Loading";
+import { selectUser } from "../../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   root: {

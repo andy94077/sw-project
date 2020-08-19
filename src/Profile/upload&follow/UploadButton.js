@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles, Button } from "@material-ui/core";
 import axios from "axios";
-import { setDialog } from "../redux/dialogSlice";
-import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL } from "../utils";
+import { setDialog } from "../../redux/dialogSlice";
+import { selectUser } from "../../redux/userSlice";
+import { CONCAT_SERVER_URL } from "../../utils";
 import Upload from "./Upload";
-import "./Profile.css";
+import "../css/Profile.css";
 
 const useStyles = makeStyles(() => ({
   center: {

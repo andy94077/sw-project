@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button, makeStyles } from "@material-ui/core";
 import Axios from "axios";
-import { CONCAT_SERVER_URL } from "../utils";
-import ErrorMsg from "../components/ErrorMsg";
+import { CONCAT_SERVER_URL } from "../../utils";
+import ErrorMsg from "../../components/ErrorMsg";
 
 const useStyles = makeStyles((theme) => ({
   central: {

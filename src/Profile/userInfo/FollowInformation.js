@@ -6,18 +6,19 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import CustomModal from "../components/CustomModal";
+import CustomModal from "../../components/CustomModal";
+import "../css/FollowInformation.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.paper,
     height: "500px",
   },
+  followInformationCustomModal: {},
   jumpFrame: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "25px",
     textAlign: "center",
     margin: "auto",
     maxHeight: "600px",
@@ -26,6 +27,14 @@ const useStyles = makeStyles((theme) => ({
     [`@media (min-width: 500px)`]: {
       width: "420px",
     },
+  },
+  Tabs: {
+    height: "60px",
+  },
+  Tab: {
+    marginTop: "7px",
+    fontSize: "17px",
+    textAlign: "center",
   },
   bold: {
     color: "#111",
@@ -41,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     borderRadius: "0px",
     bottom: "0px",
-    height: "48px",
+    height: "40px",
     width: "100%",
   },
 }));
@@ -101,7 +110,7 @@ export default function FollowInformation(props) {
       <CustomModal
         show={show}
         onHide={handClose}
-        jumpFrame={classes.jumpFrame}
+        jumpFrame={`${classes.jumpFrame} ${classes.followInformationCustomModal}`}
         backdrop
       >
         <div className={classes.root}>
@@ -109,13 +118,23 @@ export default function FollowInformation(props) {
             <Tabs
               value={value}
               onChange={handleChange}
+              className={classes.Tabs}
               indicatorColor="primary"
               textColor="primary"
               variant="fullWidth"
-              aria-label="full width tabs example"
             >
-              <Tab component="span" label="followers" />
-              <Tab component="span" label="followings" />
+              <Tab
+                className={classes.Tab}
+                disableRipple
+                component="span"
+                label="followers"
+              />
+              <Tab
+                className={classes.Tab}
+                disableRipple
+                component="span"
+                label="followings"
+              />
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0} dir={theme.direction}>
