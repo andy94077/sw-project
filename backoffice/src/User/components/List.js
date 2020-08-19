@@ -193,7 +193,6 @@ export default function List(props) {
         },
       })
       .then((response) => {
-        console.log(response.data.data);
         if (response.data.data !== null) {
           if (response.data.length !== 0) {
             setData({

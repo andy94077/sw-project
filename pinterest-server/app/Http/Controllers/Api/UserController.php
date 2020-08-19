@@ -70,6 +70,7 @@ class UserController extends BaseController
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
                 'isValid' => true,
+                'avatar_url' => $userInfo->avatar_url,
                 'bucket_time' => $userInfo->bucket_time,
                 'api_token' => $userInfo->api_token,
                 'followers' => $userInfo->followers,

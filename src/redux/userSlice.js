@@ -8,7 +8,7 @@ export const userSlice = createSlice({
   initialState: {
     username: null,
     userId: null,
-    userAvatar: "/img/avatar.jpeg",
+    userAvatar: null,
     BucketTime: null,
     apiToken: null,
   },

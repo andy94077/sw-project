@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
 import Introduction from "./Introduction";
-import Follow from "./Follow";
+import FollowInformation from "./FollowInformation";
 
 const useStyles = makeStyles(() => ({
   center: {
@@ -39,7 +39,7 @@ export default function ProfileInformation(props) {
           {url}
         </a>
         <Introduction name={name} />
-        <Follow follow={follow} />
+        <FollowInformation follow={follow} />
       </div>
     </>
   );
