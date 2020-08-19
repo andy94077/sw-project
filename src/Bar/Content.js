@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Content(props) {
   const classes = useStyles();
-  const { text, time } = props;
+  const { text, type, time } = props;
 
   return (
     <div className={classes.root}>
@@ -53,7 +53,7 @@ export default function Content(props) {
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={type === "notes" && <ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
@@ -65,7 +65,10 @@ export default function Content(props) {
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <div dangerouslySetInnerHTML={{ __html: value.content }} />
+              {type === "chat" && <ExpandMoreIcon />}
+              {type === "notes" && (
+                <div dangerouslySetInnerHTML={{ __html: value.content }} />
+              )}
             </AccordionDetails>
           </Accordion>
         );

@@ -149,7 +149,7 @@ export default function DesktopMenu(props) {
             keepMounted
             open={isContentOpen}
           >
-            <Content text={contentText} time={contentTime} />
+            <Content text={contentText} type={contentType} time={contentTime} />
           </Popper>
           {/* New notification */}
           <AnnouncementGrid

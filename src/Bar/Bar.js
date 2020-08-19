@@ -95,10 +95,11 @@ export default function Bar() {
 
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
-  // Broadcast
+  // Broadcast & chat & notes
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
 
+    // Broadcast
     window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
       setIsAdOpen(true);
@@ -112,6 +113,7 @@ export default function Bar() {
       }, 10000);
     });
 
+    // notes
     const jsonData = {
       user_id: userId,
     };
