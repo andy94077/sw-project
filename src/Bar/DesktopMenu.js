@@ -56,9 +56,9 @@ export default function DesktopMenu(props) {
   const isContentOpen = Boolean(contentAnchorEl);
 
   // Toggle function
-  function handleAdClose() {
+  const handleAdClose = () => {
     setIsAdOpen(false);
-  }
+  };
 
   const handleContentClickAway = () => {
     setContentType("");

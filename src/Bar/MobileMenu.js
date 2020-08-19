@@ -50,9 +50,9 @@ export default function MobileMenu(props) {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   // Toggle functions
-  function handleAdClose() {
+  const handleAdClose = () => {
     setIsAdOpen(false);
-  }
+  };
 
   const handleMobileContentClose = (text) => {
     if (text === "notes") {

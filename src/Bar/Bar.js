@@ -6,7 +6,7 @@ import { fade, makeStyles } from "@material-ui/core/styles";
 import { AppBar, InputBase, Toolbar, Typography } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import { selectUser } from "../redux/userSlice";
@@ -90,6 +90,7 @@ export default function Bar() {
   const [contentType, setContentType] = useState("");
   const [mobileContentType, setMobileContentType] = useState("");
 
+  const [chat, setChat] = useState([]);
   const [notes, setNotes] = useState([]);
   const [notesCount, setNotesCount] = useState([]);
 
@@ -113,10 +114,47 @@ export default function Bar() {
       }, 10000);
     });
 
-    // notes
     const jsonData = {
       user_id: userId,
     };
+
+    // chat
+    const pullChat = () =>
+      axios
+        .request({
+          method: "GET",
+          url: CONCAT_SERVER_URL("/api/v1/chatroom"),
+          params: jsonData,
+        })
+        .then((res) =>
+          setChat(
+            res.data.map((item) => {
+              item.header = {
+                avatar_url: item.avatar_url,
+                username: item.username,
+              };
+              item.secondary = formatDistanceToNow(new Date(item.updated_at));
+              item.content = item.last_message;
+              item.created_at = format(new Date(item.updated_at), "T", {
+                timeZone: "Asia/Taipei",
+              });
+              return item;
+            })
+          )
+        )
+        .catch(() =>
+          setNotes([
+            {
+              id: 0,
+              header: "ERROR",
+              secondary: "SYSTEM",
+              content: "Connection error (chat)",
+            },
+          ])
+        );
+    pullChat();
+
+    // notes
     const pullNotes = () =>
       axios
         .request({
@@ -170,20 +208,20 @@ export default function Bar() {
   }, [notes, userId]);
 
   // Static contents
-  const chat = [
-    {
-      id: 1,
-      header: "Chat 1",
-      secondary: "from Andy Chen",
-      content: "How are you?",
-    },
-    {
-      id: 2,
-      header: "Chat 2",
-      secondary: "from Jason Hung",
-      content: "How do you do?",
-    },
-  ];
+  // const chat = [
+  //   {
+  //     id: 1,
+  //     header: "Chat 1",
+  //     secondary: "from Andy Chen",
+  //     content: "How are you?",
+  //   },
+  //   {
+  //     id: 2,
+  //     header: "Chat 2",
+  //     secondary: "from Jason Hung",
+  //     content: "How do you do?",
+  //   },
+  // ];
 
   // Toggle functions
   const handleSetContent = (text) => {
