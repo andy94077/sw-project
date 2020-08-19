@@ -44,3 +44,4 @@ pinterest-server/public
 ubuntu@172.31.34.200
 pinterest-server/laravel-echo-server.lock
 pinterest-server/dump.rdb
+dump.rdb
