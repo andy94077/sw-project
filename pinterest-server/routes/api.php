@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->prefix('v1')->group(function () {
 
-
+    Route::get('follows/followers/admin', 'FollowController@getFollowerAdmin');
+    Route::get('follows/followers', 'FollowController@getFollower');
+    Route::get('follows/followings/admin', 'FollowController@getFollowingAdmin');
+    Route::get('follows/followings', 'FollowController@getFollowing');
     Route::get('/follows/info', 'FollowController@getFollowInfo');
     Route::delete('/follows/user', 'FollowController@destroyByUser');
     Route::apiResource('follows', 'FollowController');
@@ -47,13 +50,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/posts/info', 'PostController@getPostInfo');
     Route::post('/post/recovery', 'PostController@recover');
     Route::get('/posts/admin', 'PostController@adminAll');
-    Route::get('/post/id', 'PostController@getPictureFromId');
     Route::delete('/image', 'PostController@deleteImage');
     Route::delete('/post', 'PostController@delete');
     Route::post('/post/modification', 'PostController@update')->middleware(['bucket']);
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
-    Route::get('/post/picture', 'PostController@getPictureFromTag')->name('post.getPictureFromTag');
-    Route::get('/post/user', 'PostController@getPictureFromUserId')->name('post.getPictureFromUserId');
     Route::apiResource('posts', 'PostController');
 
     Route::post('users/intro', 'UserController@setIntro');

@@ -10,7 +10,7 @@ import {
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-
+import { CONCAT_SERVER_URL } from "../utils";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 import AnnouncementGrid from "./AnnouncementGrid";
@@ -98,37 +98,50 @@ export default function DesktopMenu(props) {
     setDrawerOpen(isOpen);
   };
 
+  if (username === null) {
+    return (
+      <div className={classes.sectionDesktop}>
+        <IconButton
+          edge="end"
+          onClick={toggleDrawer(true)}
+          color="inherit"
+          component="span"
+        >
+          <AccountCircleIcon />
+        </IconButton>
+        {/* Drawer */}
+        <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
+      </div>
+    );
+  }
   return (
     // Three buttons
     <div className={classes.sectionDesktop}>
       <ClickAwayListener onClickAway={handleContentClickAway}>
         <div style={{ display: "flex" }}>
-          {username === null ? null : (
-            <IconButton onClick={handleContentOpen("chat")} component="span">
-              <Badge badgeContent={0} color="secondary">
-                <ChatIcon
-                  style={{
-                    color: contentType === "chat" ? "#5ace5a" : "white",
-                  }}
-                />
-              </Badge>
-            </IconButton>
-          )}
-          {username === null ? null : (
-            <IconButton
-              onClick={handleContentOpen("notes")}
-              color="inherit"
-              component="span"
-            >
-              <Badge badgeContent={notesCount} color="secondary">
-                <NotificationsIcon
-                  style={{
-                    color: contentType === "notes" ? "ffde4c" : "white",
-                  }}
-                />
-              </Badge>
-            </IconButton>
-          )}
+          <IconButton onClick={handleContentOpen("chat")} component="span">
+            <Badge badgeContent={0} color="secondary">
+              <ChatIcon
+                style={{
+                  color: contentType === "chat" ? "#5ace5a" : "white",
+                }}
+              />
+            </Badge>
+          </IconButton>
+
+          <IconButton
+            onClick={handleContentOpen("notes")}
+            color="inherit"
+            component="span"
+          >
+            <Badge badgeContent={notesCount} color="secondary">
+              <NotificationsIcon
+                style={{
+                  color: contentType === "notes" ? "ffde4c" : "white",
+                }}
+              />
+            </Badge>
+          </IconButton>
           {/* Notification content */}
           <Popper
             anchorEl={contentAnchorEl}
@@ -152,18 +165,14 @@ export default function DesktopMenu(props) {
         color="inherit"
         component="span"
       >
-        {username === null ? (
-          <AccountCircleIcon />
-        ) : (
-          <img alt="Avatar" className={classes.rounded} src={userAvatar} />
-        )}
+        <img
+          alt="Avatar"
+          className={classes.rounded}
+          src={CONCAT_SERVER_URL(userAvatar)}
+        />
       </IconButton>
       {/* Drawer */}
-      <RightDrawer
-        open={drawerOpen}
-        toggleDrawer={toggleDrawer}
-        avatar={userAvatar}
-      />
+      <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
     </div>
   );
 }

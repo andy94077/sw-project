@@ -6,6 +6,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import { CONCAT_SERVER_URL } from "../utils";
 
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
@@ -91,37 +92,34 @@ export default function MobileMenu(props) {
     setDrawerOpen(isOpen);
   };
 
-  return (
-    <div className={classes.sectionMobile}>
-      {username === null ? (
-        <div>
-          <IconButton
-            edge="end"
-            onClick={toggleDrawer(true)}
-            color="inherit"
-            component="span"
-          >
-            <AccountCircleIcon />
-          </IconButton>
-          {/* Drawer */}
-          <RightDrawer
-            open={drawerOpen}
-            toggleDrawer={toggleDrawer}
-            avatar={userAvatar}
-          />
-        </div>
-      ) : (
+  if (username === null) {
+    return (
+      <div className={classes.sectionMobile}>
         <IconButton
-          onClick={handleMobileMenuOpen}
+          edge="end"
+          onClick={toggleDrawer(true)}
           color="inherit"
           component="span"
         >
-          <Badge badgeContent={notesCount} color="secondary">
-            <MoreIcon />
-          </Badge>
+          <AccountCircleIcon />
         </IconButton>
-      )}
-      {/* Mobile Menu */}
+        {/* Drawer */}
+        <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
+      </div>
+    );
+  }
+  return (
+    <div className={classes.sectionMobile}>
+      <IconButton
+        onClick={handleMobileMenuOpen}
+        color="inherit"
+        component="span"
+      >
+        <Badge badgeContent={notesCount} color="secondary">
+          <MoreIcon />
+        </Badge>
+      </IconButton>
+
       <Menu
         anchorEl={mobileMoreAnchorEl}
         anchorOrigin={{
@@ -177,16 +175,16 @@ export default function MobileMenu(props) {
         )}
         <MenuItem onClick={toggleDrawer(true)}>
           <IconButton color="inherit" component="span">
-            <img alt="Avatar" className={classes.rounded} src={userAvatar} />
+            <img
+              alt="Avatar"
+              className={classes.rounded}
+              src={CONCAT_SERVER_URL(userAvatar)}
+            />
           </IconButton>
           <p>Profile</p>
         </MenuItem>
         {/* Drawer */}
-        <RightDrawer
-          open={drawerOpen}
-          toggleDrawer={toggleDrawer}
-          avatar={userAvatar}
-        />
+        <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
       </Menu>
       {/* New notification */}
       <AnnouncementGrid

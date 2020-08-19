@@ -35,7 +35,6 @@ export default function FollowButton(props) {
   });
   const [error, setError] = useState({ message: "", url: "" });
   const classes = useStyles();
-
   function refreshFollow() {
     setError({ message: "", url: "" });
     Axios.get(CONCAT_SERVER_URL("/api/v1/follows"), {

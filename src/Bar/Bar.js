@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import { fade, makeStyles } from "@material-ui/core/styles";
@@ -9,7 +9,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import { format } from "date-fns";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
-import { selectUser, setAvatar } from "../redux/userSlice";
+import { selectUser } from "../redux/userSlice";
 import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie, getCookie } from "../cookieHelper";
 
@@ -75,14 +75,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Bar() {
-  const { username, userId } = useSelector(selectUser);
+  const { userId } = useSelector(selectUser);
   const [, page, tag] = window.location.pathname.split("/");
 
   // Classes & States
   const classes = useStyles();
   const history = useHistory();
-  const dispatch = useDispatch();
-  const stableDispatch = useCallback(dispatch, []);
 
   const [adMessage, setAdMessage] = useState("");
   const [isAdOpen, setIsAdOpen] = useState(false);
@@ -96,24 +94,6 @@ export default function Bar() {
   const [notesCount, setNotesCount] = useState([]);
 
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
-
-  useEffect(() => {
-    if (username !== null) {
-      axios
-        .request({
-          method: "POST",
-          url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
-          data: { name: username },
-        })
-        .then((response) => {
-          stableDispatch(
-            setAvatar({
-              userAvatar: CONCAT_SERVER_URL(`${response.data}`),
-            })
-          );
-        });
-    }
-  }, [username, stableDispatch]);
 
   // Broadcast
   useEffect(() => {

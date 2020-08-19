@@ -234,7 +234,6 @@ export default function List(props) {
       })
       .catch((error) => {
         alert("There are some problems during loading");
-        console.log(error);
       })
       .finally(() => setIsLoading(false));
   }, [refresh, filter, tableColumns]);
