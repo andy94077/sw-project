@@ -113,16 +113,17 @@ export default function List(props) {
             },
             data: { id },
           })
-          .then(() =>
-            message.success(`Deleted successfully. (User id = ${id})`)
-          )
+          .then(() => {
+            message.success(`Deleted successfully. (User id = ${id})`);
+            setRefresh();
+          })
           .catch((err) => {
+            setIsLoading(false);
             message.destroy();
             if (err.response && err.response.status === 403)
               message.error("Permission denied.");
             else message.error(`Deleted failed. Please try again later.`);
-          })
-          .finally(setRefresh);
+          });
       },
     });
   };
@@ -146,16 +147,17 @@ export default function List(props) {
               },
             }
           )
-          .then(() =>
-            message.success(`Recovered successfully. (User id = ${id})`)
-          )
+          .then(() => {
+            message.success(`Recovered successfully. (User id = ${id})`);
+            setRefresh();
+          })
           .catch((err) => {
+            setIsLoading(false);
             message.destroy();
             if (err.response && err.response.status === 403)
               message.error("Permission denied.");
             else message.error(`Deleted failed. Please try again later.`);
-          })
-          .finally(setRefresh);
+          });
       },
     });
   };

@@ -48,10 +48,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::get('/posts/latest', 'PostController@getLatest');
     Route::get('/posts/info', 'PostController@getPostInfo');
-    Route::post('/post/recovery', 'PostController@recover');
+    Route::post('/post/recovery', 'PostController@recover')->middleware('BO_can:recover_post');
     Route::get('/posts/admin', 'PostController@adminAll');
     Route::delete('/image', 'PostController@deleteImage');
-    Route::delete('/post', 'PostController@delete');
+    Route::delete('/post', 'PostController@delete')->middleware('BO_can:delete_post');
     Route::post('/post/modification', 'PostController@update')->middleware(['bucket']);
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::apiResource('posts', 'PostController');

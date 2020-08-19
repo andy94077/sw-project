@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import {
   message,
   Avatar,
@@ -19,9 +20,11 @@ import {
 } from "@ant-design/icons";
 import { format } from "date-fns";
 import { CONCAT_SERVER_URL, CONCAT_FRONTOFFICE_URL } from "../utils";
+import { selectUser } from "../redux/userSlice";
 import Comment from "./Comment";
 
 export default function Post() {
+  const { apiToken } = useSelector(selectUser);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState([]);
   const columnTitle = {
@@ -60,6 +63,7 @@ export default function Post() {
   }, []);
 
   useEffect(() => {
+    if (apiToken === null) return;
     setMotion(false);
     setLoading(true);
 
@@ -67,6 +71,9 @@ export default function Post() {
       .request({
         method: "GET",
         url: CONCAT_SERVER_URL("/api/v1/posts/admin"),
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
         params: {
           ...filter,
           ...Object.fromEntries(
@@ -98,9 +105,14 @@ export default function Post() {
         );
         setTotal(res.data["total"]);
       })
-      .catch(() => message.error("Loading failed! (Connection error.)"))
+      .catch((err) => {
+        message.destroy();
+        if (err.response && err.response.status === 403)
+          message.error("Permission denied.");
+        else message.error("Loading failed! Please try again later.");
+      })
       .finally(() => setLoading(false));
-  }, [motion, filter]);
+  }, [motion, filter, apiToken]);
 
   const handleDeletePost = (event) => {
     const id = event.currentTarget.value;
@@ -116,13 +128,22 @@ export default function Post() {
           .request({
             method: "DELETE",
             url: CONCAT_SERVER_URL("/api/v1/post"),
+            headers: {
+              Authorization: `Bearer ${apiToken}`,
+            },
             data: jsonData,
           })
           .then(() => {
             setMotion(true);
             message.success(`Deleted successfully! (Post id = ${id})`);
           })
-          .catch(() => message.error("Deleted failed! (Connection error.)"));
+          .catch((err) => {
+            setLoading(false);
+            message.destroy();
+            if (err.response && err.response.status === 403)
+              message.error("Permission denied.");
+            else message.error(`Deleted failed. Please try again later.`);
+          });
       },
     });
   };
@@ -141,13 +162,22 @@ export default function Post() {
           .request({
             method: "POST",
             url: CONCAT_SERVER_URL("/api/v1/post/recovery"),
+            headers: {
+              Authorization: `Bearer ${apiToken}`,
+            },
             data: jsonData,
           })
           .then(() => {
             setMotion(true);
             message.success(`Recovered successfully! (Post id = ${id})`);
           })
-          .catch(() => message.error("Recovered failed! (Connection error.)"));
+          .catch((err) => {
+            setLoading(false);
+            message.destroy();
+            if (err.response && err.response.status === 403)
+              message.error("Permission denied.");
+            else message.error(`Deleted failed. Please try again later.`);
+          });
       },
     });
   };
