@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { GridListTileBar, makeStyles } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import IconButton from "@material-ui/core/IconButton";
 import { useSelector } from "react-redux";
+import { CONCAT_SERVER_URL } from "../utils";
 import Loading from "../components/Loading";
 import { selectUser } from "../redux/userSlice";
 
@@ -40,21 +42,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ProfileAvatar(props) {
-  const { isMyself, image, isLoading, setIsAvatarUpload } = props;
+  const { name, image, isLoading, setIsAvatarUpload } = props;
   const classes = useStyles();
-  const { userAvatar } = useSelector(selectUser);
+  const { username, userAvatar } = useSelector(selectUser);
   const [avatarVisibility, setUploadVisibility] = useState(false);
   const changeUploadVisibility = () => setUploadVisibility(!avatarVisibility);
   const handleAvatarUpload = () => {
     setIsAvatarUpload(true);
   };
+  const [postUserAvatar, setPostUserAvatar] = useState(null);
+
+  useEffect(() => {
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
+        data: { name },
+      })
+      .then((response) => {
+        setPostUserAvatar(CONCAT_SERVER_URL(`${response.data}`));
+      })
+      .finally();
+  }, [name]);
 
   const handleKeyUp = (e) => {
     if (e.key === "Enter") {
       handleAvatarUpload();
     }
   };
-  if (isMyself === true) {
+  if (username === name) {
     return (
       <div
         className={classes.root}
@@ -98,7 +114,7 @@ export default function ProfileAvatar(props) {
     <img
       alt="Avatar"
       className={`${classes.central} ${classes.rounded}`}
-      src={userAvatar}
+      src={postUserAvatar}
     />
   );
 }

@@ -108,19 +108,21 @@ export default function Profile(props) {
   });
 
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .request({
-        method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
-        data: { name },
-      })
-      .then((response) => {
-        stableDispatch(
-          setAvatar({ userAvatar: CONCAT_SERVER_URL(`${response.data}`) })
-        );
-      })
-      .finally(() => setIsLoading(false));
+    if (name === username) {
+      setIsLoading(true);
+      axios
+        .request({
+          method: "POST",
+          url: CONCAT_SERVER_URL("/api/v1/user/getUserAvatar"),
+          data: { name },
+        })
+        .then((response) => {
+          stableDispatch(
+            setAvatar({ userAvatar: CONCAT_SERVER_URL(`${response.data}`) })
+          );
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, [name, isUpload, stableDispatch]);
 
   async function refreshInfo() {
@@ -188,6 +190,7 @@ export default function Profile(props) {
     return (
       <div>
         <ProfileAvatar
+          name={name}
           isMyself={isMyself}
           image={image}
           isLoading={isLoading}

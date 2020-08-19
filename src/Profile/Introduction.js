@@ -8,7 +8,7 @@ import AlertDialog from "../components/AlertDialog";
 import MyQuill from "../components/MyQuill";
 import { CONCAT_SERVER_URL } from "../utils";
 
-const usestyle = makeStyles(() => ({
+const useStyle = makeStyles(() => ({
   outFrame: {
     display: "inline-block",
     maxHeight: "200px",
@@ -33,10 +33,10 @@ const usestyle = makeStyles(() => ({
 
 export default function Introduction(props) {
   const { name } = props;
-  const classes = usestyle();
+  const classes = useStyle();
   // Get intro from database
   const { username, userId } = useSelector(selectUser);
-  const [intro, setIntro] = useState("Hi");
+  const [intro, setIntro] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -67,7 +67,6 @@ export default function Introduction(props) {
       .then((response) => {
         setIntro(response.data.intro);
       })
-      .catch()
       .finally(() => {
         handleEditDialogClose();
       });
@@ -81,7 +80,7 @@ export default function Introduction(props) {
             <div dangerouslySetInnerHTML={{ __html: intro }} />
           </span>
         </div>
-        {name === username ? (
+        {name === username && (
           <IconButton
             component="span"
             className={classes.Icon}
@@ -89,8 +88,6 @@ export default function Introduction(props) {
           >
             <EditIcon className={classes.EditIcon} />
           </IconButton>
-        ) : (
-          ""
         )}
       </div>
       <AlertDialog
