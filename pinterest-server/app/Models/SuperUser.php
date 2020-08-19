@@ -8,11 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Traits\HasRoles;
 
 class SuperUser extends Authenticatable
 {
+    use HasRoles;
     use Notifiable;
-    protected $guard = 'super_user';
+    protected $guard = 'super_users';
     protected $table = 'super_users';
     use SoftDeletes;
 
@@ -57,5 +59,10 @@ class SuperUser extends Authenticatable
     public function super_users()
     {
         return $this->belongsTo('App\Models\SuperUser', 'user_id', 'id');
+    }
+
+    public function guardName()
+    {
+        return $this->guard;
     }
 }

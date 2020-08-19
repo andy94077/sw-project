@@ -15,6 +15,7 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
+        // admin is granted all permissions in app/Http/Providers/AuthServiceProvider.php
         Role::create(['guard_name' => 'super_users', 'name' => 'admin']);
         $blocker = Role::create(['guard_name' => 'super_users', 'name' => 'blocker']);
         $user_manager = Role::create(['guard_name' => 'super_users', 'name' => 'user_manager']);

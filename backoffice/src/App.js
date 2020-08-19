@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { Switch, Route, useLocation, useHistory } from "react-router-dom";
 
 import Post from "./Post/Post";
@@ -7,29 +8,27 @@ import User from "./User/User";
 import LoginPage from "./Login/LoginPage";
 import BOUser from "./BOUser/BOUser";
 import Dashboard from "./Dashboard/Dashboard";
+import Announcement from "./Announcement/Announcement";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 import Bar from "./Bar/Bar";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
 import { CONCAT_SERVER_URL } from "./utils";
-import Announcement from "./Announcement/Announcement";
+import { setUser, selectUser } from "./redux/userSlice";
 
 export default function App() {
-  const [user, setUser] = useState({
-    username: null,
-    userId: null,
-    apiToken: null,
-  });
   const [isReady, setIsReady] = useState(true);
   const [error, setError] = useState({ message: "", url: "" });
   const history = useHistory();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
 
   useEffect(() => {
     const accessToken = getCookie();
     setError({ message: "", url: "" });
-    setUser({ username: null, userId: null, apiToken: null });
+    dispatch(setUser({ username: null, userId: null, apiToken: null }));
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
@@ -38,11 +37,13 @@ export default function App() {
         })
         .then((res) => {
           if (res.data.isValid === true) {
-            setUser({
-              username: res.data.username,
-              userId: res.data.user_id,
-              apiToken: res.data.api_token,
-            });
+            dispatch(
+              setUser({
+                username: res.data.username,
+                userId: res.data.user_id,
+                apiToken: res.data.api_token,
+              })
+            );
             if (location.pathname === "/") history.push("/dashboard");
           } else {
             deleteCookie();
@@ -57,7 +58,7 @@ export default function App() {
         })
         .finally(() => setIsReady(true));
     }
-  }, [location, history]);
+  }, [location, history, dispatch]);
 
   if (isReady) {
     if (error.message !== "") {

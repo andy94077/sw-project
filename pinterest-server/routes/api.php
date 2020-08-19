@@ -76,10 +76,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('users', 'UserController');
 
-    Route::delete('/superUser/admin', 'SuperUserController@adminDelete');
-    Route::post('/superUser/admin', 'SuperUserController@adminRecover');
-    Route::get('/superUser/admin', 'SuperUserController@adminAll');
-    Route::post('/superUser/register','SuperUserController@register')->name('superUser.register');
+    Route::delete('/superUser/admin', 'SuperUserController@adminDelete')->middleware('BO_can:delete_BO_user');
+    Route::post('/superUser/admin', 'SuperUserController@adminRecover')->middleware('BO_can:recover_BO_user');
+    Route::get('/superUser/admin', 'SuperUserController@adminAll')->middleware('BO_can:view_BO_user');
+    Route::post('/superUser/register','SuperUserController@register')->name('superUser.register')->middleware('BO_can:register_BO_user');
     Route::post('/superUser/logIn','SuperUserController@logIn')->name('superUser.logIn');
     Route::post('/superUser/authentication','SuperUserController@authentication')->name('superUser.authentication');
     Route::post('/superUser/userExist','SuperUserController@userExist')->name('superUser.userExist');

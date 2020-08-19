@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import {
   Table,
   Modal,
@@ -16,12 +17,15 @@ import {
   SearchOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
+
 import { CONCAT_SERVER_URL } from "../../utils";
 import styles from "./List.less";
 import { format } from "date-fns";
+import { selectUser } from "../../redux/userSlice";
 
 export default function List(props) {
   const { refresh, setRefresh } = props;
+  const { apiToken } = useSelector(selectUser);
   const initialSearchText = {
     id: "",
     name: "",
@@ -104,12 +108,20 @@ export default function List(props) {
         setIsLoading(true);
         axios
           .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+            headers: {
+              Authorization: `Bearer ${apiToken}`,
+            },
             data: { id },
           })
           .then(() =>
             message.success(`Deleted successfully. (User id = ${id})`)
           )
-          .catch(() => message.error(`Deleted failed. Please try again later.`))
+          .catch((err) => {
+            message.destroy();
+            if (err.response && err.response.status === 403)
+              message.error("Permission denied.");
+            else message.error(`Deleted failed. Please try again later.`);
+          })
           .finally(setRefresh);
       },
     });
@@ -125,13 +137,24 @@ export default function List(props) {
         modal.update({ cancelButtonProps: { disabled: true } });
         setIsLoading(true);
         axios
-          .post(CONCAT_SERVER_URL("/api/v1/superUser/admin"), { id })
+          .post(
+            CONCAT_SERVER_URL("/api/v1/superUser/admin"),
+            { id },
+            {
+              headers: {
+                Authorization: `Bearer ${apiToken}`,
+              },
+            }
+          )
           .then(() =>
             message.success(`Recovered successfully. (User id = ${id})`)
           )
-          .catch(() =>
-            message.error(`Recovered failed. Please try again later.`)
-          )
+          .catch((err) => {
+            message.destroy();
+            if (err.response && err.response.status === 403)
+              message.error("Permission denied.");
+            else message.error(`Deleted failed. Please try again later.`);
+          })
           .finally(setRefresh);
       },
     });
@@ -189,9 +212,13 @@ export default function List(props) {
   ];
 
   useEffect(() => {
+    if (apiToken === null) return;
     setIsLoading(true);
     axios
       .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
         params: {
           ...filter,
           ...Object.fromEntries(
@@ -232,11 +259,14 @@ export default function List(props) {
           }
         }
       })
-      .catch((error) => {
-        alert("There are some problems during loading");
+      .catch((err) => {
+        message.destroy();
+        if (err.response && err.response.status === 403)
+          message.error("Permission denied.");
+        else message.error("There are some problems during loading.");
       })
       .finally(() => setIsLoading(false));
-  }, [refresh, filter, tableColumns]);
+  }, [refresh, filter, tableColumns, apiToken]);
 
   const handleSearch = () => {
     setFilter({
