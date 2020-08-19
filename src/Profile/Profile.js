@@ -150,6 +150,7 @@ export default function Profile(props) {
       .then(({ data }) => {
         setFollow({ followers: data.followers, followings: data.followings });
       });
+    setIsReady("OK");
   }
 
   function refreshFollow() {
@@ -165,11 +166,7 @@ export default function Profile(props) {
 
   useEffect(() => {
     setIsReady("Loading");
-    refreshInfo()
-      .catch(() => setIsReady("Error"))
-      .finally(() => {
-        setIsReady("OK");
-      });
+    refreshInfo().catch(() => setIsReady("Error"));
   }, [username, name]);
 
   const uploadButton = isBucket ? (
@@ -191,7 +188,6 @@ export default function Profile(props) {
       <div>
         <ProfileAvatar
           name={name}
-          isMyself={isMyself}
           image={image}
           isLoading={isLoading}
           setIsAvatarUpload={setIsAvatarUpload}
