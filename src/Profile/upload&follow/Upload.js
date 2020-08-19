@@ -3,8 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Modal from "react-bootstrap/Modal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
-import "./Upload.css";
-import ContentCard from "./ContentCard";
+import "../css/Upload.css";
+import ContentCard from "../ContentCard";
 
 const useStyles = makeStyles({
   jumpFrame: {

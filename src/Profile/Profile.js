@@ -11,11 +11,11 @@ import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
-import "./Profile.css";
-import FollowButton from "./FollowButton";
-import UploadButton from "./UploadButton";
-import ProfileAvatar from "./ProfileAvatar";
-import ProfileInformation from "./ProfileInformation";
+import "./css/Profile.css";
+import FollowButton from "./upload&follow/FollowButton";
+import UploadButton from "./upload&follow/UploadButton";
+import ProfileAvatar from "./userInfo/ProfileAvatar";
+import ProfileInformation from "./userInfo/ProfileInformation";
 
 const useStyles = makeStyles((theme) => ({
   jumpFrame: {

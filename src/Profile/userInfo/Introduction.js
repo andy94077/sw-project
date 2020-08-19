@@ -3,10 +3,10 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { makeStyles, IconButton, Button } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
-import { selectUser } from "../redux/userSlice";
-import AlertDialog from "../components/AlertDialog";
-import MyQuill from "../components/MyQuill";
-import { CONCAT_SERVER_URL } from "../utils";
+import { selectUser } from "../../redux/userSlice";
+import AlertDialog from "../../components/AlertDialog";
+import MyQuill from "../../components/MyQuill";
+import { CONCAT_SERVER_URL } from "../../utils";
 
 const useStyle = makeStyles(() => ({
   outFrame: {
