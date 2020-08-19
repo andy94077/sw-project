@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\IntroductionController;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::namespace('Api')->prefix('v1')->group(function () {
-
     Route::get('follows/followers/admin', 'FollowController@getFollowerAdmin');
     Route::get('follows/followers', 'FollowController@getFollower');
     Route::get('follows/followings/admin', 'FollowController@getFollowingAdmin');
@@ -38,7 +38,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comment/post', 'CommentController@showByPost');
     Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket']);
     Route::delete('/comment', 'CommentController@delete');
-    Route::post('/comment/modification', 'CommentController@update')->middleware(['bucket']);;
+    Route::post('/comment/modification', 'CommentController@update')->middleware(['bucket']);
+    ;
     Route::apiResource('comments', 'CommentController');
 
 
@@ -65,13 +66,13 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/user/bucket', 'UserController@bucket');
     Route::delete('/user/bucket', 'UserController@unBucket');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
-    Route::post('/user/register','UserController@register')->name('user.register');
-    Route::post('/user/logIn','UserController@logIn')->name('user.logIn');
+    Route::post('/user/register', 'UserController@register')->name('user.register');
+    Route::post('/user/logIn', 'UserController@logIn')->name('user.logIn');
     Route::post('/user/count', 'UserController@count');
-    Route::post('/user/authentication','UserController@authentication')->name('user.authentication');
-    Route::post('/user/userExist','UserController@userExist')->name('user.userExist');
-    Route::post('/user/uploadUserAvatar','UserController@uploadUserAvatar')->name('user.uploadUserAvatar');
-    Route::post('/user/getUserAvatar','UserController@getUserAvatar')->name('user.getUserAvatar');
+    Route::post('/user/authentication', 'UserController@authentication')->name('user.authentication');
+    Route::post('/user/userExist', 'UserController@userExist')->name('user.userExist');
+    Route::post('/user/uploadUserAvatar', 'UserController@uploadUserAvatar')->name('user.uploadUserAvatar');
+    Route::post('/user/getUserAvatar', 'UserController@getUserAvatar')->name('user.getUserAvatar');
 
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('users', 'UserController');
@@ -79,10 +80,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::delete('/superUser/admin', 'SuperUserController@adminDelete');
     Route::post('/superUser/admin', 'SuperUserController@adminRecover');
     Route::get('/superUser/admin', 'SuperUserController@adminAll');
-    Route::post('/superUser/register','SuperUserController@register')->name('superUser.register');
-    Route::post('/superUser/logIn','SuperUserController@logIn')->name('superUser.logIn');
-    Route::post('/superUser/authentication','SuperUserController@authentication')->name('superUser.authentication');
-    Route::post('/superUser/userExist','SuperUserController@userExist')->name('superUser.userExist');
+    Route::post('/superUser/register', 'SuperUserController@register')->name('superUser.register');
+    Route::post('/superUser/logIn', 'SuperUserController@logIn')->name('superUser.logIn');
+    Route::post('/superUser/authentication', 'SuperUserController@authentication')->name('superUser.authentication');
+    Route::post('/superUser/userExist', 'SuperUserController@userExist')->name('superUser.userExist');
     Route::middleware('auth:api')->put('/superUser/password/reset', 'SuperUserController@reset');
     Route::apiResource('superUser', 'SuperUserController');
     // for upload images
@@ -90,6 +91,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
-   Route::post('/broadcast/adPost', 'BroadcastController@adPost')->name('broadcast.adPost');
-   Route::apiResource('notifications', 'NotificationController');
+    Route::apiResource('/broadcast', 'BroadcastController');
+    Route::apiResource('notifications', 'NotificationController');
+    Route::resource('chatroom', 'ChatroomController');
 });

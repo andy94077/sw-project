@@ -50,9 +50,9 @@ export default function MobileMenu(props) {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   // Toggle functions
-  function handleAdClose() {
+  const handleAdClose = () => {
     setIsAdOpen(false);
-  }
+  };
 
   const handleMobileContentClose = (text) => {
     if (text === "notes") {
@@ -153,7 +153,11 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "chat" && (
           <MenuItem>
-            <Content text={contentText} time={contentTime} />
+            <Content
+              text={contentText}
+              type={mobileContentType}
+              time={contentTime}
+            />
           </MenuItem>
         )}
         <MenuItem onClick={handleMobileContentOpen("notes")}>
@@ -170,7 +174,11 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "notes" && (
           <MenuItem>
-            <Content text={contentText} time={contentTime} />
+            <Content
+              text={contentText}
+              type={mobileContentType}
+              time={contentTime}
+            />
           </MenuItem>
         )}
         <MenuItem onClick={toggleDrawer(true)}>

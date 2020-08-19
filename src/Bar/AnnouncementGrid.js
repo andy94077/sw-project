@@ -53,7 +53,7 @@ export default function AnnouncementGrid(props) {
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content text={[{ ...adMessage, id: 0 }]} time={null} />
+        <Content text={[{ ...adMessage, id: 0 }]} type="notes" time={null} />
       </div>
     </Snackbar>
   );

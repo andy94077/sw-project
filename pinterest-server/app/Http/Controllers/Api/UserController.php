@@ -19,6 +19,15 @@ use Carbon\Carbon;
 
 class UserController extends BaseController
 {
+    public function index(Request $request)
+    {
+        $userInfo = User::where('id', intval($request['user_id']))->first();
+        return response()->json([
+            'name' => $userInfo->name,
+            'avatar_url' => $userInfo->avatar_url,
+            'online_time' => $userInfo->online_time,
+        ], 200);
+    }
 
     public function logIn(Request $request)
     {
@@ -94,8 +103,9 @@ class UserController extends BaseController
         }
     }
 
-    public function count(Request $request){
-        if($request['id'] != null){
+    public function count(Request $request)
+    {
+        if ($request['id'] != null) {
             $user = User::find($request['id']);
             $user->online_time = Carbon::now();
             $user->save();
@@ -145,12 +155,12 @@ class UserController extends BaseController
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
 
-        foreach (array('online_time', 'bucket_time', 'deleted_at', 'created_at', 'updated_at') as $col){
+        foreach (array('online_time', 'bucket_time', 'deleted_at', 'created_at', 'updated_at') as $col) {
             if ($request[$col][0] !== null && $request[$col][1] !== null) {
                 $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
-            } else if ($request[$col][0] !== null && $request[$col][1] === null) {
+            } elseif ($request[$col][0] !== null && $request[$col][1] === null) {
                 $query = $query->where($col, '>=', gmdate('Y.m.d H:i:s', strtotime($request[$col][0])));
-            } else if ($request[$col][0] === null && $request[$col][1] !== null) {
+            } elseif ($request[$col][0] === null && $request[$col][1] !== null) {
                 $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
             }
         }
@@ -176,51 +186,54 @@ class UserController extends BaseController
         return $this->sendResponse($user, "success");
     }
 
-    public function getUserInfo(){
-        $res['online'] = User::where('online_time', '>=',Carbon::parse('-10 minutes'))->count();
+    public function getUserInfo()
+    {
+        $res['online'] = User::where('online_time', '>=', Carbon::parse('-10 minutes'))->count();
         $res['valid'] = User::all()->count();
         $res['new'] = User::where('created_at', '>=', Carbon::parse('-1 days'))->count();
         return response()->json($res);
     }
 
-    public function uploadUserAvatar(Request $request){
-        if($request["imgBase64"] === "" || $request["imgBase64"] === null){
+    public function uploadUserAvatar(Request $request)
+    {
+        if ($request["imgBase64"] === "" || $request["imgBase64"] === null) {
             return response()->json(["message" => "no file"], 404);
-        }
-        else{
+        } else {
             $user = User::where('name', $request['name'])->first();
-            if($user->avatar_url !== "/img/avatar.jpeg"){
+            if ($user->avatar_url !== "/img/avatar.jpeg") {
                 unlink(substr($user->avatar_url, 1));
             }
 
             $output_file = "img/". $request["name"] ."Avatar". ((new DateTime())->format('Y-m-d--H:i:s')).".jpeg";
-            $ifp = fopen( $output_file, 'wb' );
-            $data = explode( ',', $request["imgBase64"] );
-            fwrite( $ifp, base64_decode( $data[ 1 ] ) );
-            fclose( $ifp );
+            $ifp = fopen($output_file, 'wb');
+            $data = explode(',', $request["imgBase64"]);
+            fwrite($ifp, base64_decode($data[ 1 ]));
+            fclose($ifp);
 
             $user = User::where('name', $request['name'])->first();
             $user->avatar_url = "/" . $output_file;
             $user->save();
             return response()->json($output_file);
         }
-
     }
 
-    public function getUserAvatar(Request $request){
+    public function getUserAvatar(Request $request)
+    {
         $user = User::where('name', $request['name'])->first();
         $img_location = $user->avatar_url;
         return response()->json($img_location);
     }
 
-    public function setIntro(Request $request){
+    public function setIntro(Request $request)
+    {
         $user = User::find($request['user_id']);
         $user->intro = $request['intro'];
         $user->save();
         return response()->json($user);
     }
 
-    public function getIntro(Request $request){
+    public function getIntro(Request $request)
+    {
         $user = User::where('name', $request['name'])->first();
         $res['intro'] = $user->intro;
         return response()->json($res);

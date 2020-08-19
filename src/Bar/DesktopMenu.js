@@ -56,9 +56,9 @@ export default function DesktopMenu(props) {
   const isContentOpen = Boolean(contentAnchorEl);
 
   // Toggle function
-  function handleAdClose() {
+  const handleAdClose = () => {
     setIsAdOpen(false);
-  }
+  };
 
   const handleContentClickAway = () => {
     setContentType("");
@@ -149,7 +149,7 @@ export default function DesktopMenu(props) {
             keepMounted
             open={isContentOpen}
           >
-            <Content text={contentText} time={contentTime} />
+            <Content text={contentText} type={contentType} time={contentTime} />
           </Popper>
           {/* New notification */}
           <AnnouncementGrid
