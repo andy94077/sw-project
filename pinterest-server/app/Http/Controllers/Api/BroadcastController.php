@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
-use App\Events\AdPosted;
+use App\Events\Announced;
 
 class BroadcastController extends BaseController
 {
@@ -13,10 +13,10 @@ class BroadcastController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function adPost(Request $request)
+    public function store(Request $request)
     {
         $data = $request->input('data');
-        event(new AdPosted($data)); // trigger
-        return response()->json("Ad Posted!", 200);
+        event(new Announced($data)); // trigger
+        return response()->json("Event announced!", 200);
     }
 }

@@ -99,7 +99,7 @@ export default function Bar() {
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
 
-    window.Echo.channel("Notifications").listen("AdPosted", (event) => {
+    window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
       setIsAdOpen(true);
       setAdMessage({
