@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 import { SearchOutlined } from "@ant-design/icons";
 import {
   message,
@@ -15,10 +16,12 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { CONCAT_SERVER_URL } from "../../utils";
 import { format } from "date-fns";
+import { selectUser } from "../../redux/userSlice";
 import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
 
-export default function List(props) {
+export default function List() {
+  const { apiToken } = useSelector(selectUser);
   const [state, setState] = useState({
     loading: false,
     bucketId: null,
@@ -80,15 +83,22 @@ export default function List(props) {
         axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
           data: { id },
         })
-          .then((response) => {
+          .then(() => {
             message.success(`Unbucket successfully! (User id = ${id})`);
+            setRefresh((preRefresh) => !preRefresh);
           })
           .catch((error) => {
-            errorMessageModal("Oops~ Please try again !");
-          })
-          .finally(() => setRefresh((preRefresh) => !preRefresh));
+            setTableLoading(false);
+            message.destroy();
+            if (error.response && error.response.status === 403)
+              message.error("Permission denied.");
+            else errorMessageModal("Oops~ Please try again !");
+          });
       },
       onCancel() {},
     });
@@ -105,17 +115,23 @@ export default function List(props) {
         axios({
           method: "delete",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
           data: { id },
         })
-          .then((response) => {
+          .then(() => {
             message.success(`Deleted successfully! (User id = ${id})`);
+            setRefresh((preRefresh) => !preRefresh);
           })
           .catch((error) => {
-            errorMessageModal("Oops~ Please try again !");
-          })
-          .finally(() => setRefresh((preRefresh) => !preRefresh));
+            setTableLoading(false);
+            message.destroy();
+            if (error.response && error.response.status === 403)
+              message.error("Permission denied.");
+            else errorMessageModal("Oops~ Please try again !");
+          });
       },
-      onCancel() {},
     });
   };
 
@@ -130,17 +146,23 @@ export default function List(props) {
         axios({
           method: "post",
           url: CONCAT_SERVER_URL("/api/v1/user/admin"),
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
           data: { id },
         })
-          .then((response) => {
+          .then(() => {
             message.success(`Recover successfully! (User id = ${id})`);
+            setRefresh((preRefresh) => !preRefresh);
           })
           .catch((error) => {
-            errorMessageModal("Oops~ Please try again !");
-          })
-          .finally(() => setRefresh((preRefresh) => !preRefresh));
+            setTableLoading(false);
+            message.destroy();
+            if (error.response && error.response.status === 403)
+              message.error("Permission denied.");
+            else errorMessageModal("Oops~ Please try again !");
+          });
       },
-      onCancel() {},
     });
   };
 
@@ -321,15 +343,22 @@ export default function List(props) {
           <DropOption
             id={record.id}
             onMenuClick={handleMenuClick}
-            menuOptions={[
-              { key: "Bucket", name: "Bucket" },
+            menuOptions={
               record.bucket_time
-                ? { key: "Unbucket", name: "Unbucket" }
-                : { key: "noOption", name: "" },
-              record.deleted_at
-                ? { key: "Recover", name: "Recover" }
-                : { key: "Delete", name: "Delete" },
-            ]}
+                ? [
+                    { key: "Bucket", name: "Bucket" },
+                    { key: "Unbucket", name: "Unbucket" },
+                    record.deleted_at
+                      ? { key: "Recover", name: "Recover" }
+                      : { key: "Delete", name: "Delete" },
+                  ]
+                : [
+                    { key: "Bucket", name: "Bucket" },
+                    record.deleted_at
+                      ? { key: "Recover", name: "Recover" }
+                      : { key: "Delete", name: "Delete" },
+                  ]
+            }
           />
         );
       },

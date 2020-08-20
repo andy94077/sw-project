@@ -1,9 +1,12 @@
 import React from "react";
 import { message, Form, InputNumber, Modal } from "antd";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import { CONCAT_SERVER_URL } from "../../utils";
+import { selectUser } from "../../redux/userSlice";
 
 export default function BucketForm(props) {
+  const { apiToken } = useSelector(selectUser);
   const [form] = Form.useForm();
 
   const {
@@ -27,6 +30,9 @@ export default function BucketForm(props) {
         axios({
           method: "post",
           url: CONCAT_SERVER_URL("/api/v1/user/bucket"),
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
           data: {
             id,
             hour,
@@ -35,13 +41,17 @@ export default function BucketForm(props) {
             year,
           },
         })
-          .then((response) => {
+          .then(() => {
             message.success(`Bucket successfully! (User id = ${id})`);
+            setRefresh((preRefresh) => !preRefresh);
           })
           .catch((error) => {
-            errorMessageModal("Oops~ Please try again !");
-          })
-          .finally(() => setRefresh((preRefresh) => !preRefresh));
+            handleTableLoading(false);
+            message.destroy();
+            if (error.response && error.response.status === 403)
+              message.error("Permission denied.");
+            else errorMessageModal("Oops~ Please try again !");
+          });
       })
       .catch((info) => {
         console.log("Validate Failed:", info);
