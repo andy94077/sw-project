@@ -256,19 +256,20 @@ export default function List() {
   };
 
   const handleSearch = () => {
-    setFilter({
-      ...filter,
+    setFilter((prevFilter) => ({
       ...searchText,
       page: 1,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const handleReset = () => {
-    setSearchText({ ...columnObj });
-    setFilter({
-      ...filter,
+    setSearchText(columnObj);
+    setFilter((prevFilter) => ({
       ...columnObj,
-    });
+      page: 1,
+      size: prevFilter.size,
+    }));
   };
 
   const columns = [
@@ -439,6 +440,7 @@ export default function List() {
         dataSource={data.info}
         loading={tableLoading}
         pagination={{
+          current: filter.page,
           defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,

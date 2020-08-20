@@ -155,8 +155,6 @@ export default function List(props) {
             {
               headers: {
                 Authorization: `Bearer ${apiToken}`,
-                // Accept: "application/json",
-                // ContentType: "application/json",
               },
             }
           )
@@ -284,20 +282,20 @@ export default function List(props) {
   }, [refresh, filter, tableColumns, apiToken]);
 
   const handleSearch = () => {
-    setFilter({
+    setFilter((prevFilter) => ({
       ...searchText,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const handleReset = () => {
-    setSearchText({ ...initialSearchText });
-    setFilter({
+    setSearchText(initialSearchText);
+    setFilter((prevFilter) => ({
       ...initialSearchText,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const handleSearchTextChange = (key) => (event) =>
@@ -339,7 +337,7 @@ export default function List(props) {
   );
 
   return (
-    <div>
+    <>
       <div style={{ padding: 8 }}>
         {searchFields}
         <Space style={{ margin: "8px" }}>
@@ -369,6 +367,7 @@ export default function List(props) {
       <Table
         dataSource={data.info}
         pagination={{
+          current: filter.page,
           defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
@@ -390,6 +389,6 @@ export default function List(props) {
         loading={isLoading}
         rowKey={(record) => record.id}
       />
-    </div>
+    </>
   );
 }

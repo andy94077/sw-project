@@ -236,20 +236,20 @@ export default function Post() {
     setSearchText({ ...searchText, [key]: value });
 
   const handleSearch = () => {
-    setFilter({
+    setFilter((prevFilter) => ({
       ...searchText,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const handleReset = () => {
     setSearchText(columnObj);
-    setFilter({
+    setFilter((prevFilter) => ({
       ...columnObj,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const columns = [
@@ -397,7 +397,7 @@ export default function Post() {
   ];
 
   return (
-    <div>
+    <>
       <div style={{ padding: 8 }}>
         {Object.keys(columnObj).map((key) =>
           columnObj[key] instanceof Array ? (
@@ -449,6 +449,7 @@ export default function Post() {
         bordered
         loading={loading}
         pagination={{
+          current: filter.page,
           defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
@@ -482,6 +483,6 @@ export default function Post() {
         rowKey={(record) => record.id}
         scroll={{ x: 1200 }}
       />
-    </div>
+    </>
   );
 }

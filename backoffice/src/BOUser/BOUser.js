@@ -16,7 +16,7 @@ export default function BOUser(props) {
   }, []);
 
   return (
-    <div>
+    <>
       <div style={{ margin: "10px 0" }}>
         <Button
           type="primary"
@@ -33,6 +33,6 @@ export default function BOUser(props) {
         onCancel={handleVisible(false)}
         setRefresh={handleSetRefresh}
       />
-    </div>
+    </>
   );
 }
