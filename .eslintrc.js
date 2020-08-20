@@ -18,5 +18,6 @@ module.exports = {
     "react/prop-types": 0,
     "no-param-reassign": 0,
     "react/no-danger": 0,
+    "no-nested-ternary": 0,
   },
 };
