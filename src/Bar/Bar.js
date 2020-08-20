@@ -111,24 +111,6 @@ export default function Bar() {
     };
   }, [userId]);
 
-  // Static contents
-  // const chat = [
-  //   {
-  //     id: 1,
-  //     header: "Chat 1",
-  //     secondary: "from Andy Chen",
-  //     content: "How are you?",
-  //   },
-  //   {
-  //     id: 2,
-  //     header: "Chat 2",
-  //     secondary: "from Jason Hung",
-  //     content: "How do you do?",
-  //   },
-  // ];
-
-  // Toggle functions
-
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
   };

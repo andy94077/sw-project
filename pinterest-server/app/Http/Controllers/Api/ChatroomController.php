@@ -15,7 +15,9 @@ class ChatroomController extends BaseController
     {
         $user_id = intval($request['user_id']);
         $room = Chatroom::where('user_id1', $user_id)
-              ->orderBy('updated_at', 'desc')->take(10)->get();
+              ->orderBy('updated_at', 'desc')
+              ->skip(intval($request['start']))
+              ->take(intval($request['number']))->get();
 
         foreach ($room as &$user) {
             $request->merge([
@@ -27,7 +29,17 @@ class ChatroomController extends BaseController
             $user['online_time'] = $userInfo->original['online_time'];
         }
 
-        return response()->json($room);
+        if (count($room) > 0) {
+            return response()->json([
+                "message" => $room,
+                "start" => intval($request["start"]) + intval($request['number']),
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => $room,
+                "start" => false,
+            ], 200);
+        }
     }
 
     public function create(Request $request)
