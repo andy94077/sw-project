@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdPosted implements ShouldBroadcast
+class Announced implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -34,6 +34,6 @@ class AdPosted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('Notifications');
+        return new Channel('Announcements');
     }
 }

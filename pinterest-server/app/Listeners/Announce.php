@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\AdPosted;
+use App\Events\Announced;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class AdPost
+class Announce
 {
     /**
      * Create the event listener.
@@ -21,10 +21,10 @@ class AdPost
     /**
      * Handle the event.
      *
-     * @param  AdPosted  $event
+     * @param  Announced  $event
      * @return void
      */
-    public function handle(AdPosted $event)
+    public function handle(Announced $event)
     {
         //
     }

@@ -19,8 +19,9 @@ class DatabaseSeeder extends Seeder
             CommentsTableSeeder::class,
             PermissionsTableSeeder::class,
             SuperUsersTableSeeder::class,
-            NotificationsTableSeeder::class,
             LikeTableSeeder::class,
+            NotificationsTableSeeder::class,
+            ChatroomsTableSeeder::class,
         ]);
     }
 }

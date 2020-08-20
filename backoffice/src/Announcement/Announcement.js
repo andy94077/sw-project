@@ -41,7 +41,7 @@ export default function Announcement() {
         axios
           .request({
             method: "POST",
-            url: CONCAT_SERVER_URL("/api/v1/broadcast/adPost"),
+            url: CONCAT_SERVER_URL("/api/v1/broadcast"),
             data: jsonData,
           })
           // .then((res) => console.log(res))
