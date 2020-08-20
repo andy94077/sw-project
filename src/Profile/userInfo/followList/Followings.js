@@ -9,11 +9,12 @@ const useStyles = makeStyles(() => ({
   list: {
     position: "relative",
     display: "block",
-    maxHeight: "400px",
+    height: "400px",
     overflow: "auto",
   },
   divLike: {
     display: "block",
+    padding: "0 24px 0 0",
   },
   followerDiv: {
     height: "65px",
