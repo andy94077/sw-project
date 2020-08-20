@@ -122,7 +122,6 @@ class FollowController extends BaseController
     }
 
     public function getFollowingAdmin(Request $request){
-        echo "hi";
         $followings = Follow::withTrashed()->LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.*')->get();
         return response()->json($followings);
     }
