@@ -1,0 +1,6 @@
+.TabPanelCustomPadding {
+  display: auto;
+}
+.TabPanelCustomPadding div .MuiBox-root {
+  padding: 0px 0px 0px 24px;
+}
