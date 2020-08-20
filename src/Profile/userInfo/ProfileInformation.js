@@ -39,7 +39,7 @@ export default function ProfileInformation(props) {
           {url}
         </a>
         <Introduction name={name} />
-        <FollowInformation follow={follow} />
+        <FollowInformation name={name} follow={follow} />
       </div>
     </>
   );

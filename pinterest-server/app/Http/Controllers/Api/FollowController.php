@@ -98,12 +98,16 @@ class FollowController extends BaseController
     }
 
     public function getFollowing(Request $request){
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
+        $user = User::where('name', $request['name'])->first();
+        $user_id = $user->id;
+        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url')->get();
         return response()->json($followings);
     }
 
     public function getFollower(Request $request){
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
+        $user = User::where('name', $request['name'])->first();
+        $user_id = $user->id;
+        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url')->get();
         return response()->json($followings);
     }
 
