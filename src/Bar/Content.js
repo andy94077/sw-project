@@ -7,6 +7,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Button,
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -61,6 +62,11 @@ const useStyles = makeStyles((theme) => ({
   },
   none: {
     pointerEvents: "none",
+  },
+  end: {
+    boxShadow:
+      "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+    textAlign: "center",
   },
 }));
 
@@ -292,11 +298,15 @@ export default function Content(props) {
             );
           })
         )}
-        {content.type === "chat" && canFetchChat && (
-          <div ref={chatMore}>No chatroom left.</div>
+        {content.type === "chat" && (
+          <div ref={chatMore} className={classes.end}>
+            {!canFetchChat && <Button disabled>No chatroom left</Button>}
+          </div>
         )}
-        {content.type === "notes" && canFetchNotes && (
-          <div ref={notesMore}>No notification left.</div>
+        {content.type === "notes" && (
+          <div ref={notesMore} className={classes.end}>
+            {!canFetchNotes && <Button disabled>No notification left</Button>}
+          </div>
         )}
         {content.type === "chat" && (
           <CustomModal
