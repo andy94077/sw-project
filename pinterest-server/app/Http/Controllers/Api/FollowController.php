@@ -100,15 +100,25 @@ class FollowController extends BaseController
     public function getFollowing(Request $request){
         $user = User::where('name', $request['name'])->first();
         $user_id = $user->id;
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url')->get();
-        return response()->json($followings);
+        $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url');
+        $followings = $slex->skip(($request['nextId']) * 10)->take(10)->get();
+        if(count($followings) > 0){
+            return response()->json(["message" => $followings, 'nextId' => $request['nextId']+1], 200);
+        } else {
+            return response()->json(["message" => $followings, 'nextId' => false], 200);
+        }
     }
 
     public function getFollower(Request $request){
         $user = User::where('name', $request['name'])->first();
         $user_id = $user->id;
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url')->get();
-        return response()->json($followings);
+        $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url');
+        $followings = $slex->skip(($request['nextId']) * 10)->take(10)->get();
+        if(count($followings) > 0){
+            return response()->json(["message" => $followings, 'nextId' => $request['nextId']+1], 200);
+        } else {
+            return response()->json(["message" => $followings, 'nextId' => false], 200);
+        }
     }
 
     public function getFollowingAdmin(Request $request){

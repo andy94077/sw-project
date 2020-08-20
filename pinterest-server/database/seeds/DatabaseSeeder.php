@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PermissionsTableSeeder::class,
             SuperUsersTableSeeder::class,
             LikeTableSeeder::class,
+            FollowTableSeeder::class,
             NotificationsTableSeeder::class,
             ChatroomsTableSeeder::class,
         ]);
