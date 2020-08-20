@@ -122,7 +122,7 @@ export default function List(props) {
             message.destroy();
             if (err.response && err.response.status === 403)
               message.error("Permission denied.");
-            else message.error(`Deleted failed. Please try again later.`);
+            else message.error("Deleted failed. Please try again later.");
           });
       },
     });
