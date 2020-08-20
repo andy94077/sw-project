@@ -16,9 +16,9 @@ class AuthorizeBOMiddleware
      */
     public function handle($request, Closure $next, $guard)
     {
-        // echo $request->bearerToken();
+        //echo $request->bearerToken();
         $user = SuperUser::where('api_token', $request->bearerToken())->first();
-        // echo $users->count() . ' ' . $guard;
+        // echo $user->count() . ' ' . $guard;
         // echo 'user ' . $users[0]->permissions;
         // echo SuperUser::role('BO_manager')->get();
         // echo $users[0]->can($guard);

@@ -30,6 +30,7 @@ export default function List(props) {
     id: "",
     name: "",
     email: "",
+    roles: [""],
     created_at: ["", ""],
     deleted_at: ["", ""],
     updated_at: ["", ""],
@@ -70,6 +71,17 @@ export default function List(props) {
         sorter: (a, b) => a.email.localeCompare(b.email),
       },
       {
+        title: "Roles",
+        dataIndex: "roles",
+        key: "roles",
+        sorter: (a, b) =>
+          a.roles
+            .map((role) => role.name)
+            .join(", ")
+            .localeCompare(b.roles.map((role) => role.name).join(", ")),
+        render: (roles) => roles.map((role) => role.name).join(", "),
+      },
+      {
         title: "Create Time",
         dataIndex: "created_at",
         key: "created_at",
@@ -107,11 +119,10 @@ export default function List(props) {
         modal.update({ cancelButtonProps: { disabled: true } });
         setIsLoading(true);
         axios
-          .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+          .delete(CONCAT_SERVER_URL(`/api/v1/superUser/${id}`), {
             headers: {
               Authorization: `Bearer ${apiToken}`,
             },
-            data: { id },
           })
           .then(() => {
             message.success(`Deleted successfully. (User id = ${id})`);
@@ -138,12 +149,14 @@ export default function List(props) {
         modal.update({ cancelButtonProps: { disabled: true } });
         setIsLoading(true);
         axios
-          .post(
-            CONCAT_SERVER_URL("/api/v1/superUser/admin"),
-            { id },
+          .put(
+            CONCAT_SERVER_URL(`/api/v1/superUser/${id}`),
+            {},
             {
               headers: {
                 Authorization: `Bearer ${apiToken}`,
+                // Accept: "application/json",
+                // ContentType: "application/json",
               },
             }
           )
@@ -217,7 +230,7 @@ export default function List(props) {
     if (apiToken === null) return;
     setIsLoading(true);
     axios
-      .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+      .get(CONCAT_SERVER_URL("/api/v1/superUser"), {
         headers: {
           Authorization: `Bearer ${apiToken}`,
         },
