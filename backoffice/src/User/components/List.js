@@ -76,7 +76,7 @@ export default function List() {
     const modal = Modal.confirm({
       title: "Do you want to unbucket this user?",
       icon: <ExclamationCircleOutlined />,
-      content: "Some descriptions",
+      content: `(User id = ${id})`,
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
         setTableLoading(true);
@@ -108,7 +108,7 @@ export default function List() {
     const modal = Modal.confirm({
       title: "Do you want to delete this user?",
       icon: <ExclamationCircleOutlined />,
-      content: "Some descriptions",
+      content: `(User id = ${id})`,
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
         setTableLoading(true);
@@ -139,7 +139,7 @@ export default function List() {
     const modal = Modal.confirm({
       title: "Do you want to recover this user?",
       icon: <ExclamationCircleOutlined />,
-      content: "Some descriptions",
+      content: `(User id = ${id})`,
       onOk() {
         modal.update({ cancelButtonProps: { disabled: true } });
         setTableLoading(true);

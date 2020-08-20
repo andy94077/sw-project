@@ -67,7 +67,7 @@ export default function BucketForm(props) {
       closable={!loading}
       maskClosable={!loading}
       okText="Submit"
-      cancelText="Return"
+      cancelText="Cancel"
     >
       <Form
         id="bucketForm"
