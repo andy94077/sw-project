@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import axios from "axios";
+
 import { fade, makeStyles } from "@material-ui/core/styles";
 import { AppBar, InputBase, Toolbar, Typography } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 
-import { format, formatDistanceToNow } from "date-fns";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import { selectUser } from "../redux/userSlice";
-import { CONCAT_SERVER_URL } from "../utils";
-import { setCookie, getCookie } from "../cookieHelper";
+
+import AnnouncementGrid from "./AnnouncementGrid";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -85,22 +84,14 @@ export default function Bar() {
   const [adMessage, setAdMessage] = useState("");
   const [isAdOpen, setIsAdOpen] = useState(false);
 
-  const [contentText, setContentText] = useState([{ id: 1 }]);
-  const [contentTime, setContentTime] = useState(null);
-  const [contentType, setContentType] = useState("");
-  const [mobileContentType, setMobileContentType] = useState("");
-
-  const [chat, setChat] = useState([]);
-  const [notes, setNotes] = useState([]);
-  const [notesCount, setNotesCount] = useState([]);
+  const [notesCount, setNotesCount] = useState(0);
 
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
-  // Broadcast & chat & notes
+  // Broadcast
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
 
-    // Broadcast
     window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
       setIsAdOpen(true);
@@ -114,98 +105,11 @@ export default function Bar() {
       }, 10000);
     });
 
-    const jsonData = {
-      user_id: userId,
+    return () => {
+      window.Echo.channel("Announcements").stopListening("Announced");
+      window.Echo.channel("Notifications").stopListening("NotificationChanged");
     };
-
-    // chat
-    const pullChat = () =>
-      axios
-        .request({
-          method: "GET",
-          url: CONCAT_SERVER_URL("/api/v1/chatroom"),
-          params: jsonData,
-        })
-        .then((res) =>
-          setChat(
-            res.data.map((item) => {
-              item.header = {
-                avatar_url: item.avatar_url,
-                username: item.username,
-              };
-              item.secondary = formatDistanceToNow(new Date(item.updated_at));
-              item.content = item.last_message;
-              item.created_at = format(new Date(item.updated_at), "T", {
-                timeZone: "Asia/Taipei",
-              });
-              return item;
-            })
-          )
-        )
-        .catch(() =>
-          setNotes([
-            {
-              id: 0,
-              header: "ERROR",
-              secondary: "SYSTEM",
-              content: "Connection error (chat)",
-            },
-          ])
-        );
-    pullChat();
-
-    // notes
-    const pullNotes = () =>
-      axios
-        .request({
-          method: "GET",
-          url: CONCAT_SERVER_URL("/api/v1/notifications"),
-          params: jsonData,
-        })
-        .then((res) =>
-          setNotes(
-            res.data.map((item) => {
-              item.created_at = format(new Date(item.created_at), "T", {
-                timeZone: "Asia/Taipei",
-              });
-              return item;
-            })
-          )
-        )
-        .catch(() =>
-          setNotes([
-            {
-              id: 0,
-              header: "ERROR",
-              secondary: "SYSTEM",
-              content: "Connection error",
-            },
-          ])
-        );
-    pullNotes();
-
-    window.Echo.channel("Notifications").listen(
-      "NotificationChanged",
-      pullNotes
-    );
-
-    return () =>
-      window.Echo.channel("Notifications")
-        .stopListening("AdPosted")
-        .stopListening("NotificationChanged");
   }, [userId]);
-
-  useEffect(() => {
-    if (contentType === "notes") {
-      setContentText(notes);
-    }
-    const notesTime = getCookie(`notesTime${userId}`);
-    const nc = notes.filter((note) => note.created_at > notesTime).length;
-    setNotesCount(nc);
-    if (nc > 9) {
-      setNotesCount("10+");
-    }
-  }, [notes, userId]);
 
   // Static contents
   // const chat = [
@@ -224,21 +128,6 @@ export default function Bar() {
   // ];
 
   // Toggle functions
-  const handleSetContent = (text) => {
-    setContentType(text);
-    setMobileContentType(text);
-
-    // chat not implemented yet.
-    if (text === "chat") {
-      setContentText(chat);
-      setContentTime(9999999999999);
-    } else {
-      setNotesCount(0);
-      setContentText(notes);
-      setContentTime(getCookie(`notesTime${userId}`));
-      setCookie(`notesTime${userId}`, Date.now(), 60);
-    }
-  };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);
@@ -246,6 +135,10 @@ export default function Bar() {
 
   const handleSetSearchValue = (event) => {
     setSearchValue(event.target.value);
+  };
+
+  const handleAdClose = () => {
+    setIsAdOpen(false);
   };
 
   // The bar
@@ -274,32 +167,16 @@ export default function Bar() {
             />
           </div>
           <div className={classes.grow} />
-          <DesktopMenu
-            adMessage={adMessage}
-            contentTime={contentTime}
-            contentText={contentText}
-            contentType={contentType}
-            handleSetContent={handleSetContent}
-            isAdOpen={isAdOpen}
-            notesCount={notesCount}
-            setContentType={setContentType}
-            setIsAdOpen={setIsAdOpen}
-            setNotesCount={setNotesCount}
-          />
-          <MobileMenu
-            adMessage={adMessage}
-            contentTime={contentTime}
-            contentText={contentText}
-            handleSetContent={handleSetContent}
-            isAdOpen={isAdOpen}
-            mobileContentType={mobileContentType}
-            notesCount={notesCount}
-            setIsAdOpen={setIsAdOpen}
-            setMobileContentType={setMobileContentType}
-            setNotesCount={setNotesCount}
-          />
+          <DesktopMenu notesCount={notesCount} setNotesCount={setNotesCount} />
+          <MobileMenu notesCount={notesCount} setNotesCount={setNotesCount} />
         </Toolbar>
       </AppBar>
+      {/* New notification */}
+      <AnnouncementGrid
+        isAdOpen={isAdOpen}
+        handleAdClose={handleAdClose}
+        adMessage={adMessage}
+      />
       <div className={classes.offset} />
     </div>
   );

@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { useInfiniteQuery } from "react-query";
+import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Accordion,
@@ -8,8 +11,13 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
+import { format, formatDistanceToNow } from "date-fns";
 import CustomModal from "../components/CustomModal";
+import useIntersectionObserver from "../components/useIntersectionObserver";
+import Loading from "../components/Loading";
+import { selectUser } from "../redux/userSlice";
 import { CONCAT_SERVER_URL } from "../utils";
+import { setCookie, getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
   rounded: {
@@ -58,9 +66,159 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Content(props) {
   const classes = useStyles();
-  const { text, type, time } = props;
+  const { userId } = useSelector(selectUser);
+  const { type, setNotesCount } = props;
+
+  const chatMore = useRef();
+  const notesMore = useRef();
 
   const [show, setShow] = useState(false);
+  const [content, setContent] = useState({
+    type: null,
+    text: null,
+    time: null,
+  });
+
+  // Infinite scroll
+  // chat
+  const {
+    data: chat,
+    // error,
+    // isFetchingMore,
+    fetchMore: fetchChat,
+    canFetchMore: canFetchChat,
+  } = useInfiniteQuery(
+    "chat",
+    (_, start = 0) => {
+      const jsonData = {
+        user_id: userId,
+        start,
+        number: 10,
+      };
+      return axios
+        .request({
+          method: "GET",
+          url: CONCAT_SERVER_URL("/api/v1/chatroom"),
+          params: jsonData,
+        })
+        .then((res) => {
+          res.data.message.map((item) => {
+            item.header = {
+              avatar_url: item.avatar_url,
+              username: item.username,
+            };
+            item.secondary = formatDistanceToNow(new Date(item.updated_at));
+            item.content = item.last_message;
+            item.created_at = format(new Date(item.updated_at), "T", {
+              timeZone: "Asia/Taipei",
+            });
+            return item;
+          });
+          return res.data;
+        });
+    },
+    {
+      getFetchMore: (lastGroup) => lastGroup.start,
+    }
+  );
+
+  useIntersectionObserver({
+    target: chatMore,
+    onIntersect: fetchChat,
+    enabled: canFetchChat,
+  });
+
+  // notes
+  const {
+    data: notes,
+    // error,
+    // isFetchingMore,
+    fetchMore: fetchNotes,
+    canFetchMore: canFetchNotes,
+  } = useInfiniteQuery(
+    "notes",
+    (_, start = 0) => {
+      const jsonData = {
+        user_id: userId,
+        start,
+        number: 10,
+      };
+      return axios
+        .request({
+          method: "GET",
+          url: CONCAT_SERVER_URL("/api/v1/notifications"),
+          params: jsonData,
+        })
+        .then((res) => {
+          res.data.message.map((item) => {
+            item.secondary = formatDistanceToNow(new Date(item.created_at));
+            item.created_at = format(new Date(item.created_at), "T", {
+              timeZone: "Asia/Taipei",
+            });
+            return item;
+          });
+          return res.data;
+        });
+    },
+    {
+      getFetchMore: (lastGroup) => lastGroup.start,
+    }
+  );
+
+  useIntersectionObserver({
+    target: notesMore,
+    onIntersect: fetchNotes,
+    enabled: canFetchNotes,
+  });
+
+  // Update
+  useEffect(() => {
+    if (window.Echo === undefined) return () => {};
+
+    if (type === "chat") {
+      // TODO
+    } else if (type === "notes") {
+      window.Echo.channel("Notifications").listen("NotificationChanged", null); // TODO
+    }
+
+    return () => {
+      if (type === "chat") {
+        // TODO
+      } else if (type === "notes") {
+        window.Echo.channel("Notifications").stopListening(
+          "NotificationChanged"
+        );
+      }
+    };
+  }, [type]);
+
+  useEffect(() => {
+    if (type === "chat") {
+      setContent({
+        type,
+        text: chat,
+        time: 9999999999999, // not implemented yet.
+      });
+    } else if (type === "notes") {
+      setContent({
+        type,
+        text: notes,
+        time: getCookie(`notesTime${userId}`),
+      });
+      setNotesCount(0);
+      setCookie(`notesTime${userId}`, Date.now(), 60);
+    }
+
+    if (notes !== undefined) {
+      const notesTime = getCookie(`notesTime${userId}`);
+      const nc = notes[0].message.filter((note) => note.created_at > notesTime)
+        .length;
+      setNotesCount(nc);
+      if (nc > 9) {
+        setNotesCount("10+");
+      }
+    }
+  }, [type, chat, notes, setNotesCount]);
 
   // Toggle function (for chat)
   const handleSetShow = () => {
@@ -73,69 +231,85 @@ export default function Content(props) {
     setShow(false);
   };
 
-  return (
-    <div className={classes.root}>
-      {text.map((value) => {
-        const background =
-          time === null || time < value.created_at ? "#fff8e5" : "white";
+  // Wait for content updating
+  if (content.type === type) {
+    return (
+      <div className={classes.root}>
+        {content.text.map((page) =>
+          page.message.map((value) => {
+            const background =
+              content.time === null || content.time < value.created_at
+                ? "#fff8e5"
+                : "white";
 
-        return (
-          <div
-            onClick={handleSetShow}
-            onKeyDown={handleSetShow}
-            tabIndex={0}
-            role="button"
-            style={{ outline: "none" }}
-          >
-            <Accordion
-              key={time + value.id}
-              defaultExpanded={background === "#fff8e5" || type === "chat"}
-              className={type === "chat" && classes.none}
-              style={{
-                margin: 0,
-                borderBottom: "1px solid #aaa",
-                background,
-              }}
-            >
-              <AccordionSummary
-                expandIcon={type === "notes" && <ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
+            return (
+              <div
+                key={content.time + value.id}
+                onClick={handleSetShow}
+                onKeyDown={handleSetShow}
+                tabIndex={0}
+                role="button"
+                style={{ outline: "none" }}
               >
-                <Typography className={classes.heading}>
-                  {type === "chat" && (
-                    <div>
-                      <img
-                        alt="Avatar"
-                        className={classes.rounded}
-                        src={CONCAT_SERVER_URL(value.header.avatar_url)}
-                      />
-                      {value.header.username}
-                    </div>
-                  )}
-                  {type === "notes" && value.header}
-                </Typography>
-                <Typography className={classes.secondaryHeading}>
-                  {value.secondary}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div dangerouslySetInnerHTML={{ __html: value.content }} />
-              </AccordionDetails>
-            </Accordion>
-          </div>
-        );
-      })}
-      {type === "chat" && (
-        <CustomModal
-          show={show}
-          onHide={onHide}
-          jumpFrame={classes.jumpFrame}
-          backdrop
-        >
-          <h4>Chatroom</h4>
-        </CustomModal>
-      )}
-    </div>
-  );
+                <Accordion
+                  defaultExpanded={
+                    background === "#fff8e5" || content.type === "chat"
+                  }
+                  className={content.type === "chat" ? classes.none : null}
+                  style={{
+                    margin: 0,
+                    borderBottom: "1px solid #aaa",
+                    background,
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={content.type === "notes" && <ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography className={classes.heading}>
+                      {content.type === "chat" && (
+                        <div>
+                          <img
+                            alt="Avatar"
+                            className={classes.rounded}
+                            src={CONCAT_SERVER_URL(value.header.avatar_url)}
+                          />
+                          {value.header.username}
+                        </div>
+                      )}
+                      {content.type === "notes" && value.header}
+                    </Typography>
+                    <Typography className={classes.secondaryHeading}>
+                      {value.secondary}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <div dangerouslySetInnerHTML={{ __html: value.content }} />
+                  </AccordionDetails>
+                </Accordion>
+              </div>
+            );
+          })
+        )}
+        {content.type === "chat" && canFetchChat && (
+          <div ref={chatMore}>No chatroom left.</div>
+        )}
+        {content.type === "notes" && canFetchNotes && (
+          <div ref={notesMore}>No notification left.</div>
+        )}
+        {content.type === "chat" && (
+          <CustomModal
+            show={show}
+            onHide={onHide}
+            jumpFrame={classes.jumpFrame}
+            backdrop
+          >
+            <h4>Chatroom</h4>
+          </CustomModal>
+        )}
+      </div>
+    );
+  }
+  return <Loading />;
 }
