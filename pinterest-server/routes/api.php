@@ -59,11 +59,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('users/intro', 'UserController@setIntro');
     Route::get('users/intro', 'UserController@getIntro');
     Route::get('users/info', 'UserController@getUserInfo');
-    Route::delete('/user/admin', 'UserController@adminDelete');
-    Route::post('/user/admin', 'UserController@adminRecover');
+    Route::delete('/user/admin', 'UserController@adminDelete')->middleware('BO_can:delete_user');
+    Route::post('/user/admin', 'UserController@adminRecover')->middleware('BO_can:recover_user');
     Route::get('/users/admin', 'UserController@adminAll');
-    Route::post('/user/bucket', 'UserController@bucket');
-    Route::delete('/user/bucket', 'UserController@unBucket');
+    Route::post('/user/bucket', 'UserController@bucket')->middleware('BO_can:bucket');
+    Route::delete('/user/bucket', 'UserController@unBucket')->middleware('BO_can:unbucket');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
     Route::post('/user/register','UserController@register')->name('user.register');
     Route::post('/user/logIn','UserController@logIn')->name('user.logIn');
@@ -90,6 +90,6 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
-   Route::post('/broadcast/adPost', 'BroadcastController@adPost')->name('broadcast.adPost');
+   Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
    Route::apiResource('notifications', 'NotificationController');
 });
