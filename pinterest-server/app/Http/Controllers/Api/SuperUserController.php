@@ -105,7 +105,7 @@ class SuperUserController extends BaseController
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
 
-        if ($request['roles'][0] !== null) {
+        if ($request['roles']) {
             foreach ($request['roles'] as $role) {
                 $query = $query->role($role);
             }
@@ -142,7 +142,7 @@ class SuperUserController extends BaseController
         return response()->json('success');
     }
 
-    public function getAllRoles(Request $request)
+    public function getAllRoles()
     {
         $roles = Role::where('guard_name', 'super_users')->pluck('name');
         return response()->json($roles);
