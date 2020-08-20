@@ -49,10 +49,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::get('/posts/latest', 'PostController@getLatest');
     Route::get('/posts/info', 'PostController@getPostInfo');
-    Route::post('/post/recovery', 'PostController@recover');
+    Route::post('/post/recovery', 'PostController@recover')->middleware('BO_can:recover_post');
     Route::get('/posts/admin', 'PostController@adminAll');
     Route::delete('/image', 'PostController@deleteImage');
-    Route::delete('/post', 'PostController@delete');
+    Route::delete('/post', 'PostController@delete')->middleware('BO_can:delete_post');
     Route::post('/post/modification', 'PostController@update')->middleware(['bucket']);
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::apiResource('posts', 'PostController');
@@ -60,11 +60,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('users/intro', 'UserController@setIntro');
     Route::get('users/intro', 'UserController@getIntro');
     Route::get('users/info', 'UserController@getUserInfo');
-    Route::delete('/user/admin', 'UserController@adminDelete');
-    Route::post('/user/admin', 'UserController@adminRecover');
+    Route::delete('/user/admin', 'UserController@adminDelete')->middleware('BO_can:delete_user');
+    Route::post('/user/admin', 'UserController@adminRecover')->middleware('BO_can:recover_user');
     Route::get('/users/admin', 'UserController@adminAll');
-    Route::post('/user/bucket', 'UserController@bucket');
-    Route::delete('/user/bucket', 'UserController@unBucket');
+    Route::post('/user/bucket', 'UserController@bucket')->middleware('BO_can:bucket');
+    Route::delete('/user/bucket', 'UserController@unBucket')->middleware('BO_can:unbucket');
     Route::post('/upload', 'PostController@uploadImage')->name('post.image_upload');
     Route::post('/user/register', 'UserController@register')->name('user.register');
     Route::post('/user/logIn', 'UserController@logIn')->name('user.logIn');
@@ -77,10 +77,10 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('users', 'UserController');
 
-    Route::delete('/superUser/admin', 'SuperUserController@adminDelete');
-    Route::post('/superUser/admin', 'SuperUserController@adminRecover');
-    Route::get('/superUser/admin', 'SuperUserController@adminAll');
-    Route::post('/superUser/register', 'SuperUserController@register')->name('superUser.register');
+    Route::delete('/superUser/admin', 'SuperUserController@adminDelete')->middleware('BO_can:delete_BO_user');
+    Route::post('/superUser/admin', 'SuperUserController@adminRecover')->middleware('BO_can:recover_BO_user');
+    Route::get('/superUser/admin', 'SuperUserController@adminAll')->middleware('BO_can:view_BO_user');
+    Route::post('/superUser/register', 'SuperUserController@register')->name('superUser.register')->middleware('BO_can:register_BO_user');
     Route::post('/superUser/logIn', 'SuperUserController@logIn')->name('superUser.logIn');
     Route::post('/superUser/authentication', 'SuperUserController@authentication')->name('superUser.authentication');
     Route::post('/superUser/userExist', 'SuperUserController@userExist')->name('superUser.userExist');
@@ -91,7 +91,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
-    Route::apiResource('/broadcast', 'BroadcastController');
-    Route::apiResource('notifications', 'NotificationController');
-    Route::resource('chatroom', 'ChatroomController');
+   Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
+   Route::apiResource('notifications', 'NotificationController');
+   Route::resource('chatroom', 'ChatroomController');
 });

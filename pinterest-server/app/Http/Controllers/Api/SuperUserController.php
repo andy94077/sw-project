@@ -104,7 +104,7 @@ class SuperUserController extends BaseController
             $query = $query->where('email', 'like', "%{$request['email']}%");
         }
 
-        foreach (array('deleted_at', 'created_at', 'updated_at') as $col){
+        foreach (array('deleted_at', 'created_at', 'updated_at') as $col) {
             if ($request[$col][0] !== null && $request[$col][1] !== null) {
                 $query = $query->whereBetween($col, array(gmdate('Y.m.d H:i:s', strtotime($request[$col][0])), gmdate('Y.m.d H:i:s', strtotime($request[$col][1]))));
             } else if ($request[$col][0] !== null && $request[$col][1] === null) {
@@ -113,7 +113,7 @@ class SuperUserController extends BaseController
                 $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
             }
         }
-        
+
         $size = $query->count();
         $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
@@ -124,13 +124,13 @@ class SuperUserController extends BaseController
     {
         $user = SuperUser::find($request['id']);
         $user->delete();
-        return $this->sendResponse($user, "success");
+        return response()->json('success');
     }
 
     public function adminRecover(Request $request)
     {
         $user = SuperUser::withTrashed()->find($request['id']);
         $user->restore();
-        return $this->sendResponse($user, "success");
+        return response()->json('success');
     }
 }
