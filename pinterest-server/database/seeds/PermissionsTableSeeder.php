@@ -21,6 +21,7 @@ class PermissionsTableSeeder extends Seeder
         $user_manager = Role::create(['guard_name' => 'super_users', 'name' => 'user_manager']);
         $post_manager = Role::create(['guard_name' => 'super_users', 'name' => 'post_manager']);
         $BO_manager = Role::create(['guard_name' => 'super_users', 'name' => 'BO_manager']);
+        $spokesman = Role::create(['guard_name' => 'super_users', 'name' => 'spokesman']);
 
         $bucket = Permission::create(['guard_name' => 'super_users', 'name' => 'bucket']);
         $unbucket = Permission::create(['guard_name' => 'super_users', 'name' => 'unbucket']);
@@ -35,9 +36,12 @@ class PermissionsTableSeeder extends Seeder
         $view_BO_user = Permission::create(['guard_name' => 'super_users', 'name' => 'view_BO_user']);
         $register_BO_user = Permission::create(['guard_name' => 'super_users', 'name' => 'register_BO_user']);
 
+        $make_announcement = Permission::create(['guard_name' => 'super_users', 'name' => 'make_announcement']);
+
         $blocker->syncPermissions([$bucket, $unbucket]);
         $user_manager->syncPermissions([$bucket, $unbucket, $delete_user, $recover_user]);
         $post_manager->syncPermissions([$delete_post, $recover_post]);
         $BO_manager->syncPermissions([$delete_BO_user, $recover_BO_user, $view_BO_user, $register_BO_user]);
+        $spokesman->syncPermissions([$make_announcement]);
     }
 }

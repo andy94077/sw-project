@@ -45,5 +45,8 @@ class SuperUsersTableSeeder extends Seeder
 
         $user4 = SuperUser::find(5);
         $user4->assignRole('BO_manager');
+
+        $user5 = SuperUser::find(4);
+        $user5->assignRole('spokesman');
     }
 }
