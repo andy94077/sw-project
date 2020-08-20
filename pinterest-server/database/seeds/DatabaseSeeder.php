@@ -17,8 +17,10 @@ class DatabaseSeeder extends Seeder
             ImagesTableSeeder::class,
             PostTableSeeder::class,
             CommentsTableSeeder::class,
+            PermissionsTableSeeder::class,
             SuperUsersTableSeeder::class,
             LikeTableSeeder::class,
+            FollowTableSeeder::class,
             NotificationsTableSeeder::class,
             ChatroomsTableSeeder::class,
         ]);
