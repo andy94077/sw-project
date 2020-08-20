@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useInfiniteQuery } from "react-query";
 import { makeStyles, Avatar, Button } from "@material-ui/core";
@@ -14,15 +15,18 @@ const useStyles = makeStyles(() => ({
   },
   divLike: {
     display: "block",
-    padding: "0 24px 0 0",
   },
   followerDiv: {
     height: "65px",
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingLeft: "10px",
+    paddingLeft: "25px",
     fontSize: "25px",
+    "&:hover": {
+      backgroundColor: `rgb(240,240,240)`,
+    },
+    outline: "none",
   },
   avatar: {
     width: "45px",
@@ -33,8 +37,8 @@ const useStyles = makeStyles(() => ({
 export default function Followings(props) {
   const { name } = props;
   const classes = useStyles();
-  const [list, setList] = useState([]);
   const loadMoreButtonRef = useRef();
+  const history = useHistory();
   const {
     data,
     isFetching,
@@ -61,31 +65,44 @@ export default function Followings(props) {
     onIntersect: fetchMore,
     enabled: canFetchMore,
   });
-  useEffect(() => {
-    if (isFetching === true) return;
-    setList(
-      data.map((page) =>
-        page.message.map((value) => (
-          <span className={classes.followerDiv} key={value.username}>
-            {/**
-                Avatar use div to display,so there will be some error
-                such like : <div> cannot appear as a descendant of <p>.
-              */}
-            <Avatar
-              alt={`${value.username}'s avatar`}
-              className={classes.avatar}
-              src={CONCAT_SERVER_URL(value.avatar_url)}
-            />
-            <span style={{ display: "block", width: "15px" }} />
-            {value.username}
-          </span>
-        ))
-      )
-    );
-  }, [name, data, isFetching]);
+  const handleSearch = (target) => () => {
+    console.log(target);
+    history.push(`/profile/${target}`);
+  };
+  const handleKeyUp = (e) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
+
   return (
     <span className={classes.list}>
-      {list}
+      {isFetching === true
+        ? null
+        : data.map((page) =>
+            page.message.map((value) => (
+              <span
+                className={classes.followerDiv}
+                key={value.username}
+                role="button"
+                tabIndex="0"
+                onClick={handleSearch(value.username)}
+                onKeyUp={handleKeyUp}
+              >
+                {/**
+              Avatar use div to display,so there will be some error
+              such like : <div> cannot appear as a descendant of <p>.
+            */}
+                <Avatar
+                  alt={`${value.username}'s avatar`}
+                  className={classes.avatar}
+                  src={CONCAT_SERVER_URL(value.avatar_url)}
+                />
+                <span style={{ display: "block", width: "15px" }} />
+                {value.username}
+              </span>
+            ))
+          )}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}
