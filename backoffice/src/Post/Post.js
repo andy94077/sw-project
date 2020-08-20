@@ -63,7 +63,6 @@ export default function Post() {
   }, []);
 
   useEffect(() => {
-    if (apiToken === null) return;
     setMotion(false);
     setLoading(true);
 
@@ -71,9 +70,6 @@ export default function Post() {
       .request({
         method: "GET",
         url: CONCAT_SERVER_URL("/api/v1/posts/admin"),
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-        },
         params: {
           ...filter,
           ...Object.fromEntries(
@@ -105,14 +101,11 @@ export default function Post() {
         );
         setTotal(res.data["total"]);
       })
-      .catch((err) => {
-        message.destroy();
-        if (err.response && err.response.status === 403)
-          message.error("Permission denied.");
-        else message.error("Loading failed! Please try again later.");
+      .catch(() => {
+        message.error("Loading failed! Please try again later.");
       })
       .finally(() => setLoading(false));
-  }, [motion, filter, apiToken]);
+  }, [motion, filter]);
 
   const handleDeletePost = (event) => {
     const id = event.currentTarget.value;
