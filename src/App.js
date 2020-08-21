@@ -39,20 +39,19 @@ export default function App() {
   // Broadcast
   useEffect(() => {
     window.io = io;
-    if (user.apiToken !== null) {
-      window.Echo = new Echo({
-        broadcaster: "socket.io",
-        host: REDIS_URL, // this is the laravel-echo-server host
-        auth: {
-          headers: {
-            Authorization: `Bearer ${user.apiToken}`,
-          },
+    if (user.apiToken === null) return;
+    window.Echo = new Echo({
+      broadcaster: "socket.io",
+      host: REDIS_URL, // this is the laravel-echo-server host
+      auth: {
+        headers: {
+          Authorization: `Bearer ${user.apiToken}`,
         },
-        socketio: { pingTimeout: 30000 },
-      });
-      window.Echo.join("Online");
-      window.Echo.channel("Notifications");
-    }
+      },
+      socketio: { pingTimeout: 30000 },
+    });
+    window.Echo.join("Online");
+    window.Echo.channel("Notifications");
   }, [user.apiToken]);
 
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function App() {
         })
       );
     }
-  }, [location, history, stableDispatch]);
+  }, [getCookie()]);
 
   useEffect(() => {
     const timer = setInterval(() => {

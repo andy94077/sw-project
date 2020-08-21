@@ -9,11 +9,11 @@ import App from "./App";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router basename={BACKOFFICE_URL}>
-      <Provider store={store}>
+    <Provider store={store}>
+      <Router basename={BACKOFFICE_URL}>
         <App />
-      </Provider>
-    </Router>
+      </Router>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );

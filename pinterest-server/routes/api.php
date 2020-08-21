@@ -77,7 +77,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::middleware('auth:api')->put('/user/password/reset', 'UserController@reset');
     Route::apiResource('users', 'UserController');
 
-    Route::get('/superUser/roles', 'SuperUserController@getAllRoles')->middleware('BO_can:view_BO_user');
+    Route::get('/superUser/allRoles', 'SuperUserController@getAllRoles')->middleware('BO_can:view_BO_user');
     Route::post('/superUser/logIn', 'SuperUserController@logIn')->name('superUser.logIn');
     Route::post('/superUser/authentication', 'SuperUserController@authentication')->name('superUser.authentication');
     Route::post('/superUser/userExist', 'SuperUserController@userExist')->name('superUser.userExist');

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\SuperUser;
 use App\Models\Image;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class SuperUserController extends BaseController
 {
@@ -72,6 +73,10 @@ class SuperUserController extends BaseController
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
+                'roles' => $userInfo->getRoleNames(),
+                'permissions' => ($userInfo->hasRole('admin') ? 
+                    Permission::where('guard_name', 'super_users')->pluck('name') : 
+                    $userInfo->getAllPermissions()->pluck('name')),
                 'api_token' => $userInfo->api_token,
                 'isValid' => true
             ], 200);
@@ -130,6 +135,8 @@ class SuperUserController extends BaseController
     public function destroy($id)
     {
         $user = SuperUser::find($id);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->delete();
         return response()->json('success');
     }
@@ -138,6 +145,8 @@ class SuperUserController extends BaseController
     public function update($id)
     {
         $user = SuperUser::withTrashed()->find($id);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->restore();
         return response()->json('success');
     }

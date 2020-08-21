@@ -67,7 +67,7 @@ export default function List(props) {
   useEffect(() => {
     if (apiToken === null) return;
     axios
-      .get(CONCAT_SERVER_URL("/api/v1/superUser/roles"), {
+      .get(CONCAT_SERVER_URL("/api/v1/superUser/allRoles"), {
         headers: {
           Authorization: `Bearer ${apiToken}`,
         },
