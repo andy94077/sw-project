@@ -116,6 +116,7 @@ export default function FollowButton(props) {
 
   function handleClick() {
     const handleType = checkHandleType(followInfo);
+    console.log(handleType);
     if (handleType === "DeleteById") {
       deleteFollow();
     } else if (handleType === "UpdateById") {
@@ -132,7 +133,7 @@ export default function FollowButton(props) {
   return (
     <Button
       className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text}`}
-      variant="contained"
+      variant={followInfo.isFollow ? "outlined" : "contained"}
       color="secondary"
       component="span"
       onClick={handleClick}

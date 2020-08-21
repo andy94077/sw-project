@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->timestampTz('bucket_time')->nullable()->default(null);
             $table->rememberToken();
             $table->string('api_token')->nullable()->default(null);
-            $table->string('intro')->nullable()->default("<h>hi</hi>");
+            $table->string('intro')->nullable();
             $table->unsignedBigInteger('followers')->default(0);
             $table->unsignedBigInteger('followings')->default(0);
             $table->softDeletes();

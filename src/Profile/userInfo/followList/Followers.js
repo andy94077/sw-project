@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useInfiniteQuery } from "react-query";
@@ -39,6 +39,7 @@ export default function Followers(props) {
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
   const history = useHistory();
+  const [list, setList] = useState([]);
   const {
     data,
     isFetching,
@@ -75,34 +76,35 @@ export default function Followers(props) {
     }
   };
 
+  useEffect(() => {
+    if (isFetching === true) return;
+    setList(
+      data.map((page) =>
+        page.message.map((value) => (
+          <span
+            className={classes.followerDiv}
+            key={value.username}
+            role="button"
+            tabIndex="0"
+            onClick={handleSearch(value.username)}
+            onKeyUp={handleKeyUp}
+          >
+            <Avatar
+              alt={`${value.username}'s avatar`}
+              className={classes.avatar}
+              src={CONCAT_SERVER_URL(value.avatar_url)}
+            />
+            <span style={{ display: "block", width: "15px" }} />
+            {value.username}
+          </span>
+        ))
+      )
+    );
+  }, [data, isFetching]);
+
   return (
     <span className={classes.list}>
-      {isFetching === true
-        ? null
-        : data.map((page) =>
-            page.message.map((value) => (
-              <span
-                className={classes.followerDiv}
-                key={value.username}
-                role="button"
-                tabIndex="0"
-                onClick={handleSearch(value.username)}
-                onKeyUp={handleKeyUp}
-              >
-                {/**
-              Avatar use div to display,so there will be some error
-              such like : <div> cannot appear as a descendant of <p>.
-            */}
-                <Avatar
-                  alt={`${value.username}'s avatar`}
-                  className={classes.avatar}
-                  src={CONCAT_SERVER_URL(value.avatar_url)}
-                />
-                <span style={{ display: "block", width: "15px" }} />
-                {value.username}
-              </span>
-            ))
-          )}
+      {list}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}
