@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+
 import "./SignUpForm.css";
 import { Modal, Form, Input } from "antd";
 import { CONCAT_SERVER_URL } from "../../utils";
+import { selectUser } from "../../redux/userSlice";
 
 export default function SignUpForm(props) {
   const { visible, onCancel, setRefresh } = props;
+  const { apiToken } = useSelector(selectUser);
 
   const initialFormInfo = {
     username: { validateStatus: null, errMsg: "" },
@@ -53,11 +57,19 @@ export default function SignUpForm(props) {
 
   const onSubmit = (values) => {
     axios
-      .post(CONCAT_SERVER_URL("/api/v1/superUser/register"), {
-        name: values.username,
-        email: values.email,
-        password: values.password,
-      })
+      .post(
+        CONCAT_SERVER_URL("/api/v1/superUser"),
+        {
+          name: values.username,
+          email: values.email,
+          password: values.password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
+        }
+      )
       .then((res) => {
         if (res.data.isSignUp === true) {
           setState({

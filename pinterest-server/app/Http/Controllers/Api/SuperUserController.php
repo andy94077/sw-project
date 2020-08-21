@@ -11,6 +11,8 @@ use App\Http\Controllers\Auth\SuperRegisterController;
 use Illuminate\Support\Facades\Validator;
 use App\Models\SuperUser;
 use App\Models\Image;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class SuperUserController extends BaseController
 {
@@ -28,7 +30,7 @@ class SuperUserController extends BaseController
         }
     }
 
-    public function register(Request $request)
+    public function store(Request $request)
     {
         $isValid = SuperRegisterController::validator($request);
         $errorMes = $isValid->messages();
@@ -71,6 +73,10 @@ class SuperUserController extends BaseController
             return response()->json([
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
+                'roles' => $userInfo->getRoleNames(),
+                'permissions' => ($userInfo->hasRole('admin') ? 
+                    Permission::where('guard_name', 'super_users')->pluck('name') : 
+                    $userInfo->getAllPermissions()->pluck('name')),
                 'api_token' => $userInfo->api_token,
                 'isValid' => true
             ], 200);
@@ -91,9 +97,9 @@ class SuperUserController extends BaseController
         }
     }
 
-    public function adminAll(Request $request)
+    public function index(Request $request)
     {
-        $query = SuperUser::withTrashed();
+        $query = SuperUser::withTrashed()->with('roles');
         if ($request['id']) {
             $query = $query->where('id', 'like', "%{$request['id']}%");
         }
@@ -102,6 +108,12 @@ class SuperUserController extends BaseController
         }
         if ($request['email']) {
             $query = $query->where('email', 'like', "%{$request['email']}%");
+        }
+
+        if ($request['roles']) {
+            foreach ($request['roles'] as $role) {
+                $query = $query->role($role);
+            }
         }
 
         foreach (array('deleted_at', 'created_at', 'updated_at') as $col) {
@@ -120,17 +132,28 @@ class SuperUserController extends BaseController
         return response()->json($users, 200);
     }
 
-    public function adminDelete(Request $request)
+    public function destroy($id)
     {
-        $user = SuperUser::find($request['id']);
+        $user = SuperUser::find($id);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->delete();
         return response()->json('success');
     }
 
-    public function adminRecover(Request $request)
+    // recover user
+    public function update($id)
     {
-        $user = SuperUser::withTrashed()->find($request['id']);
+        $user = SuperUser::withTrashed()->find($id);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->restore();
         return response()->json('success');
+    }
+
+    public function getAllRoles()
+    {
+        $roles = Role::where('guard_name', 'super_users')->pluck('name');
+        return response()->json($roles);
     }
 }

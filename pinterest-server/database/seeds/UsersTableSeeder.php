@@ -22,6 +22,7 @@ class UsersTableSeeder extends Seeder
                 'avatar_url' => "/img/avatar.jpeg",
                 'created_at' => date("Y-m-d H:i:s"),
                 'api_token' => hash('sha256', 'admin'),
+                'intro' => '<p>hi</p>',
             ]
         );
         for ($i = 1; $i <= 100; $i++) {
@@ -33,6 +34,9 @@ class UsersTableSeeder extends Seeder
                     'avatar_url' => "/img/avatar.jpeg",
                     'created_at' => date("Y-m-d H:i:s"),
                     'api_token' => hash('sha256', Str::random(80)),
+                    'intro' => "<p>Hi I am user${i}</p>",
+                    'followers' => max(40 - $i, 0), // cooperate with FollowTableSeeder
+                    'followings' => $i < 40 ? $i - 1 : 0,
                 ]
             );
         }

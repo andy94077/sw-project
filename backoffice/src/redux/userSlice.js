@@ -5,12 +5,16 @@ export const userSlice = createSlice({
   initialState: {
     username: null,
     userId: null,
+    roles: [],
+    permissions: [],
     apiToken: null,
   },
   reducers: {
     setUser: (state, action) => {
       state.username = action.payload.username;
       state.userId = action.payload.userId;
+      state.roles = action.payload.roles;
+      state.permissions = action.payload.permissions;
       state.apiToken = action.payload.apiToken;
     },
   },
