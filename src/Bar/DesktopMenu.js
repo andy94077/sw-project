@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
+import { makeStyles } from "@material-ui/core/styles";
 import {
   Badge,
   ClickAwayListener,
@@ -13,7 +13,6 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import { CONCAT_SERVER_URL } from "../utils";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
-import AnnouncementGrid from "./AnnouncementGrid";
 
 import { selectUser } from "../redux/userSlice";
 import { setCookie } from "../cookieHelper";
@@ -37,29 +36,16 @@ const useStyles = makeStyles((theme) => ({
 export default function DesktopMenu(props) {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const {
-    adMessage,
-    contentTime,
-    contentText,
-    contentType,
-    handleSetContent,
-    isAdOpen,
-    setIsAdOpen,
-    notesCount,
-    setContentType,
-    setNotesCount,
-  } = props;
+  const { notesCount, setNotesCount } = props;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [contentAnchorEl, setContentAnchorEl] = useState(null);
+  const [contentType, setContentType] = useState("");
+
   const isContentOpen = Boolean(contentAnchorEl);
 
   // Toggle function
-  const handleAdClose = () => {
-    setIsAdOpen(false);
-  };
-
   const handleContentClickAway = () => {
     setContentType("");
     setContentAnchorEl(null);
@@ -82,7 +68,7 @@ export default function DesktopMenu(props) {
         // Switch from another:
         handleContentClose(text === "chat" ? "notes" : "chat");
       }
-      handleSetContent(text);
+      setContentType(text);
       setContentAnchorEl(event.currentTarget);
     }
   };
@@ -149,14 +135,8 @@ export default function DesktopMenu(props) {
             keepMounted
             open={isContentOpen}
           >
-            <Content text={contentText} type={contentType} time={contentTime} />
+            <Content type={contentType} setNotesCount={setNotesCount} />
           </Popper>
-          {/* New notification */}
-          <AnnouncementGrid
-            isAdOpen={isAdOpen}
-            handleAdClose={handleAdClose}
-            adMessage={adMessage}
-          />
         </div>
       </ClickAwayListener>
       <IconButton

@@ -12,8 +12,8 @@ import { selectUser, setAvatar } from "../redux/userSlice";
 import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
 import "./css/Profile.css";
-import FollowButton from "./upload&follow/FollowButton";
-import UploadButton from "./upload&follow/UploadButton";
+import FollowButton from "./upload_follow/FollowButton";
+import UploadButton from "./upload_follow/UploadButton";
 import ProfileAvatar from "./userInfo/ProfileAvatar";
 import ProfileInformation from "./userInfo/ProfileInformation";
 

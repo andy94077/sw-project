@@ -9,17 +9,32 @@ use App\Models\Notification;
 
 class NotificationController extends BaseController
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $notes = Notification::where('group', 'public')
                ->orWhere('user_id', $request['user_id'])
-               ->orderBy('id', 'desc')->take(10)->get();
-        return response()->json($notes);
+               ->orderBy('id', 'desc')
+               ->skip($request['start'])
+               ->take(intval($request['number']))->get();
+        
+        if (count($notes) > 0) {
+            return response()->json([
+                "message" => $notes,
+                "start" => intval($request["start"]) + intval($request['number']),
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => $notes,
+                "start" => false,
+            ], 200);
+        }
     }
     
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $note = new Notification();
         $note->group = $request['group'];
-        if($request['group'] === "personal"){
+        if ($request['group'] === "personal") {
             $notes->user_id = $request['user_id'];
         }
         $note->header = $request['header'];

@@ -50,7 +50,9 @@ export default function App() {
       },
       socketio: { pingTimeout: 30000 },
     });
+    
     window.Echo.join("Online");
+    window.Echo.channel("Announcements");
     window.Echo.channel("Notifications");
   }, [user.apiToken]);
 

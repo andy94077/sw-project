@@ -8,19 +8,22 @@ import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import CustomModal from "../../components/CustomModal";
 import "../css/FollowInformation.css";
+import Followers from "./followList/Followers";
+import Followings from "./followList/Followings";
+import "./FollowInformation.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.paper,
-    height: "500px",
+    height: "460px",
   },
-  followInformationCustomModal: {},
   jumpFrame: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
     margin: "auto",
+    minHeight: "600px",
     maxHeight: "600px",
     overflow: "hidden",
     width: "84%",
@@ -75,7 +78,7 @@ function TabPanel(props) {
 }
 
 export default function FollowInformation(props) {
-  const { follow } = props;
+  const { name, follow } = props;
   const classes = useStyles();
   const [show, setShow] = useState(false);
   const theme = useTheme();
@@ -110,10 +113,10 @@ export default function FollowInformation(props) {
       <CustomModal
         show={show}
         onHide={handClose}
-        jumpFrame={`${classes.jumpFrame} ${classes.followInformationCustomModal}`}
+        jumpFrame={`${classes.jumpFrame} followInformationCustomModal`}
         backdrop
       >
-        <div className={classes.root}>
+        <div className={`${classes.root} TabPanelCustomPadding`}>
           <AppBar position="static" color="default">
             <Tabs
               value={value}
@@ -138,16 +141,16 @@ export default function FollowInformation(props) {
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0} dir={theme.direction}>
-            Item One
+            <Followers name={name} />
           </TabPanel>
           <TabPanel value={value} index={1} dir={theme.direction}>
-            Item Two
+            <Followings name={name} />
           </TabPanel>
         </div>
         <Button
           variant="contained"
           component="span"
-          className={classes.closeButton}
+          classes={{ root: classes.closeButton }}
           onClick={handClose}
         >
           Close

@@ -98,17 +98,30 @@ class FollowController extends BaseController
     }
 
     public function getFollowing(Request $request){
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
-        return response()->json($followings);
+        $user = User::where('name', $request['name'])->first();
+        $user_id = $user->id;
+        $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url');
+        $followings = $slex->skip(($request['nextId']) * 10)->take(10)->get();
+        if(count($followings) > 0){
+            return response()->json(["message" => $followings, 'nextId' => $request['nextId']+1], 200);
+        } else {
+            return response()->json(["message" => $followings, 'nextId' => false], 200);
+        }
     }
 
     public function getFollower(Request $request){
-        $followings = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $request['user_id'])->select('users.name as username', 'users.avatar_url as avatar_url')->get();
-        return response()->json($followings);
+        $user = User::where('name', $request['name'])->first();
+        $user_id = $user->id;
+        $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $user_id)->select('users.name as username', 'users.avatar_url as avatar_url');
+        $followings = $slex->skip(($request['nextId']) * 10)->take(10)->get();
+        if(count($followings) > 0){
+            return response()->json(["message" => $followings, 'nextId' => $request['nextId']+1], 200);
+        } else {
+            return response()->json(["message" => $followings, 'nextId' => false], 200);
+        }
     }
 
     public function getFollowingAdmin(Request $request){
-        echo "hi";
         $followings = Follow::withTrashed()->LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $request['user_id'])->select('users.*')->get();
         return response()->json($followings);
     }

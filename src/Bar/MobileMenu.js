@@ -10,7 +10,6 @@ import { CONCAT_SERVER_URL } from "../utils";
 
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
-import AnnouncementGrid from "./AnnouncementGrid";
 
 import { selectUser } from "../redux/userSlice";
 import { setCookie } from "../cookieHelper";
@@ -31,29 +30,16 @@ const useStyles = makeStyles((theme) => ({
 export default function MobileMenu(props) {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const {
-    adMessage,
-    contentTime,
-    contentText,
-    handleSetContent,
-    isAdOpen,
-    mobileContentType,
-    notesCount,
-    setIsAdOpen,
-    setMobileContentType,
-    setNotesCount,
-  } = props;
+  const { notesCount, setNotesCount } = props;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [mobileContentType, setMobileContentType] = useState("");
+
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   // Toggle functions
-  const handleAdClose = () => {
-    setIsAdOpen(false);
-  };
-
   const handleMobileContentClose = (text) => {
     if (text === "notes") {
       setNotesCount(0);
@@ -67,7 +53,7 @@ export default function MobileMenu(props) {
     if (text === mobileContentType) {
       handleMobileContentClose(text);
     } else {
-      handleSetContent(text);
+      setMobileContentType(text);
     }
   };
 
@@ -153,11 +139,7 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "chat" && (
           <MenuItem>
-            <Content
-              text={contentText}
-              type={mobileContentType}
-              time={contentTime}
-            />
+            <Content type={mobileContentType} setNotesCount={setNotesCount} />
           </MenuItem>
         )}
         <MenuItem onClick={handleMobileContentOpen("notes")}>
@@ -174,11 +156,7 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "notes" && (
           <MenuItem>
-            <Content
-              text={contentText}
-              type={mobileContentType}
-              time={contentTime}
-            />
+            <Content type={mobileContentType} setNotesCount={setNotesCount} />
           </MenuItem>
         )}
         <MenuItem onClick={toggleDrawer(true)}>
@@ -194,12 +172,6 @@ export default function MobileMenu(props) {
         {/* Drawer */}
         <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
       </Menu>
-      {/* New notification */}
-      <AnnouncementGrid
-        isAdOpen={isAdOpen}
-        handleAdClose={handleAdClose}
-        adMessage={adMessage}
-      />
     </div>
   );
 }
