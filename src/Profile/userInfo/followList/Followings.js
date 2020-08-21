@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useInfiniteQuery } from "react-query";
 import { makeStyles, Avatar, Button } from "@material-ui/core";
+import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
 
@@ -39,7 +41,7 @@ export default function Followings(props) {
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
   const history = useHistory();
-  const [list, setList] = useState();
+  const { userId } = useSelector(selectUser);
   const {
     data,
     isFetching,
@@ -51,7 +53,7 @@ export default function Followings(props) {
     (key, nextId = 0) => {
       return axios
         .get(CONCAT_SERVER_URL("/api/v1/follows/followings"), {
-          params: { name, nextId },
+          params: { name, nextId, viewer_id: userId },
         })
         .then((response) => {
           return response.data;
@@ -77,38 +79,61 @@ export default function Followings(props) {
 
   useEffect(() => {
     if (isFetching === false) {
-      setList(
-        data.map((page) =>
-          page.message.map((value) => (
-            <span
-              className={classes.followerDiv}
-              key={value.username}
-              role="button"
-              tabIndex="0"
-              onClick={handleSearch(value.username)}
-              onKeyUp={handleKeyUp}
-            >
-              {/**
-                Avatar use div to display,so there will be some error
-                such like : <div> cannot appear as a descendant of <p>.
-              */}
-              <Avatar
-                alt={`${value.username}'s avatar`}
-                className={classes.avatar}
-                src={CONCAT_SERVER_URL(value.avatar_url)}
-              />
-              <span style={{ display: "block", width: "15px" }} />
-              {value.username}
-            </span>
-          ))
-        )
-      );
+      // data.map((page) =>
+      //   page.message.map((value) => (
+      //     <span
+      //       className={classes.followerDiv}
+      //       key={value.username}
+      //       role="button"
+      //       tabIndex="0"
+      //       onClick={handleSearch(value.username)}
+      //       onKeyUp={handleKeyUp}
+      //     >
+      //       {/**
+      //         Avatar use div to display,so there will be some error
+      //         such like : <div> cannot appear as a descendant of <p>.
+      //       */}
+      //       <Avatar
+      //         alt={`${value.username}'s avatar`}
+      //         className={classes.avatar}
+      //         src={CONCAT_SERVER_URL(value.avatar_url)}
+      //       />
+      //       <span style={{ display: "block", width: "15px" }} />
+      //       {value.username}
+      //     </span>
+      //   ))
+      // )
     }
   }, [data, isFetching]);
 
   return (
     <span className={classes.list}>
-      {list}
+      {isFetching
+        ? null
+        : data.map((page) =>
+            page.message.map((value) => (
+              <span
+                className={classes.followerDiv}
+                key={value.username}
+                role="button"
+                tabIndex="0"
+                onClick={handleSearch(value.username)}
+                onKeyUp={handleKeyUp}
+              >
+                {/**
+                Avatar use div to display,so there will be some error
+                such like : <div> cannot appear as a descendant of <p>.
+              */}
+                <Avatar
+                  alt={`${value.username}'s avatar`}
+                  className={classes.avatar}
+                  src={CONCAT_SERVER_URL(value.avatar_url)}
+                />
+                <span style={{ display: "block", width: "15px" }} />
+                {value.username}
+              </span>
+            ))
+          )}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}
