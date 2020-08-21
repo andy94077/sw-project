@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import {
@@ -10,6 +10,8 @@ import {
   Tooltip,
   message,
   DatePicker,
+  Select,
+  Tag,
 } from "antd";
 import {
   ExclamationCircleOutlined,
@@ -19,21 +21,25 @@ import {
 } from "@ant-design/icons";
 
 import { CONCAT_SERVER_URL } from "../../utils";
-import styles from "./List.less";
+import "./List.css";
 import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
 
 export default function List(props) {
   const { refresh, setRefresh } = props;
   const { apiToken } = useSelector(selectUser);
-  const initialSearchText = {
-    id: "",
-    name: "",
-    email: "",
-    created_at: ["", ""],
-    deleted_at: ["", ""],
-    updated_at: ["", ""],
-  };
+  const initialSearchText = useMemo(
+    () => ({
+      id: "",
+      name: "",
+      email: "",
+      roles: [],
+      created_at: ["", ""],
+      deleted_at: ["", ""],
+      updated_at: ["", ""],
+    }),
+    []
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState(initialSearchText);
   const [filter, setFilter] = useState({
@@ -42,10 +48,32 @@ export default function List(props) {
     size: 10,
   });
 
+  const handleSearchTextChange = (key) => (event) =>
+    setSearchText({ ...searchText, [key]: event.target.value });
+
+  const handleSearchArrayChange = useCallback(
+    (key) => (value) =>
+      setSearchText((prevSearchText) => ({ ...prevSearchText, [key]: value })),
+    []
+  );
+
   const [data, setData] = useState({
     info: [],
     length: 0,
   });
+
+  const [allRoles, setAllRoles] = useState([]);
+
+  useEffect(() => {
+    if (apiToken === null) return;
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/superUser/allRoles"), {
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
+      })
+      .then((res) => setAllRoles(res.data));
+  }, [apiToken]);
 
   const tableColumns = useMemo(
     () => [
@@ -68,6 +96,46 @@ export default function List(props) {
         dataIndex: "email",
         key: "email",
         sorter: (a, b) => a.email.localeCompare(b.email),
+      },
+      {
+        title: "Roles",
+        dataIndex: "roles",
+        key: "roles",
+        sorter: (a, b) =>
+          a.roles
+            .map((role) => role.name)
+            .join(", ")
+            .localeCompare(b.roles.map((role) => role.name).join(", ")),
+        render: (roles) => roles.map((role) => role.name).join(", "),
+        renderSearch: (
+          <Select
+            className="BOUser-select"
+            mode="multiple"
+            placeholder="Roles..."
+            allowClear
+            onChange={handleSearchArrayChange("roles")}
+            tagRender={({ label, closable, onClose }) => (
+              <Tag
+                closable={closable}
+                onClose={onClose}
+                style={{ borderRadius: 5 }}
+              >
+                {label}
+              </Tag>
+            )}
+            style={{
+              width: 250,
+              margin: 8,
+            }}
+            dropdownStyle={{
+              borderRadius: "15px",
+            }}
+          >
+            {allRoles.map((role) => (
+              <Select.Option key={role}>{role}</Select.Option>
+            ))}
+          </Select>
+        ),
       },
       {
         title: "Create Time",
@@ -94,7 +162,7 @@ export default function List(props) {
         timeZone: "Asia/Taipei",
       },
     ],
-    []
+    [allRoles, handleSearchArrayChange]
   );
 
   const handleDeleteUser = (event) => {
@@ -107,11 +175,10 @@ export default function List(props) {
         modal.update({ cancelButtonProps: { disabled: true } });
         setIsLoading(true);
         axios
-          .delete(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+          .delete(CONCAT_SERVER_URL(`/api/v1/superUser/${id}`), {
             headers: {
               Authorization: `Bearer ${apiToken}`,
             },
-            data: { id },
           })
           .then(() => {
             message.success(`Deleted successfully. (User id = ${id})`);
@@ -138,9 +205,9 @@ export default function List(props) {
         modal.update({ cancelButtonProps: { disabled: true } });
         setIsLoading(true);
         axios
-          .post(
-            CONCAT_SERVER_URL("/api/v1/superUser/admin"),
-            { id },
+          .put(
+            CONCAT_SERVER_URL(`/api/v1/superUser/${id}`),
+            {},
             {
               headers: {
                 Authorization: `Bearer ${apiToken}`,
@@ -217,7 +284,7 @@ export default function List(props) {
     if (apiToken === null) return;
     setIsLoading(true);
     axios
-      .get(CONCAT_SERVER_URL("/api/v1/superUser/admin"), {
+      .get(CONCAT_SERVER_URL("/api/v1/superUser"), {
         headers: {
           Authorization: `Bearer ${apiToken}`,
         },
@@ -225,15 +292,26 @@ export default function List(props) {
           ...filter,
           ...Object.fromEntries(
             tableColumns
-              .filter((col) => col.hasOwnProperty("timeFormat"))
-              .map((col) => [
-                col.dataIndex,
-                filter[col.dataIndex] === null
-                  ? ["", ""]
-                  : filter[col.dataIndex].map((item) =>
-                      item === "" || item === null ? "" : item.format()
-                    ),
-              ])
+              .filter(
+                (col) => initialSearchText[col.dataIndex] instanceof Array
+              )
+              .map((col) => {
+                if (col.hasOwnProperty("timeFormat"))
+                  return [
+                    col.dataIndex,
+                    filter[col.dataIndex] === null
+                      ? initialSearchText[col.dataIndex]
+                      : filter[col.dataIndex].map((item) =>
+                          item === "" || item === null ? "" : item.format()
+                        ),
+                  ];
+                return [
+                  col.dataIndex,
+                  filter[col.dataIndex] === null
+                    ? initialSearchText[col.dataIndex]
+                    : filter[col.dataIndex],
+                ];
+              })
           ),
         },
       })
@@ -268,47 +346,44 @@ export default function List(props) {
         else message.error("There are some problems during loading.");
       })
       .finally(() => setIsLoading(false));
-  }, [refresh, filter, tableColumns, apiToken]);
+  }, [refresh, filter, tableColumns, apiToken, initialSearchText]);
 
   const handleSearch = () => {
-    setFilter({
+    setFilter((prevFilter) => ({
       ...searchText,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
   const handleReset = () => {
-    setSearchText({ ...initialSearchText });
-    setFilter({
+    setSearchText(initialSearchText);
+    setFilter((prevFilter) => ({
       ...initialSearchText,
       page: 1,
-      size: 10,
-    });
+      size: prevFilter.size,
+    }));
   };
 
-  const handleSearchTextChange = (key) => (event) =>
-    setSearchText({ ...searchText, [key]: event.target.value });
-
-  const handleSearchDateChange = (key) => (value) =>
-    setSearchText({ ...searchText, [key]: value });
-
-  const searchFields = tableColumns.map((col) =>
-    col.hasOwnProperty("timeFormat") ? (
-      <DatePicker.RangePicker
-        key={col.dataIndex}
-        placeholder={["Search", col.title]}
-        allowEmpty={[true, true]}
-        value={searchText[col.dataIndex]}
-        onChange={handleSearchDateChange(col.dataIndex)}
-        showTime
-        style={{
-          width: 250,
-          margin: 8,
-          borderRadius: "15px",
-        }}
-      />
-    ) : (
+  const searchFields = tableColumns.map((col) => {
+    if (col.hasOwnProperty("renderSearch")) return col.renderSearch;
+    if (col.hasOwnProperty("timeFormat"))
+      return (
+        <DatePicker.RangePicker
+          key={col.dataIndex}
+          placeholder={["Search", col.title]}
+          allowEmpty={[true, true]}
+          value={searchText[col.dataIndex]}
+          onChange={handleSearchArrayChange(col.dataIndex)}
+          showTime
+          style={{
+            width: 250,
+            margin: 8,
+            borderRadius: "15px",
+          }}
+        />
+      );
+    return (
       <Input
         key={col.dataIndex}
         placeholder={`Search ${col.title}`}
@@ -322,11 +397,11 @@ export default function List(props) {
           borderRadius: "15px",
         }}
       />
-    )
-  );
+    );
+  });
 
   return (
-    <div>
+    <>
       <div style={{ padding: 8 }}>
         {searchFields}
         <Space style={{ margin: "8px" }}>
@@ -356,6 +431,7 @@ export default function List(props) {
       <Table
         dataSource={data.info}
         pagination={{
+          current: filter.page,
           defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
@@ -370,13 +446,12 @@ export default function List(props) {
             }
           },
         }}
-        className={styles.table}
         bordered
         scroll={{ x: 1200 }}
         columns={columns}
         loading={isLoading}
         rowKey={(record) => record.id}
       />
-    </div>
+    </>
   );
 }

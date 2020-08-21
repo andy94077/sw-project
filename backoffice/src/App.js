@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Switch, Route, useLocation, useHistory } from "react-router-dom";
 
 import Post from "./Post/Post";
@@ -11,11 +11,11 @@ import Dashboard from "./Dashboard/Dashboard";
 import Announcement from "./Announcement/Announcement";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
-import Bar from "./Bar/Bar";
+import Container from "./Container/Container";
 
 import { getCookie, deleteCookie } from "./cookieHelper";
 import { CONCAT_SERVER_URL } from "./utils";
-import { setUser, selectUser } from "./redux/userSlice";
+import { setUser } from "./redux/userSlice";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
@@ -23,12 +23,10 @@ export default function App() {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
-  const user = useSelector(selectUser);
 
   useEffect(() => {
     const accessToken = getCookie();
     setError({ message: "", url: "" });
-    dispatch(setUser({ username: null, userId: null, apiToken: null }));
     if (location.pathname !== "/" || accessToken !== null) {
       setIsReady(false);
       axios
@@ -41,6 +39,8 @@ export default function App() {
               setUser({
                 username: res.data.username,
                 userId: res.data.user_id,
+                roles: res.data.roles,
+                permissions: res.data.permissions,
                 apiToken: res.data.api_token,
               })
             );
@@ -57,8 +57,19 @@ export default function App() {
           });
         })
         .finally(() => setIsReady(true));
+    } else {
+      dispatch(
+        setUser({
+          username: null,
+          userId: null,
+          roles: [],
+          permissions: [],
+          apiToken: null,
+        })
+      );
     }
-  }, [location, history, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getCookie()]);
 
   if (isReady) {
     if (error.message !== "") {
@@ -72,8 +83,7 @@ export default function App() {
       );
     }
     return (
-      <Bar
-        username={user.username}
+      <Container
         content={
           <Switch>
             <Route exact path={"/dashboard"} component={Dashboard} />

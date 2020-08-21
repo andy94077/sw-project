@@ -1,6 +1,7 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Layout, Menu } from "antd";
-import "./Bar.css";
+import "./Container.css";
 import {
   PieChartOutlined,
   TeamOutlined,
@@ -9,12 +10,14 @@ import {
 } from "@ant-design/icons";
 import { useLocation, useHistory, Link } from "react-router-dom";
 
+import { selectUser } from "../redux/userSlice";
 import { deleteCookie } from "../cookieHelper";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-export default function Bar(props) {
-  const { username, content } = props;
+export default function Container(props) {
+  const { content } = props;
+  const { username, roles, permissions } = useSelector(selectUser);
   const history = useHistory();
   const location = useLocation();
 
@@ -34,13 +37,14 @@ export default function Bar(props) {
           selectable={false}
           triggerSubMenuAction="click"
         >
+          <Menu.Item className="role">{`Role: ${roles.join(", ")}`}</Menu.Item>
           <Menu.SubMenu icon={<UserOutlined />} title={username}>
             <Menu.Item onClick={logOut}>Log out</Menu.Item>
           </Menu.SubMenu>
         </Menu>
       </Header>
       <Layout className="site-layout">
-        <Sider collapsible>
+        <Sider collapsible className="site-sider">
           <Menu
             theme="dark"
             defaultSelectedKeys={[location.pathname.split("/").slice(-1)[0]]}
@@ -59,12 +63,16 @@ export default function Bar(props) {
             <Menu.Item key="post" icon={<FileTextOutlined />}>
               <Link to="/post">Posts</Link>
             </Menu.Item>
-            <Menu.Item key="BOUser" icon={<TeamOutlined />}>
-              <Link to="/BOUser">BO Users</Link>
-            </Menu.Item>
-            <Menu.Item key="Announcement" icon={<TeamOutlined />}>
-              <Link to="/Announcement">Announcement</Link>
-            </Menu.Item>
+            {permissions.includes("view_BO_user") && (
+              <Menu.Item key="BOUser" icon={<TeamOutlined />}>
+                <Link to="/BOUser">BO Users</Link>
+              </Menu.Item>
+            )}
+            {permissions.includes("make_announcement") && (
+              <Menu.Item key="Announcement" icon={<TeamOutlined />}>
+                <Link to="/Announcement">Announcement</Link>
+              </Menu.Item>
+            )}
           </Menu>
         </Sider>
         <Layout>
