@@ -81,7 +81,7 @@ export default function Bar() {
   const classes = useStyles();
   const history = useHistory();
 
-  const [adMessage, setAdMessage] = useState("");
+  const [adMessage, setAdMessage] = useState([]);
   const [isAdOpen, setIsAdOpen] = useState(false);
 
   const [notesCount, setNotesCount] = useState(0);
@@ -95,11 +95,17 @@ export default function Bar() {
     window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
       setIsAdOpen(true);
-      setAdMessage({
-        id: 0,
-        created_at: Date.now(),
-        ...data,
-      });
+      setAdMessage([
+        {
+          message: [
+            {
+              id: 0,
+              created_at: Date.now(),
+              ...data,
+            },
+          ],
+        },
+      ]);
       setTimeout(() => {
         setIsAdOpen(false);
       }, 10000);
@@ -155,9 +161,10 @@ export default function Bar() {
       </AppBar>
       {/* New notification */}
       <AnnouncementGrid
-        isAdOpen={isAdOpen}
-        handleAdClose={handleAdClose}
         adMessage={adMessage}
+        handleAdClose={handleAdClose}
+        isAdOpen={isAdOpen}
+        setNotesCount={setNotesCount}
       />
       <div className={classes.offset} />
     </div>

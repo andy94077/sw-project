@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
 export default function AnnouncementGrid(props) {
   const classes = useStyles();
 
-  const { isAdOpen, handleAdClose, adMessage } = props;
+  const { adMessage, handleAdClose, isAdOpen, setNotesCount } = props;
 
   return (
     <Snackbar
@@ -53,7 +53,11 @@ export default function AnnouncementGrid(props) {
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content text={[{ ...adMessage, id: 0 }]} type="notes" time={null} />
+        <Content
+          type="announcement"
+          setNotesCount={setNotesCount}
+          adMessage={adMessage}
+        />
       </div>
     </Snackbar>
   );

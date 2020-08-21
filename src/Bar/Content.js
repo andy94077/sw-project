@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { userId } = useSelector(selectUser);
-  const { type, setNotesCount } = props;
+  const { type, setNotesCount, adMessage = null } = props;
 
   const chatMore = useRef();
   const notesMore = useRef();
@@ -213,6 +213,12 @@ export default function Content(props) {
       });
       setNotesCount(0);
       setCookie(`notesTime${userId}`, Date.now(), 60);
+    } else if (type === "announcement") {
+      setContent({
+        type,
+        text: adMessage,
+        time: null,
+      });
     }
 
     if (notes !== undefined) {
@@ -269,7 +275,7 @@ export default function Content(props) {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={content.type === "notes" && <ExpandMoreIcon />}
+                    expandIcon={content.type !== "chat" && <ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                   >
@@ -284,7 +290,7 @@ export default function Content(props) {
                           {value.header.username}
                         </div>
                       )}
-                      {content.type === "notes" && value.header}
+                      {content.type !== "chat" && value.header}
                     </Typography>
                     <Typography className={classes.secondaryHeading}>
                       {value.secondary}
