@@ -103,14 +103,14 @@ export default function Message(props) {
                 >
                   <Typography className={classes.heading}>
                     {type === "chat" && (
-                      <div>
+                      <>
                         <img
                           alt="Avatar"
                           className={classes.rounded}
                           src={CONCAT_SERVER_URL(value.header.avatar_url)}
                         />
                         {value.header.username}
-                      </div>
+                      </>
                     )}
                     {type !== "chat" && value.header}
                   </Typography>

@@ -54,10 +54,10 @@ export default function Content(props) {
   // Infinite scroll
   // chat
   const {
+    status: statusChat,
     data: chat,
     fetchMore: fetchChat,
     canFetchMore: canFetchChat,
-    refetch: refetchChat,
   } = useInfiniteQuery(
     "chat",
     async (_, start = 0) => {
@@ -71,6 +71,7 @@ export default function Content(props) {
         url: CONCAT_SERVER_URL("/api/v1/chatroom"),
         params: jsonData,
       });
+      console.log(res.data);
       res.data.message.forEach((item) => {
         item.header = {
           avatar_url: item.avatar_url,
@@ -97,10 +98,10 @@ export default function Content(props) {
 
   // notes
   const {
+    status: statusNotes,
     data: notes,
     fetchMore: fetchNotes,
     canFetchMore: canFetchNotes,
-    refetch: refetchNotes,
   } = useInfiniteQuery(
     "notes",
     async (_, start = 0) => {
@@ -135,15 +136,14 @@ export default function Content(props) {
 
   // Update
   useEffect(() => {
+    if (statusChat !== "success" || statusNotes !== "success") return () => {};
     if (type === "chat") {
-      refetchChat();
       setContent({
         type,
         text: chat,
         time: getCookie(`chatTime${userId}`), // not implemented yet.
       });
     } else if (type === "notes") {
-      refetchNotes();
       setContent({
         type,
         text: notes,
@@ -163,10 +163,10 @@ export default function Content(props) {
         // );
       }
     };
-  }, [type, chat, notes]);
+  }, [statusChat, statusNotes, type, chat, notes, userId]);
 
   useEffect(() => {
-    if (chat !== undefined) {
+    if (statusChat === "success") {
       const chatTime = getCookie(`chatTime${userId}`);
       const cc = chat[0].message.filter((ch) => ch.created_at > chatTime)
         .length;
@@ -175,10 +175,10 @@ export default function Content(props) {
         setChatCount("10+");
       }
     }
-  }, [chat, setChatCount]);
+  }, [chat, statusChat, userId]);
 
   useEffect(() => {
-    if (notes !== undefined) {
+    if (statusNotes === "success") {
       const notesTime = getCookie(`notesTime${userId}`);
       const nc = notes[0].message.filter((note) => note.created_at > notesTime)
         .length;
@@ -187,7 +187,7 @@ export default function Content(props) {
         setNotesCount("10+");
       }
     }
-  }, [notes, setNotesCount]);
+  }, [notes, statusNotes, userId]);
 
   // Wait for content updating
   if (content.type === type) {

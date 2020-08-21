@@ -67,6 +67,7 @@ export default function DesktopMenu(props) {
   };
 
   const handleContentClose = (type) => {
+    handleContentClickAway();
     if (type === "chat") {
       setChatCount(0);
       setCookie(`chatTime${userId}`, Date.now(), 60);
@@ -81,7 +82,6 @@ export default function DesktopMenu(props) {
     if (content.anchorEl === event.currentTarget) {
       // Close itself:
       handleContentClose(type);
-      handleContentClickAway();
     } else {
       if (content.anchorEl !== null) {
         // Switch from another:
@@ -155,7 +155,6 @@ export default function DesktopMenu(props) {
           <Popper
             anchorEl={content.anchorEl}
             className={classes.sectionDesktop}
-            keepMounted
             open={content.open}
           >
             <Content
