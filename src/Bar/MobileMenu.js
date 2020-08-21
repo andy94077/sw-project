@@ -6,8 +6,9 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import { CONCAT_SERVER_URL } from "../utils";
 
+import { CONCAT_SERVER_URL } from "../utils";
+import AnnouncementGrid from "./AnnouncementGrid";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
@@ -30,7 +31,16 @@ const useStyles = makeStyles((theme) => ({
 export default function MobileMenu(props) {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const { notesCount, setNotesCount } = props;
+  const {
+    anContent,
+    anType,
+    chatCount,
+    isAnOpen,
+    notesCount,
+    setChatCount,
+    setIsAnOpen,
+    setNotesCount,
+  } = props;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -41,6 +51,10 @@ export default function MobileMenu(props) {
 
   // Toggle functions
   const handleMobileContentClose = (text) => {
+    if (text === "chat") {
+      setChatCount(0);
+      setCookie(`chatTime${userId}`, Date.now(), 60);
+    }
     if (text === "notes") {
       setNotesCount(0);
       setCookie(`notesTime${userId}`, Date.now(), 60);
@@ -101,7 +115,14 @@ export default function MobileMenu(props) {
         color="inherit"
         component="span"
       >
-        <Badge badgeContent={notesCount} color="secondary">
+        <Badge
+          badgeContent={
+            chatCount === "10+" || notesCount === "10+"
+              ? "10+"
+              : chatCount + notesCount
+          }
+          color="secondary"
+        >
           <MoreIcon />
         </Badge>
       </IconButton>
@@ -127,7 +148,7 @@ export default function MobileMenu(props) {
           style={{ width: "325px" }}
         >
           <IconButton color="inherit" component="span">
-            <Badge badgeContent={0} color="secondary">
+            <Badge badgeContent={chatCount} color="secondary">
               <ChatIcon
                 style={{
                   color: mobileContentType === "chat" ? "#5ace5a" : "black",
@@ -139,7 +160,11 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "chat" && (
           <MenuItem>
-            <Content type={mobileContentType} setNotesCount={setNotesCount} />
+            <Content
+              type={mobileContentType}
+              setChatCount={setChatCount}
+              setNotesCount={setNotesCount}
+            />
           </MenuItem>
         )}
         <MenuItem onClick={handleMobileContentOpen("notes")}>
@@ -156,7 +181,11 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "notes" && (
           <MenuItem>
-            <Content type={mobileContentType} setNotesCount={setNotesCount} />
+            <Content
+              type={mobileContentType}
+              setChatCount={setChatCount}
+              setNotesCount={setNotesCount}
+            />
           </MenuItem>
         )}
         <MenuItem onClick={toggleDrawer(true)}>
@@ -169,9 +198,14 @@ export default function MobileMenu(props) {
           </IconButton>
           <p>Profile</p>
         </MenuItem>
-        {/* Drawer */}
         <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
       </Menu>
+      <AnnouncementGrid
+        content={anContent}
+        type={anType}
+        isAnOpen={isAnOpen}
+        setIsAnOpen={setIsAnOpen}
+      />
     </div>
   );
 }

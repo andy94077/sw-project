@@ -2,21 +2,12 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton, Snackbar } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Content from "./Content";
 
-const useStyles = makeStyles(() => ({
+import Message from "./Message";
+
+const useStyles = makeStyles((theme) => ({
   bar: {
-    marginTop: "60px",
-  },
-  content: {
-    background: "white",
-    color: "black",
-    borderRadius: 10,
-  },
-  contentText: {
-    maxWidth: "275px",
-    minHeight: "10px",
-    overflow: "auto",
+    marginBottom: "10px",
   },
   icon: {
     position: "absolute",
@@ -29,18 +20,33 @@ const useStyles = makeStyles(() => ({
       background: "#aaa",
     },
   },
+  root: {
+    minWidth: "275px",
+    maxWidth: "600px",
+    maxHeight: "300px",
+    overflow: "auto",
+    border: "2px solid #ddd",
+    borderRadius: "5px",
+    zIndex: "2000",
+    [theme.breakpoints.up("md")]: {
+      minWidth: "400px",
+    },
+  },
 }));
 
 export default function AnnouncementGrid(props) {
   const classes = useStyles();
+  const { content, type, isAnOpen, setIsAnOpen } = props;
 
-  const { adMessage, handleAdClose, isAdOpen, setNotesCount } = props;
+  const handleClose = () => {
+    setIsAnOpen(false);
+  };
 
   return (
     <Snackbar
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       className={classes.bar}
-      open={isAdOpen}
+      open={isAnOpen}
     >
       <div>
         <IconButton
@@ -49,15 +55,13 @@ export default function AnnouncementGrid(props) {
           component="span"
           aria-label="close"
           color="inherit"
-          onClick={handleAdClose}
+          onClick={handleClose}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content
-          type="announcement"
-          setNotesCount={setNotesCount}
-          adMessage={adMessage}
-        />
+        <div className={classes.root}>
+          <Message type={type} text={content} time={null} />
+        </div>
       </div>
     </Snackbar>
   );

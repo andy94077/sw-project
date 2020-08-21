@@ -10,8 +10,6 @@ import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import { selectUser } from "../redux/userSlice";
 
-import AnnouncementGrid from "./AnnouncementGrid";
-
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
@@ -81,10 +79,15 @@ export default function Bar() {
   const classes = useStyles();
   const history = useHistory();
 
-  const [adMessage, setAdMessage] = useState([]);
-  const [isAdOpen, setIsAdOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState({
+    content: "",
+    type: "",
+  });
 
+  const [chatCount, setChatCount] = useState(0);
   const [notesCount, setNotesCount] = useState(0);
+
+  const [isAnOpen, setIsAnOpen] = useState(false);
 
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
@@ -94,27 +97,25 @@ export default function Bar() {
 
     window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
-      setIsAdOpen(true);
-      setAdMessage([
-        {
-          message: [
-            {
-              id: 0,
-              created_at: Date.now(),
-              ...data,
-            },
-          ],
-        },
-      ]);
-      setTimeout(() => {
-        setIsAdOpen(false);
-      }, 10000);
+      setAnnouncement({
+        content: [
+          {
+            message: [
+              {
+                id: 0,
+                created_at: Date.now(),
+                ...data,
+              },
+            ],
+          },
+        ],
+        type: "notes",
+      });
+      setIsAnOpen(true);
     });
 
-    return () => {
+    return () =>
       window.Echo.channel("Announcements").stopListening("Announced");
-      window.Echo.channel("Notifications").stopListening("NotificationChanged");
-    };
   }, [userId]);
 
   const handleSearch = (e) => {
@@ -123,10 +124,6 @@ export default function Bar() {
 
   const handleSetSearchValue = (event) => {
     setSearchValue(event.target.value);
-  };
-
-  const handleAdClose = () => {
-    setIsAdOpen(false);
   };
 
   // The bar
@@ -155,17 +152,28 @@ export default function Bar() {
             />
           </div>
           <div className={classes.grow} />
-          <DesktopMenu notesCount={notesCount} setNotesCount={setNotesCount} />
-          <MobileMenu notesCount={notesCount} setNotesCount={setNotesCount} />
+          <DesktopMenu
+            anContent={announcement.content}
+            anType={announcement.type}
+            chatCount={chatCount}
+            isAnOpen={isAnOpen}
+            notesCount={notesCount}
+            setChatCount={setChatCount}
+            setIsAnOpen={setIsAnOpen}
+            setNotesCount={setNotesCount}
+          />
+          <MobileMenu
+            anContent={announcement.content}
+            anType={announcement.type}
+            chatCount={chatCount}
+            isAnOpen={isAnOpen}
+            notesCount={notesCount}
+            setChatCount={setChatCount}
+            setIsAnOpen={setIsAnOpen}
+            setNotesCount={setNotesCount}
+          />
         </Toolbar>
       </AppBar>
-      {/* New notification */}
-      <AnnouncementGrid
-        adMessage={adMessage}
-        handleAdClose={handleAdClose}
-        isAdOpen={isAdOpen}
-        setNotesCount={setNotesCount}
-      />
       <div className={classes.offset} />
     </div>
   );

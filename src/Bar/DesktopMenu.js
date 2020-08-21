@@ -10,7 +10,9 @@ import {
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+
 import { CONCAT_SERVER_URL } from "../utils";
+import AnnouncementGrid from "./AnnouncementGrid";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
@@ -36,40 +38,66 @@ const useStyles = makeStyles((theme) => ({
 export default function DesktopMenu(props) {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const { notesCount, setNotesCount } = props;
+  const {
+    anContent,
+    anType,
+    chatCount,
+    isAnOpen,
+    notesCount,
+    setChatCount,
+    setIsAnOpen,
+    setNotesCount,
+  } = props;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [contentAnchorEl, setContentAnchorEl] = useState(null);
-  const [contentType, setContentType] = useState("");
-
-  const isContentOpen = Boolean(contentAnchorEl);
+  const [content, setContent] = useState({
+    anchorEl: null,
+    open: false,
+    type: "",
+  });
 
   // Toggle function
   const handleContentClickAway = () => {
-    setContentType("");
-    setContentAnchorEl(null);
+    setContent({
+      anchorEl: null,
+      open: false,
+      type: "",
+    });
   };
 
-  const handleContentClose = (text) => {
-    if (text === "notes") {
+  const handleContentClose = (type) => {
+    if (type === "chat") {
+      setChatCount(0);
+      setCookie(`chatTime${userId}`, Date.now(), 60);
+    }
+    if (type === "notes") {
       setNotesCount(0);
       setCookie(`notesTime${userId}`, Date.now(), 60);
     }
   };
 
-  const handleContentOpen = (text) => (event) => {
-    if (contentAnchorEl === event.currentTarget) {
+  const handleContentOpen = (type) => (event) => {
+    if (content.anchorEl === event.currentTarget) {
       // Close itself:
-      handleContentClose(text);
+      handleContentClose(type);
       handleContentClickAway();
     } else {
-      if (contentAnchorEl !== null) {
+      if (content.anchorEl !== null) {
         // Switch from another:
-        handleContentClose(text === "chat" ? "notes" : "chat");
+        handleContentClose(type === "chat" ? "notes" : "chat");
       }
-      setContentType(text);
-      setContentAnchorEl(event.currentTarget);
+      setContent({
+        anchorEl: event.currentTarget,
+        open: true,
+        type,
+      });
+      if (type === "chat") {
+        setChatCount(0);
+      }
+      if (type === "notes") {
+        setNotesCount(0);
+      }
     }
   };
 
@@ -106,37 +134,42 @@ export default function DesktopMenu(props) {
       <ClickAwayListener onClickAway={handleContentClickAway}>
         <div style={{ display: "flex" }}>
           <IconButton onClick={handleContentOpen("chat")} component="span">
-            <Badge badgeContent={0} color="secondary">
+            <Badge badgeContent={chatCount} color="secondary">
               <ChatIcon
                 style={{
-                  color: contentType === "chat" ? "#5ace5a" : "white",
+                  color: content.type === "chat" ? "#5ace5a" : "white",
                 }}
               />
             </Badge>
           </IconButton>
 
-          <IconButton
-            onClick={handleContentOpen("notes")}
-            color="inherit"
-            component="span"
-          >
+          <IconButton onClick={handleContentOpen("notes")} component="span">
             <Badge badgeContent={notesCount} color="secondary">
               <NotificationsIcon
                 style={{
-                  color: contentType === "notes" ? "ffde4c" : "white",
+                  color: content.type === "notes" ? "ffde4c" : "white",
                 }}
               />
             </Badge>
           </IconButton>
-          {/* Notification content */}
           <Popper
-            anchorEl={contentAnchorEl}
+            anchorEl={content.anchorEl}
             className={classes.sectionDesktop}
             keepMounted
-            open={isContentOpen}
+            open={content.open}
           >
-            <Content type={contentType} setNotesCount={setNotesCount} />
+            <Content
+              type={content.type}
+              setChatCount={setChatCount}
+              setNotesCount={setNotesCount}
+            />
           </Popper>
+          <AnnouncementGrid
+            content={anContent}
+            type={anType}
+            isAnOpen={isAnOpen}
+            setIsAnOpen={setIsAnOpen}
+          />
         </div>
       </ClickAwayListener>
       <IconButton
@@ -151,7 +184,6 @@ export default function DesktopMenu(props) {
           src={CONCAT_SERVER_URL(userAvatar)}
         />
       </IconButton>
-      {/* Drawer */}
       <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
     </div>
   );

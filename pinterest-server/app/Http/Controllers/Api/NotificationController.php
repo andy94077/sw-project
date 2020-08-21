@@ -15,14 +15,9 @@ class NotificationController extends BaseController
             ->orWhere('user_id', $request['user_id'])
             ->orderBy('id', 'desc')
             ->skip($request['start'])
-            ->take(intval($request['number']) + 1)->get();
+            ->take(intval($request['number']))->get();
 
-        $length = $notes->count();
-        if ($length > intval($request['number'])) {
-            $notes->pop();
-        }
-
-        if ($length > $request['number']) {
+        if (count($notes) > 0) {
             return response()->json([
                 "message" => $notes,
                 "start" => intval($request["start"]) + intval($request['number']),
