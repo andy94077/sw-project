@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useInfiniteQuery } from "react-query";
 import { makeStyles, Avatar, Button } from "@material-ui/core";
+import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
 
@@ -22,7 +24,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingLeft: "25px",
-    fontSize: "25px",
+    fontSize: "20px",
     "&:hover": {
       backgroundColor: `rgb(240,240,240)`,
     },
@@ -39,8 +41,9 @@ export default function Followings(props) {
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
   const history = useHistory();
+  const { userId } = useSelector(selectUser);
   const [list, setList] = useState([]);
-
+  
   const {
     data,
     isFetching,
@@ -52,7 +55,7 @@ export default function Followings(props) {
     (key, nextId = 0) => {
       return axios
         .get(CONCAT_SERVER_URL("/api/v1/follows/followings"), {
-          params: { name, nextId },
+          params: { name, nextId, viewer_id: userId },
         })
         .then((response) => {
           return response.data;
@@ -68,7 +71,6 @@ export default function Followings(props) {
     enabled: canFetchMore,
   });
   const handleSearch = (target) => () => {
-    console.log(target);
     history.push(`/profile/${target}`);
   };
   const handleKeyUp = (e) => {

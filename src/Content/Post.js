@@ -10,7 +10,7 @@ import {
   Avatar,
 } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect, Link } from "react-router-dom";
+import { useHistory, Redirect, Link } from "react-router-dom";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 import { selectUser } from "../redux/userSlice";
@@ -54,6 +54,7 @@ const useStyles = makeStyles(() => ({
 export default function Post(props) {
   const { author, timeAgo, content, id, refresh } = props;
   const classes = useStyles();
+  const history = useHistory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -117,6 +118,16 @@ export default function Post(props) {
       });
   };
 
+  const handleSearch = (target) => () => {
+    history.push(`/profile/${target}`);
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
+
   async function handleEdit() {
     if (onEdit === 0) {
       setOnEdit(1);
@@ -162,11 +173,19 @@ export default function Post(props) {
           avatar: classes.avatar,
         }}
         avatar={
-          <Avatar
-            alt="Avatar"
-            src={postUserAvatar}
-            style={{ width: "50px", height: "50px" }}
-          />
+          <div
+            role="button"
+            tabIndex="0"
+            onClick={handleSearch(author)}
+            onKeyUp={handleKeyUp}
+            style={{ outline: "none" }}
+          >
+            <Avatar
+              alt="Avatar"
+              src={postUserAvatar}
+              style={{ width: "50px", height: "50px" }}
+            />
+          </div>
         }
         title={
           <Link to={`/profile/${author}`} className={classes.user}>
