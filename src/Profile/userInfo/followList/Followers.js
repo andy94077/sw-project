@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingLeft: "25px",
-    fontSize: "25px",
+    fontSize: "20px",
     "&:hover": {
       backgroundColor: `rgb(240,240,240)`,
     },
@@ -66,7 +66,6 @@ export default function Followers(props) {
     enabled: canFetchMore,
   });
   const handleSearch = (target) => () => {
-    console.log(target);
     history.push(`/profile/${target}`);
   };
   const handleKeyUp = (e) => {
