@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useInfiniteQuery } from "react-query";
 import { makeStyles, Avatar, Button } from "@material-ui/core";
+import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
+import FollowButton from "../../upload_follow/FollowButton";
+import Loading from "../../../components/Loading";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -32,12 +36,21 @@ const useStyles = makeStyles(() => ({
     width: "45px",
     height: "45px",
   },
+  button: {
+    display: "flex",
+    width: "90px",
+    fontSize: "13px",
+    textAlign: "center",
+    margin: "auto 7% auto auto",
+    height: "30px",
+  },
 }));
 
 export default function Followers(props) {
   const { name } = props;
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
+  const { userId } = useSelector(selectUser);
   const history = useHistory();
   const [list, setList] = useState([]);
   const {
@@ -95,6 +108,9 @@ export default function Followers(props) {
             />
             <span style={{ display: "block", width: "15px" }} />
             {value.username}
+            {value.isFollow === false && value.id !== userId && (
+              <FollowButton id={value.id} style={classes.button} />
+            )}
           </span>
         ))
       )
@@ -103,7 +119,7 @@ export default function Followers(props) {
 
   return (
     <span className={classes.list}>
-      {list}
+      {isFetching ? <Loading /> : list}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}

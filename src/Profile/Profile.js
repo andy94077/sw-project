@@ -98,7 +98,7 @@ export default function Profile(props) {
   const [isMyself, setIsMyself] = useState(false);
   const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
-  const { username, userId, bucketTime } = useSelector(selectUser);
+  const { username, bucketTime } = useSelector(selectUser);
   const [follow, setFollow] = useState({ followers: 0, followings: 0 });
   const isBucket = checkBucket(bucketTime);
   const [isLoading, setIsLoading] = useState(false);
@@ -175,10 +175,6 @@ export default function Profile(props) {
     <UploadButton image={image} setImage={setImage} />
   );
 
-  const followButton = (
-    <FollowButton id={id} userId={userId} refresh={refreshFollow} />
-  );
-
   const onHide = () => {
     setIsAvatarUpload(false);
   };
@@ -193,7 +189,12 @@ export default function Profile(props) {
           setIsAvatarUpload={setIsAvatarUpload}
         />
         <ProfileInformation name={name} url={url} follow={follow} />
-        {username !== null && (isMyself ? uploadButton : followButton)}
+        {username !== null &&
+          (isMyself ? (
+            uploadButton
+          ) : (
+            <FollowButton id={id} setRefresh={refreshFollow} />
+          ))}
         <div className={classes.central}>
           <PhotoGrid userId={id} />
         </div>
