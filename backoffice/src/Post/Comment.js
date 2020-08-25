@@ -105,7 +105,7 @@ export default function Comment(props) {
         axios
           .request({
             method: "DELETE",
-            url: CONCAT_SERVER_URL("/api/v1/comment"),
+            url: CONCAT_SERVER_URL("/api/v1/comments"),
             data: jsonData,
           })
           .then(() => {
