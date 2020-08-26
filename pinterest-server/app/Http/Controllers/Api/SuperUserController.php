@@ -154,7 +154,14 @@ class SuperUserController extends BaseController
 
     public function getAllRoles()
     {
-        $roles = Role::where('guard_name', 'super_users')->pluck('name');
+        $roles = Role::where('guard_name', 'super_users')->orderBy('name')->pluck('name');
         return response()->json($roles);
+    }
+
+    public function ChangeRoles(Request $request)
+    {
+        $user = SuperUser::find($request['id']);
+        $user->syncRoles($request['roles']);
+        return response()->json('success');
     }
 }
