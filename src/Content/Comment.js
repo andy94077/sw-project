@@ -56,9 +56,7 @@ export default function Comment(props) {
   const dispatch = useDispatch();
 
   function refreshComment() {
-    Axios.get(CONCAT_SERVER_URL("/api/v1/comment/post"), {
-      params: { post: id },
-    })
+    Axios.get(CONCAT_SERVER_URL(`/api/v1/comments/${id}`))
       .then(({ data }) => {
         setComments(data.reverse());
         setIsUpload(false);

@@ -7,6 +7,8 @@ import { makeStyles, Avatar, Button } from "@material-ui/core";
 import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
+import FollowButton from "../../upload_follow/FollowButton";
+import Loading from "../../../components/Loading";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -34,6 +36,14 @@ const useStyles = makeStyles(() => ({
     width: "45px",
     height: "45px",
   },
+  button: {
+    display: "flex",
+    width: "90px",
+    fontSize: "13px",
+    textAlign: "center",
+    margin: "auto 7% auto auto",
+    height: "30px",
+  },
 }));
 
 export default function Followings(props) {
@@ -43,7 +53,7 @@ export default function Followings(props) {
   const history = useHistory();
   const { userId } = useSelector(selectUser);
   const [list, setList] = useState([]);
-  
+
   const {
     data,
     isFetching,
@@ -99,6 +109,9 @@ export default function Followings(props) {
             />
             <span style={{ display: "block", width: "15px" }} />
             {value.username}
+            {value.isFollow === false && value.id !== userId && (
+              <FollowButton id={value.id} style={classes.button} />
+            )}
           </span>
         ))
       )
@@ -107,7 +120,7 @@ export default function Followings(props) {
 
   return (
     <span className={classes.list}>
-      {list}
+      {isFetching ? <Loading /> : list}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}

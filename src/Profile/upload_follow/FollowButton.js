@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, makeStyles } from "@material-ui/core";
+import { useSelector } from "react-redux";
 import Axios from "axios";
 import { CONCAT_SERVER_URL } from "../../utils";
 import ErrorMsg from "../../components/ErrorMsg";
+import { selectUser } from "../../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   central: {
@@ -28,7 +30,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FollowButton(props) {
-  const { id, userId, refresh } = props;
+  const { id, style, setRefresh = () => {} } = props;
+  // console.log(style);
+  const { userId } = useSelector(selectUser);
   const [followInfo, setFollowInfo] = useState({
     isFollow: false,
     followId: null,
@@ -61,7 +65,7 @@ export default function FollowButton(props) {
     Axios.delete(CONCAT_SERVER_URL(`/api/v1/follows/${followInfo.followId}`))
       .then(() => {
         setFollowInfo({ followId: followInfo.id, isFollow: null });
-        refresh();
+        setRefresh();
       })
       .catch(() => {
         setError({
@@ -76,7 +80,7 @@ export default function FollowButton(props) {
     Axios.put(CONCAT_SERVER_URL(`/api/v1/follows/${followInfo.followId}`))
       .then(() => {
         setFollowInfo({ followId: followInfo.followId, isFollow: null });
-        refresh();
+        setRefresh();
       })
       .catch(() => {
         setError({
@@ -94,7 +98,7 @@ export default function FollowButton(props) {
     })
       .then((res) => {
         setFollowInfo({ isFollow: true, followId: res.data.id });
-        refresh();
+        setRefresh();
       })
       .catch(() => {
         setError({
@@ -114,9 +118,9 @@ export default function FollowButton(props) {
     return "PostByUserIdAndId";
   }
 
-  function handleClick() {
+  const handleClick = (e) => {
+    e.stopPropagation();
     const handleType = checkHandleType(followInfo);
-    console.log(handleType);
     if (handleType === "DeleteById") {
       deleteFollow();
     } else if (handleType === "UpdateById") {
@@ -124,7 +128,7 @@ export default function FollowButton(props) {
     } else if (handleType === "PostByUserIdAndId") {
       postFollow();
     }
-  }
+  };
 
   if (error.message) {
     return <ErrorMsg message={error.message} imgUrl={error.url} />;
@@ -132,7 +136,7 @@ export default function FollowButton(props) {
 
   return (
     <Button
-      className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text}`}
+      className={`${classes.central} ${classes.center} ${classes.rounded} ${classes.text} ${style}`}
       variant={followInfo.isFollow ? "outlined" : "contained"}
       color="secondary"
       component="span"

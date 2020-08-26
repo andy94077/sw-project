@@ -147,7 +147,10 @@ class FollowController extends BaseController
 
         $mutual = DB::table('follows')->select(DB::raw('target_id , users.name, count(target_id) as same_follow'))
                         ->LeftJoin('users', 'users.id', '=', 'follows.target_id')
-                        ->where('follower_id', $user_id)->orWhere('follower_id', $request['viewer_id'])
+                        ->where(function ($query) use ($user_id, $request) {
+                            $query->where('follower_id', $user_id)->orWhere('follower_id', $request['viewer_id']);
+                        })
+                        ->where('follows.deleted_at', null)
                         ->groupBy('target_id')->having('same_follow', 2)->orderBy('target_id')->get();
         $i = 0;
         $j = 0;

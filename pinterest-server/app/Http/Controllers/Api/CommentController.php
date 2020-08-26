@@ -17,9 +17,9 @@ class CommentController extends BaseController{
         $comments = Comment::all();
         return response()->json($comments, 200);
     }
-    public function showByPost(Request $request){
+    public function show($id){
         $comments = Comment::LeftJoin('users', 'users.id', '=', 'comments.user_id')
-            ->where('post_id', $request['post'])
+            ->where('post_id', $id)
             ->select('comments.*', 'users.name as user_name')
             ->orderBy('updated_at', 'DESC')
             ->get();
@@ -49,17 +49,9 @@ class CommentController extends BaseController{
         }
     }
 
-    public function delete(Request $request){
-        $comment = Comment::find($request['id']);
-        if($request['user'] && Post::find($comment->post_id) === null){
-            return response()->json("Post is deleted", 404);
-        }
-        $comment->delete();
-        return $this->sendResponse($comment, "success");
-    }
-
-    public function update(Request $request){
-        $comment = Comment::find($request['id']);
+    public function update(Request $request, $id){
+        $comment = Comment::find($id);
+        echo $id;
         if($request['user'] && Post::find($comment->post_id) === null){
             return response()->json("Post is deleted", 404);
         }
@@ -105,8 +97,13 @@ class CommentController extends BaseController{
         return response()->json($comments);
     }
 
-    public function destroy($id){
-        return $id;
+    public function destroy(Request $request, $id){
+        $comment = Comment::find($id);
+        if($request['user'] && Post::find($comment->post_id) === null){
+            return response()->json("Post is deleted", 404);
+        }
+        $comment->delete();
+        return $this->sendResponse($comment, "success");
     }
 
     public function getCommentInfo(){
