@@ -201,7 +201,6 @@ export default function SignUpForm(props) {
         </Form.Item>
         <Form.Item name="roles" label="Roles">
           <Select
-            // className="BOUser-select"
             mode="multiple"
             placeholder="Roles..."
             allowClear
