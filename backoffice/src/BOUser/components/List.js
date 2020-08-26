@@ -18,7 +18,10 @@ import {
   DeleteOutlined,
   SearchOutlined,
   UndoOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
+
+import EditRoleForm from "./EditRoleForm";
 
 import { CONCAT_SERVER_URL } from "../../utils";
 import "./List.css";
@@ -26,7 +29,7 @@ import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
 
 export default function List(props) {
-  const { refresh, setRefresh } = props;
+  const { allRoles, refresh, setRefresh } = props;
   const { apiToken } = useSelector(selectUser);
   const initialSearchText = useMemo(
     () => ({
@@ -48,6 +51,16 @@ export default function List(props) {
     size: 10,
   });
 
+  const [selectedUser, setSelectedUser] = useState({ id: null, roles: [] });
+
+  const [editRolesFormVisible, setEditRolesFormVisible] = useState(false);
+  const handleEditRolesFormVisible = (_visible) => () =>
+    setEditRolesFormVisible(_visible);
+  const handleFormOpen = ({ id, roles }) => () => {
+    setSelectedUser({ id, roles });
+    setEditRolesFormVisible(true);
+  };
+
   const handleSearchTextChange = (key) => (event) =>
     setSearchText({ ...searchText, [key]: event.target.value });
 
@@ -61,19 +74,6 @@ export default function List(props) {
     info: [],
     length: 0,
   });
-
-  const [allRoles, setAllRoles] = useState([]);
-
-  useEffect(() => {
-    if (apiToken === null) return;
-    axios
-      .get(CONCAT_SERVER_URL("/api/v1/superUser/allRoles"), {
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      })
-      .then((res) => setAllRoles(res.data));
-  }, [apiToken]);
 
   const tableColumns = useMemo(
     () => [
@@ -106,7 +106,25 @@ export default function List(props) {
             .map((role) => role.name)
             .join(", ")
             .localeCompare(b.roles.map((role) => role.name).join(", ")),
-        render: (roles) => roles.map((role) => role.name).join(", "),
+        render: (roles, row) => (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>{roles.map((role) => role.name).join(", ")}</span>
+            <Button
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={handleFormOpen({
+                id: row.id,
+                roles: roles.map((role) => role.name),
+              })}
+            />
+          </div>
+        ),
         renderSearch: (
           <Select
             className="BOUser-select"
@@ -452,6 +470,17 @@ export default function List(props) {
         loading={isLoading}
         rowKey={(record) => record.id}
       />
+      {editRolesFormVisible && (
+        <EditRoleForm
+          id={selectedUser.id}
+          userRoles={selectedUser.roles}
+          allRoles={allRoles}
+          // Do not control `visible` attribute because the form will not get proper props of `id` and `userRoles`
+          visible={true}
+          onCancel={handleEditRolesFormVisible(false)}
+          setRefresh={setRefresh}
+        />
+      )}
     </>
   );
 }

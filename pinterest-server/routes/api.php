@@ -29,7 +29,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/likes/latest', 'LikeController@getLatest');
     Route::get('/likes/sum', 'LikeController@sum');
     Route::apiResource('likes', 'LikeController');
-    
+
     Route::get('/comments/latest', 'CommentController@getLatest');
     Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
@@ -75,21 +75,22 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::apiResource('users', 'UserController');
 
     Route::get('/superUser/allRoles', 'SuperUserController@getAllRoles')->middleware('BO_can:view_BO_user');
+    Route::post('/superUser/roles', 'SuperUserController@changeRoles')->middleware('BO_can:change_BO_user_role');
     Route::post('/superUser/logIn', 'SuperUserController@logIn')->name('superUser.logIn');
     Route::post('/superUser/authentication', 'SuperUserController@authentication')->name('superUser.authentication');
     Route::post('/superUser/userExist', 'SuperUserController@userExist')->name('superUser.userExist');
-    
+
     Route::apiResource('superUser', 'SuperUserController')->only(['index'])->middleware('BO_can:view_BO_user');
     Route::apiResource('superUser', 'SuperUserController')->only(['store'])->middleware('BO_can:register_BO_user');
     Route::Resource('superUser', 'SuperUserController')->only(['update'])->middleware('BO_can:recover_BO_user');
     Route::Resource('superUser', 'SuperUserController')->only(['destroy'])->middleware('BO_can:delete_BO_user');
-    
+
     // for upload images
     Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage')->middleware(['bucket']);
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
-   Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
-   Route::apiResource('notifications', 'NotificationController');
-   Route::resource('chatroom', 'ChatroomController');
+    Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
+    Route::apiResource('notifications', 'NotificationController');
+    Route::resource('chatroom', 'ChatroomController');
 });

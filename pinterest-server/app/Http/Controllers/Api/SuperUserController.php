@@ -47,6 +47,7 @@ class SuperUserController extends BaseController
             ], 200);
         } else {
             $user = SuperRegisterController::create($request);
+            $user->syncRoles($request['roles']);
             return response()->json(['Message' => "Sign up seccess!", 'isSignUp' => true], 200);
         }
     }
@@ -74,8 +75,8 @@ class SuperUserController extends BaseController
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
                 'roles' => $userInfo->getRoleNames(),
-                'permissions' => ($userInfo->hasRole('admin') ? 
-                    Permission::where('guard_name', 'super_users')->pluck('name') : 
+                'permissions' => ($userInfo->hasRole('admin') ?
+                    Permission::where('guard_name', 'super_users')->pluck('name') :
                     $userInfo->getAllPermissions()->pluck('name')),
                 'api_token' => $userInfo->api_token,
                 'isValid' => true
@@ -153,7 +154,14 @@ class SuperUserController extends BaseController
 
     public function getAllRoles()
     {
-        $roles = Role::where('guard_name', 'super_users')->pluck('name');
+        $roles = Role::where('guard_name', 'super_users')->orderBy('name')->pluck('name');
         return response()->json($roles);
+    }
+
+    public function ChangeRoles(Request $request)
+    {
+        $user = SuperUser::find($request['id']);
+        $user->syncRoles($request['roles']);
+        return response()->json('success');
     }
 }

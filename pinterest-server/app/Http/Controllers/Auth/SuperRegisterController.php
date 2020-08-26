@@ -86,7 +86,6 @@ class SuperRegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'avatar_url' => "/img/avatar.jpeg",
             'api_token' => hash('sha256', Str::random(80)),
             ]);
     }
