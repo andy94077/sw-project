@@ -64,7 +64,7 @@ export default function Followers(props) {
     (key, nextId = 0) => {
       return axios
         .get(CONCAT_SERVER_URL("/api/v1/follows/followers"), {
-          params: { name, nextId },
+          params: { name, nextId, viewer_id: userId },
         })
         .then((response) => {
           return response.data;
