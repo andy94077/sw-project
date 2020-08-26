@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
@@ -9,8 +9,9 @@ import { format, formatDistanceToNow } from "date-fns";
 import Message from "./Message";
 import useIntersectionObserver from "../components/useIntersectionObserver";
 import Loading from "../components/Loading";
-import { selectUser } from "../redux/userSlice";
 import { CONCAT_SERVER_URL } from "../utils";
+import { selectUser } from "../redux/userSlice";
+import { setChatsCount, setNotesCount } from "../redux/menuDataSlice";
 import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -40,10 +41,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { userId } = useSelector(selectUser);
-  const { type, setChatCount, setNotesCount } = props;
+  const { type } = props;
 
-  const chatMore = useRef();
+  const chatsMore = useRef();
   const notesMore = useRef();
+  const dispatch = useDispatch();
 
   const [content, setContent] = useState({
     type: null,
@@ -52,15 +54,15 @@ export default function Content(props) {
   });
 
   // Infinite scroll
-  // chat
+  // chats
   const {
-    status: statusChat,
-    data: chat,
-    fetchMore: fetchChat,
-    canFetchMore: canFetchChat,
+    status: statusChats,
+    data: chats,
+    fetchMore: fetchChats,
+    canFetchMore: canFetchChats,
   } = useInfiniteQuery(
-    "chat",
-    async (_, start = 0) => {
+    "chats",
+    async (_, start = 10) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -90,9 +92,9 @@ export default function Content(props) {
   );
 
   useIntersectionObserver({
-    target: chatMore,
-    onIntersect: fetchChat,
-    enabled: canFetchChat,
+    target: chatsMore,
+    onIntersect: fetchChats,
+    enabled: canFetchChats,
   });
 
   // notes
@@ -103,7 +105,7 @@ export default function Content(props) {
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
-    async (_, start = 0) => {
+    async (_, start = 10) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -135,12 +137,12 @@ export default function Content(props) {
 
   // Update
   useEffect(() => {
-    if (statusChat !== "success" || statusNotes !== "success") return () => {};
-    if (type === "chat") {
+    if (statusChats !== "success" || statusNotes !== "success") return () => {};
+    if (type === "chats") {
       setContent({
         type,
-        text: chat,
-        time: getCookie(`chatTime${userId}`), // not implemented yet.
+        text: chats,
+        time: getCookie(`chatsTime${userId}`),
       });
     } else if (type === "notes") {
       setContent({
@@ -154,36 +156,39 @@ export default function Content(props) {
     if (window.Echo === undefined) return () => {};
 
     return () => {
-      if (type === "chat") {
+      if (type === "chats") {
         // TODO
+        // window.Echo.channel("Chatrooms").stopListening(
+        //   "ChatroomChanged"
+        // );
       } else if (type === "notes") {
         // window.Echo.channel("Notifications").stopListening(
         //   "NotificationChanged"
         // );
       }
     };
-  }, [statusChat, statusNotes, type, chat, notes, userId]);
+  }, [statusChats, statusNotes, type, chats, notes, userId]);
 
   useEffect(() => {
-    if (statusChat === "success") {
-      const chatTime = getCookie(`chatTime${userId}`);
-      const cc = chat[0].message.filter((ch) => ch.created_at > chatTime)
+    if (statusChats === "success") {
+      const chatsTime = getCookie(`chatsTime${userId}`);
+      const cc = chats[0].message.filter((chat) => chat.created_at > chatsTime)
         .length;
-      setChatCount(cc);
+      dispatch(setChatsCount({ chatsCount: cc }));
       if (cc > 9) {
-        setChatCount("10+");
+        dispatch(setChatsCount({ chatsCount: "10+" }));
       }
     }
-  }, [chat, statusChat, userId]);
+  }, [chats, statusChats, userId]);
 
   useEffect(() => {
     if (statusNotes === "success") {
       const notesTime = getCookie(`notesTime${userId}`);
       const nc = notes[0].message.filter((note) => note.created_at > notesTime)
         .length;
-      setNotesCount(nc);
+      dispatch(setNotesCount({ notesCount: nc }));
       if (nc > 9) {
-        setNotesCount("10+");
+        dispatch(setNotesCount({ notesCount: "10+" }));
       }
     }
   }, [notes, statusNotes, userId]);
@@ -194,9 +199,9 @@ export default function Content(props) {
       <div className={classes.root}>
         <Message type={content.type} text={content.text} time={content.time} />
 
-        {content.type === "chat" && (
-          <div ref={chatMore} className={classes.end}>
-            {!canFetchChat && (
+        {content.type === "chats" && (
+          <div ref={chatsMore} className={classes.end}>
+            {!canFetchChats && (
               <Button disabled classes={{ label: classes.endText }}>
                 No chatroom left
               </Button>

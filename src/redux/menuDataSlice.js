@@ -61,20 +61,31 @@ export const menuDataSlice = createSlice({
         });
 
       const chatsTime = getCookie(`chatsTime${action.payload.userId}`);
-      const cc = state.chats.filter((chat) => chat.created_at > chatsTime)
-        .length;
+      const cc = state.chats.filter(
+        (chat) => chat.created_at > chatsTime || chatsTime === undefined
+      ).length;
       state.chatsCount = cc;
       if (cc > 9) {
         state.chatsCount = "10+";
       }
 
+      console.log(state.chats, state.notes);
       const notesTime = getCookie(`notesTime${action.payload.userId}`);
-      const nc = state.notes.filter((note) => note.created_at > notesTime)
-        .length;
+      const nc = state.notes.filter(
+        (note) => note.created_at > notesTime || notesTime === undefined
+      ).length;
       state.notesCount = nc;
       if (nc > 9) {
         state.notesCount = "10+";
       }
+    },
+
+    setChatsCount: (state, action) => {
+      state.chatsCount = action.payload.chatsCount;
+    },
+
+    setNotesCount: (state, action) => {
+      state.notesCount = action.payload.notesCount;
     },
 
     setAnnouncement: (state, action) => {
@@ -94,6 +105,11 @@ export const menuDataSlice = createSlice({
     },
   },
 });
-export const { setChatsNotes, setAnnouncement } = menuDataSlice.actions;
+export const {
+  setChatsNotes,
+  setChatsCount,
+  setNotesCount,
+  setAnnouncement,
+} = menuDataSlice.actions;
 export default menuDataSlice.reducer;
 export const selectMenuData = (state) => state.menuData;
