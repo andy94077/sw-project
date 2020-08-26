@@ -3,12 +3,12 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 
 import "./SignUpForm.css";
-import { Modal, Form, Input } from "antd";
+import { Modal, Form, Input, Select, Tag } from "antd";
 import { CONCAT_SERVER_URL } from "../../utils";
 import { selectUser } from "../../redux/userSlice";
 
 export default function SignUpForm(props) {
-  const { visible, onCancel, setRefresh } = props;
+  const { allRoles, visible, onCancel, setRefresh } = props;
   const { apiToken } = useSelector(selectUser);
 
   const initialFormInfo = {
@@ -63,6 +63,7 @@ export default function SignUpForm(props) {
           name: values.username,
           email: values.email,
           password: values.password,
+          roles: values.roles,
         },
         {
           headers: {
@@ -197,6 +198,36 @@ export default function SignUpForm(props) {
           hasFeedback
         >
           <Input.Password onKeyUp={handleKeyUp} />
+        </Form.Item>
+        <Form.Item name="roles" label="Roles">
+          <Select
+            // className="BOUser-select"
+            mode="multiple"
+            placeholder="Roles..."
+            allowClear
+            tagRender={({ label, closable, onClose }) => (
+              <Tag
+                closable={closable}
+                onClose={onClose}
+                style={{ borderRadius: 5 }}
+              >
+                {label}
+              </Tag>
+            )}
+            style={
+              {
+                // width: 250,
+                // margin: 8,
+              }
+            }
+            dropdownStyle={{
+              borderRadius: "5px",
+            }}
+          >
+            {allRoles.map((role) => (
+              <Select.Option key={role}>{role}</Select.Option>
+            ))}
+          </Select>
         </Form.Item>
       </Form>
     </Modal>

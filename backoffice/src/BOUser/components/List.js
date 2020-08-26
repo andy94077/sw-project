@@ -26,7 +26,7 @@ import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
 
 export default function List(props) {
-  const { refresh, setRefresh } = props;
+  const { allRoles, refresh, setRefresh } = props;
   const { apiToken } = useSelector(selectUser);
   const initialSearchText = useMemo(
     () => ({
@@ -61,19 +61,6 @@ export default function List(props) {
     info: [],
     length: 0,
   });
-
-  const [allRoles, setAllRoles] = useState([]);
-
-  useEffect(() => {
-    if (apiToken === null) return;
-    axios
-      .get(CONCAT_SERVER_URL("/api/v1/superUser/allRoles"), {
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      })
-      .then((res) => setAllRoles(res.data));
-  }, [apiToken]);
 
   const tableColumns = useMemo(
     () => [
