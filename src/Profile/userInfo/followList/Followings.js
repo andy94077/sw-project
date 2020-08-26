@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
   button: {
     display: "flex",
     width: "90px",
-    fontAize: "12px",
+    fontSize: "13px",
     textAlign: "center",
     margin: "auto 7% auto auto",
     height: "30px",
