@@ -71,7 +71,6 @@ export default function Content(props) {
         url: CONCAT_SERVER_URL("/api/v1/chatroom"),
         params: jsonData,
       });
-      console.log(res.data);
       res.data.message.forEach((item) => {
         item.header = {
           avatar_url: item.avatar_url,

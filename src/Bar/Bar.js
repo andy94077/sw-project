@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
 import { fade, makeStyles } from "@material-ui/core/styles";
@@ -9,6 +9,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import { selectUser } from "../redux/userSlice";
+import { setChatsNotes, setAnnouncement } from "../redux/menuDataSlice";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -78,16 +79,7 @@ export default function Bar() {
   // Classes & States
   const classes = useStyles();
   const history = useHistory();
-
-  const [announcement, setAnnouncement] = useState({
-    content: "",
-    type: "",
-  });
-
-  const [chatCount, setChatCount] = useState(0);
-  const [notesCount, setNotesCount] = useState(0);
-
-  const [isAnOpen, setIsAnOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const [searchValue, setSearchValue] = useState(page === "home" ? tag : "");
 
@@ -97,22 +89,19 @@ export default function Bar() {
 
     window.Echo.channel("Announcements").listen("Announced", (event) => {
       const { data } = event;
-      setAnnouncement({
-        content: [
-          {
-            message: [
-              {
-                id: 0,
-                created_at: Date.now(),
-                ...data,
-              },
-            ],
-          },
-        ],
-        type: "notes",
-      });
-      setIsAnOpen(true);
+      dispatch(
+        setAnnouncement({
+          data,
+        })
+      );
     });
+
+    // Init menu
+    dispatch(
+      setChatsNotes({
+        userId,
+      })
+    );
 
     return () =>
       window.Echo.channel("Announcements").stopListening("Announced");
@@ -152,26 +141,8 @@ export default function Bar() {
             />
           </div>
           <div className={classes.grow} />
-          <DesktopMenu
-            anContent={announcement.content}
-            anType={announcement.type}
-            chatCount={chatCount}
-            isAnOpen={isAnOpen}
-            notesCount={notesCount}
-            setChatCount={setChatCount}
-            setIsAnOpen={setIsAnOpen}
-            setNotesCount={setNotesCount}
-          />
-          <MobileMenu
-            anContent={announcement.content}
-            anType={announcement.type}
-            chatCount={chatCount}
-            isAnOpen={isAnOpen}
-            notesCount={notesCount}
-            setChatCount={setChatCount}
-            setIsAnOpen={setIsAnOpen}
-            setNotesCount={setNotesCount}
-          />
+          <DesktopMenu />
+          <MobileMenu />
         </Toolbar>
       </AppBar>
       <div className={classes.offset} />
