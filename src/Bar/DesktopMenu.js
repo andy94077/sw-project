@@ -55,7 +55,6 @@ export default function DesktopMenu() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [content, setContent] = useState({
     anchorEl: null,
-    open: false,
     type: "",
   });
 
@@ -63,7 +62,6 @@ export default function DesktopMenu() {
   const handleContentClickAway = () => {
     setContent({
       anchorEl: null,
-      open: false,
       type: "",
     });
   };
@@ -91,7 +89,6 @@ export default function DesktopMenu() {
       }
       setContent({
         anchorEl: event.currentTarget,
-        open: true,
         type,
       });
       if (type === "chats") {
@@ -157,7 +154,7 @@ export default function DesktopMenu() {
           <Popper
             anchorEl={content.anchorEl}
             className={classes.popperDesktop}
-            open={content.open}
+            open // To fix position (keep opened)
           >
             <Content type={content.type} />
           </Popper>

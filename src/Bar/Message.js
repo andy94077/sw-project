@@ -55,13 +55,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Message(props) {
   const classes = useStyles();
-  const { type, text, time } = props;
+  const { type, allText, time } = props;
 
   const [show, setShow] = useState(false);
 
   // Toggle function (for chat)
   const handleSetShow = () => {
-    if (type === "chat") {
+    if (type === "chats") {
       setShow(true);
     }
   };
@@ -72,61 +72,63 @@ export default function Message(props) {
 
   return (
     <div>
-      {text.map((page) =>
-        page.message.map((value) => {
-          const background =
-            time === null || time < value.created_at ? "#fff8e5" : "white";
+      {allText.map((text) =>
+        text.map((page) =>
+          page.message.map((value) => {
+            const background =
+              time === null || time < value.created_at ? "#fff8e5" : "white";
 
-          return (
-            <div
-              key={time + value.id}
-              onClick={handleSetShow}
-              onKeyDown={handleSetShow}
-              tabIndex={0}
-              role="button"
-              style={{ outline: "none" }}
-            >
-              <Accordion
-                defaultExpanded={background === "#fff8e5" || type === "chat"}
-                className={clsx(classes.accordion, {
-                  [classes.none]: type === "chat",
-                })}
-                style={{
-                  borderRadius: 0,
-                  background,
-                }}
+            return (
+              <div
+                key={time + value.id}
+                onClick={handleSetShow}
+                onKeyDown={handleSetShow}
+                tabIndex={0}
+                role="button"
+                style={{ outline: "none" }}
               >
-                <AccordionSummary
-                  expandIcon={type !== "chat" && <ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
+                <Accordion
+                  defaultExpanded={background === "#fff8e5" || type === "chats"}
+                  className={clsx(classes.accordion, {
+                    [classes.none]: type === "chats",
+                  })}
+                  style={{
+                    borderRadius: 0,
+                    background,
+                  }}
                 >
-                  <Typography className={classes.heading}>
-                    {type === "chat" && (
-                      <>
-                        <img
-                          alt="Avatar"
-                          className={classes.rounded}
-                          src={CONCAT_SERVER_URL(value.header.avatar_url)}
-                        />
-                        {value.header.username}
-                      </>
-                    )}
-                    {type !== "chat" && value.header}
-                  </Typography>
-                  <Typography className={classes.secondaryHeading}>
-                    {value.secondary}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <div dangerouslySetInnerHTML={{ __html: value.content }} />
-                </AccordionDetails>
-              </Accordion>
-            </div>
-          );
-        })
+                  <AccordionSummary
+                    expandIcon={type !== "chats" && <ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography className={classes.heading}>
+                      {type === "chats" && (
+                        <>
+                          <img
+                            alt="Avatar"
+                            className={classes.rounded}
+                            src={CONCAT_SERVER_URL(value.header.avatar_url)}
+                          />
+                          {value.header.username}
+                        </>
+                      )}
+                      {type !== "chats" && value.header}
+                    </Typography>
+                    <Typography className={classes.secondaryHeading}>
+                      {value.secondary}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <div dangerouslySetInnerHTML={{ __html: value.content }} />
+                  </AccordionDetails>
+                </Accordion>
+              </div>
+            );
+          })
+        )
       )}
-      {type === "chat" && (
+      {type === "chats" && (
         <CustomModal
           show={show}
           onHide={onHide}

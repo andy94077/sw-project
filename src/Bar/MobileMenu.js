@@ -49,7 +49,7 @@ export default function MobileMenu() {
   // Toggle functions
   const handleMobileContentClose = (text) => {
     if (text === "chats") {
-      dispatch(setChatsCount());
+      dispatch(setChatsCount({ chatsCount: 0 }));
       setCookie(`chatsTime${userId}`, Date.now(), 60);
     }
     if (text === "notes") {

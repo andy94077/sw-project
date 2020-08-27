@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,10 +8,9 @@ import { Button } from "@material-ui/core";
 import { format, formatDistanceToNow } from "date-fns";
 import Message from "./Message";
 import useIntersectionObserver from "../components/useIntersectionObserver";
-import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
-import { setChatsCount, setNotesCount } from "../redux/menuDataSlice";
+import { selectMenuData } from "../redux/menuDataSlice";
 import { getCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,15 +40,15 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { userId } = useSelector(selectUser);
+  const { chats, notes } = useSelector(selectMenuData);
   const { type } = props;
 
   const chatsMore = useRef();
   const notesMore = useRef();
-  const dispatch = useDispatch();
 
   const [content, setContent] = useState({
     type: null,
-    text: null,
+    allText: null,
     time: null,
   });
 
@@ -57,15 +56,15 @@ export default function Content(props) {
   // chats
   const {
     status: statusChats,
-    data: chats,
+    data: newChats,
     fetchMore: fetchChats,
     canFetchMore: canFetchChats,
   } = useInfiniteQuery(
     "chats",
-    async (_, start = 10) => {
+    async (_, start = 0) => {
       const jsonData = {
         user_id: userId,
-        start,
+        start: start + chats.length,
         number: 10,
       };
       const res = await axios.request({
@@ -100,15 +99,15 @@ export default function Content(props) {
   // notes
   const {
     status: statusNotes,
-    data: notes,
+    data: newNotes,
     fetchMore: fetchNotes,
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
-    async (_, start = 10) => {
+    async (_, start = 0) => {
       const jsonData = {
         user_id: userId,
-        start,
+        start: start + notes.length,
         number: 10,
       };
       const res = await axios.request({
@@ -141,13 +140,13 @@ export default function Content(props) {
     if (type === "chats") {
       setContent({
         type,
-        text: chats,
+        allText: [[chats], newChats],
         time: getCookie(`chatsTime${userId}`),
       });
     } else if (type === "notes") {
       setContent({
         type,
-        text: notes,
+        allText: [[notes], newNotes],
         time: getCookie(`notesTime${userId}`),
       });
       // window.Echo.channel("Notifications").listen("NotificationChanged", null); // TODO
@@ -167,37 +166,17 @@ export default function Content(props) {
         // );
       }
     };
-  }, [statusChats, statusNotes, type, chats, notes, userId]);
-
-  useEffect(() => {
-    if (statusChats === "success") {
-      const chatsTime = getCookie(`chatsTime${userId}`);
-      const cc = chats[0].message.filter((chat) => chat.created_at > chatsTime)
-        .length;
-      dispatch(setChatsCount({ chatsCount: cc }));
-      if (cc > 9) {
-        dispatch(setChatsCount({ chatsCount: "10+" }));
-      }
-    }
-  }, [chats, statusChats, userId]);
-
-  useEffect(() => {
-    if (statusNotes === "success") {
-      const notesTime = getCookie(`notesTime${userId}`);
-      const nc = notes[0].message.filter((note) => note.created_at > notesTime)
-        .length;
-      dispatch(setNotesCount({ notesCount: nc }));
-      if (nc > 9) {
-        dispatch(setNotesCount({ notesCount: "10+" }));
-      }
-    }
-  }, [notes, statusNotes, userId]);
+  }, [statusChats, statusNotes, type, newChats, newNotes, userId]);
 
   // Wait for content updating
   if (content.type === type) {
     return (
       <div className={classes.root}>
-        <Message type={content.type} text={content.text} time={content.time} />
+        <Message
+          type={content.type}
+          allText={content.allText}
+          time={content.time}
+        />
 
         {content.type === "chats" && (
           <div ref={chatsMore} className={classes.end}>
@@ -221,5 +200,5 @@ export default function Content(props) {
       </div>
     );
   }
-  return <Loading />;
+  return <div style={{ display: "none" }} />;
 }
