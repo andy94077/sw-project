@@ -7,9 +7,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\test;
+use App\Models\Verification;
 use DateTime;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
     use SoftDeletes;
@@ -67,5 +70,17 @@ class User extends Authenticatable
         if($value != null)
             return (new DateTime($value))->format('c');
         return null;
+    }
+
+    public function generateCode(){
+        $verification = new Verification();
+        $verification->user_id = $this->id;
+        $verification->code = Str::random(10);
+        $verification->save();
+    }
+
+    public function sendEmailVerificationNotification(){
+        $verification = Verification::where('user_id', $this->id)->first();
+        Mail::to($this->email)->send(new test($verification ->code));
     }
 }

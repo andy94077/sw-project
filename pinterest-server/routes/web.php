@@ -56,3 +56,7 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('passw
 Route::get('/500', function () {
     abort(500);
 });
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -37,6 +37,7 @@ class UsersTableSeeder extends Seeder
                     'intro' => "<p>Hi I am user${i}</p>",
                     'followers' => max(40 - $i, 0), // cooperate with FollowTableSeeder
                     'followings' => $i < 40 ? $i - 1 : 0,
+                    'email_verified_at' =>  date("Y-m-d H:i:s"),
                 ]
             );
         }

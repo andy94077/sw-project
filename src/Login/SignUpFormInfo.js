@@ -250,13 +250,16 @@ export default function SignUpFormInfo() {
     axios
       .post(CONCAT_SERVER_URL("/api/v1/user/register"), formdata, config)
       .then((response) => {
+        console.log(typeof response.data, response.data);
         if (response.data.isSignUp) {
+          console.log("isSignUp");
           setState({
             isError: [false, false, false],
             nowLoading: false,
             errorMes: ["", "", ""],
           });
           if (response.data.isLogin) {
+            console.log("isLogin");
             setCookie("accessToken", response.data.token, 1);
             if (history.location.pathname === "/") history.push("/home");
           }
@@ -283,6 +286,7 @@ export default function SignUpFormInfo() {
         }
       })
       .catch((error) => {
+        console.log("error ", error);
         if (error === null) return;
         setState({
           isError: [true, true, true],
