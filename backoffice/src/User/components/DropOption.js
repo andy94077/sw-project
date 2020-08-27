@@ -1,12 +1,23 @@
 import React from "react";
 import { BarsOutlined, DownOutlined } from "@ant-design/icons";
-import { Dropdown, Button, Menu } from "antd";
+import { Dropdown, Button, Menu, Tooltip } from "antd";
 
 export default function DropOption(props) {
   const { id, onMenuClick, menuOptions, buttonStyle } = props;
-  const menu = menuOptions.map((item) => {
-    return <Menu.Item key={item.key}>{item.name}</Menu.Item>;
-  });
+  const menu = menuOptions
+    .filter((item) => item !== null && item !== undefined && item !== "")
+    .map((item) =>
+      item.permission ? (
+        <Menu.Item key={item.key}>{item.name}</Menu.Item>
+      ) : (
+        <Menu.Item key={item.key} disabled>
+          <Tooltip placement="left" title="Permission Denied">
+            {item.name}
+          </Tooltip>
+        </Menu.Item>
+      )
+    );
+
   return (
     <Dropdown
       overlay={

@@ -19,3 +19,7 @@ code {
 .ant-modal-header {
   border-radius: 15px 15px 0 0 !important;
 }
+
+.ant-tooltip-inner {
+  border-radius: 5px !important;
+}

@@ -21,7 +21,7 @@ import DropOption from "./DropOption";
 import BucketForm from "./BucketForm";
 
 export default function List() {
-  const { apiToken } = useSelector(selectUser);
+  const { permissions, apiToken } = useSelector(selectUser);
   const [state, setState] = useState({
     loading: false,
     bucketId: null,
@@ -344,22 +344,29 @@ export default function List() {
           <DropOption
             id={record.id}
             onMenuClick={handleMenuClick}
-            menuOptions={
-              record.bucket_time
-                ? [
-                    { key: "Bucket", name: "Bucket" },
-                    { key: "Unbucket", name: "Unbucket" },
-                    record.deleted_at
-                      ? { key: "Recover", name: "Recover" }
-                      : { key: "Delete", name: "Delete" },
-                  ]
-                : [
-                    { key: "Bucket", name: "Bucket" },
-                    record.deleted_at
-                      ? { key: "Recover", name: "Recover" }
-                      : { key: "Delete", name: "Delete" },
-                  ]
-            }
+            menuOptions={[
+              {
+                key: "Bucket",
+                name: "Bucket",
+                permission: permissions.includes("bucket"),
+              },
+              record.bucket_time && {
+                key: "Unbucket",
+                name: "Unbucket",
+                permission: permissions.includes("unbucket"),
+              },
+              record.deleted_at
+                ? {
+                    key: "Recover",
+                    name: "Recover",
+                    permission: permissions.includes("recover_user"),
+                  }
+                : {
+                    key: "Delete",
+                    name: "Delete",
+                    permission: permissions.includes("delete_user"),
+                  },
+            ]}
           />
         );
       },
