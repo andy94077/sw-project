@@ -1,34 +1,49 @@
-import React, { useState } from "react";
-import { makeStyles, Paper, Button, TextField } from "@material-ui/core";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import IconButton from "@material-ui/core/IconButton";
-import axios from "axios";
+import React /* , { useState } */ from "react";
+import { useSelector } from "react-redux";
+import { makeStyles } from "@material-ui/core/styles";
+// import axios from "axios";
+import clsx from "clsx";
+import {
+  // Button,
+  // IconButton,
+  // Menu,
+  // MenuItem,
+  Paper,
+  // TextField,
+} from "@material-ui/core";
+// import MoreVertIcon from "@material-ui/icons/MoreVert";
 
+import { selectUser } from "../redux/userSlice";
 import { CONCAT_SERVER_URL } from "../utils";
-import AlertDialog from "../components/AlertDialog";
+// import AlertDialog from "../components/AlertDialog";
 
 const useStyles = makeStyles(() => ({
   root: {
-    flex: "70%",
     display: "flex",
     flexDirection: "row",
   },
+  rootByMe: {
+    flexDirection: "row-reverse",
+  },
   message: {
     minHeight: "20px",
-    width: "55%",
+    maxWidth: "55%",
+    padding: "3px 10px",
     borderRadius: "30px",
-    margin: "5px",
+    margin: "3px",
     display: "flex",
     background: "#fafafa",
   },
-  author: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: "5px 20px 5px 20px",
-    fontWeight: "bold",
+  messageByMe: {
+    background: "#c9cfed",
+  },
+  avatar: {
+    width: "32px",
+    height: "32px",
+    margin: "8px",
+    padding: "1px",
+    border: "2px solid #3f51b5",
+    borderRadius: "25px",
   },
   content: {
     display: "flex",
@@ -46,101 +61,114 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function ChatBox(props) {
-  const { messageId, message, refresh, userId } = props;
-  const [menu, setMenu] = useState(null);
-  const [canEdit] = useState(false);
-  const [onDelete, setOnDelete] = useState(false);
-  const [onEdit, setOnEdit] = useState(false);
-  const [isOption] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
-  const [newMessage, setNewMessage] = useState(message);
-  const [errMessage, setErrMessage] = useState("");
+  const { show, message, from /* , messageId, refresh */ } = props;
+  const { userId, userAvatar } = useSelector(selectUser);
+
+  // const [menu, setMenu] = useState(null);
+  // const [canEdit] = useState(false);
+  // const [onDelete, setOnDelete] = useState(false);
+  // const [onEdit, setOnEdit] = useState(false);
+  // const [isOption] = useState(false);
+  // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [isConnectionFailed, setIsConnectionFailed] = useState(false);
+  // const [newMessage, setNewMessage] = useState(message);
+  // const [errMessage, setErrMessage] = useState("");
   const classes = useStyles();
 
-  const handleClick = (event) => {
-    setMenu(event.currentTarget);
-  };
+  // const handleClick = (event) => {
+  //   setMenu(event.currentTarget);
+  // };
 
-  const handleClose = () => {
-    setMenu(null);
-  };
+  // const handleClose = () => {
+  //   setMenu(null);
+  // };
 
-  function handleDeleteDialogClose() {
-    setIsDeleteDialogOpen(false);
-  }
+  // function handleDeleteDialogClose() {
+  //   setIsDeleteDialogOpen(false);
+  // }
 
-  function handleEditDialogClose() {
-    setIsEditDialogOpen(false);
-  }
+  // function handleEditDialogClose() {
+  //   setIsEditDialogOpen(false);
+  // }
 
-  const handleDelete = () => {
-    if (!onDelete) {
-      setOnDelete(true);
-      axios
-        .delete(CONCAT_SERVER_URL(`/api/v1/messages/${messageId}`), {
-          data: {
-            user: true,
-          },
-        })
-        .then(() => {
-          refresh();
-        })
-        .catch(() => {
-          setErrMessage({
-            title: "Network error",
-            message: "Failed to delete the message, please retry",
-          });
-          setIsConnectionFailed(true);
-        })
-        .finally(() => {
-          setOnDelete(false);
-          setIsDeleteDialogOpen(false);
-        });
-    }
-  };
+  // const handleDelete = () => {
+  //   if (!onDelete) {
+  //     setOnDelete(true);
+  //     axios
+  //       .delete(CONCAT_SERVER_URL(`/api/v1/messages/${messageId}`), {
+  //         data: {
+  //           user: true,
+  //         },
+  //       })
+  //       .then(() => {
+  //         refresh();
+  //       })
+  //       .catch(() => {
+  //         setErrMessage({
+  //           title: "Network error",
+  //           message: "Failed to delete the message, please retry",
+  //         });
+  //         setIsConnectionFailed(true);
+  //       })
+  //       .finally(() => {
+  //         setOnDelete(false);
+  //         setIsDeleteDialogOpen(false);
+  //       });
+  //   }
+  // };
 
-  function handleEdit() {
-    if (!onEdit && newMessage !== "") {
-      setOnEdit(true);
-      axios
-        .post(CONCAT_SERVER_URL(`/api/v1/messages/${messageId}`), {
-          content: newMessage,
-          user: true,
-          user_id: userId,
-        })
-        .then(() => {
-          refresh();
-          setIsEditDialogOpen(false);
-        })
-        .catch((e) => {
-          if (e.message === "Request failed with status code 403") {
-            setIsConnectionFailed(true);
-            setErrMessage({
-              title: "Bucket Error",
-              message: "You cannot edit message when you in the bucket",
-            });
-          } else {
-            setErrMessage({
-              title: "Network error",
-              message: "Failed to edit the message, please retry",
-            });
-            setIsConnectionFailed(true);
-          }
-        })
-        .finally(() => {
-          setOnEdit(false);
-        });
-    }
-  }
+  // function handleEdit() {
+  //   if (!onEdit && newMessage !== "") {
+  //     setOnEdit(true);
+  //     axios
+  //       .post(CONCAT_SERVER_URL(`/api/v1/messages/${messageId}`), {
+  //         content: newMessage,
+  //         user: true,
+  //         user_id: userId,
+  //       })
+  //       .then(() => {
+  //         refresh();
+  //         setIsEditDialogOpen(false);
+  //       })
+  //       .catch((e) => {
+  //         if (e.message === "Request failed with status code 403") {
+  //           setIsConnectionFailed(true);
+  //           setErrMessage({
+  //             title: "Bucket Error",
+  //             message: "You cannot edit message when you in the bucket",
+  //           });
+  //         } else {
+  //           setErrMessage({
+  //             title: "Network error",
+  //             message: "Failed to edit the message, please retry",
+  //           });
+  //           setIsConnectionFailed(true);
+  //         }
+  //       })
+  //       .finally(() => {
+  //         setOnEdit(false);
+  //       });
+  //   }
+  // }
 
   return (
-    <div className={classes.root}>
-      <Paper className={classes.message}>
+    <div
+      className={clsx(classes.root, { [classes.rootByMe]: from === userId })}
+    >
+      <img
+        alt="Avatar"
+        className={classes.avatar}
+        src={CONCAT_SERVER_URL(from === userId ? userAvatar : show.avatar_url)}
+      />
+      <Paper
+        className={clsx(classes.message, {
+          [classes.messageByMe]: from === userId,
+        })}
+      >
         <div className={classes.content}>{message}</div>
       </Paper>
-      {isOption && (
+      {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
           <MoreVertIcon />
         </IconButton>
@@ -225,7 +253,7 @@ export default function ChatBox(props) {
           </>
         }
         onClose={handleDeleteDialogClose}
-      />
+      /> */}
     </div>
   );
 }

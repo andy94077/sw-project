@@ -1,10 +1,21 @@
-import React, { useState } from "react";
-import SendIcon from "@material-ui/icons/Send";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Divider, TextareaAutosize } from "@material-ui/core";
+import { Link } from "react-router-dom";
+import axios from "axios";
+
+import {
+  Button,
+  Divider,
+  TextareaAutosize,
+  Typography,
+} from "@material-ui/core";
+import SendIcon from "@material-ui/icons/Send";
 import ScrollToBottom from "react-scroll-to-bottom";
+import { selectUser } from "../redux/userSlice";
 import Loading from "../components/Loading";
 import ChatBox from "./ChatBox";
+import { CONCAT_SERVER_URL } from "../utils";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -20,10 +31,18 @@ const useStyles = makeStyles(() => ({
     display: "block",
     margin: "auto",
   },
+  avatar: {
+    width: "35px",
+    height: "35px",
+    margin: "10px",
+    padding: "1px",
+    border: "2px solid #3f51b5",
+    borderRadius: "25px",
+  },
   messages: {
     overflow: "auto",
     weight: "100%",
-    height: "calc(100% - 60px)",
+    height: "calc(100% - 120px)",
     flexGrow: "1",
     display: "flex",
   },
@@ -50,12 +69,41 @@ const useStyles = makeStyles(() => ({
     borderRadius: 5,
     marginLeft: 5,
   },
+  end: {
+    textAlign: "center",
+    minHeight: "10px",
+  },
+  endText: {
+    color: "#666",
+  },
 }));
 
-export default function Chatroom() {
+export default function Chatroom(props) {
   const classes = useStyles();
+  const { show, onHide } = props;
+  const { userId } = useSelector(selectUser);
+
   const [value, setValue] = useState("");
   const [isUpload, setIsUpload] = useState(false);
+  const [boxes, setBoxes] = useState([]);
+
+  useEffect(() => {
+    // Init room
+    const jsonData = {
+      user_id1: userId,
+      user_id2: show.id,
+      start: 0,
+      number: 20,
+    };
+
+    axios
+      .request({
+        method: "GET",
+        url: CONCAT_SERVER_URL("/api/v1/chatbox"),
+        params: jsonData,
+      })
+      .then((res) => setBoxes([res.data]));
+  }, []);
 
   const handleSend = () => {
     setIsUpload(true);
@@ -75,21 +123,39 @@ export default function Chatroom() {
   return (
     <div className={classes.root}>
       <div className={classes.room}>
-        <ScrollToBottom className={classes.messages}>
-          <ChatBox message="Test" />
-          {/* {comments.map((i) => (
-            <CommentBox
-              key={i.id}
-              author={i.user_name}
-              comment={i.content}
-              commentId={i.id}
-              canDelete={username === i.user_name || username === author}
-              canEdit={username === i.user_name}
-              refresh={refreshComment}
-              isUser={username !== null}
-              userId={userId}
+        <Typography variant="h5" gutterBottom>
+          <Link to={`/profile/${show.name}`} onClick={onHide}>
+            <img
+              alt="Avatar"
+              className={classes.avatar}
+              src={CONCAT_SERVER_URL(show.avatar_url)}
             />
-          ))} */}
+            {show.name}
+          </Link>
+        </Typography>
+        <Divider />
+        <ScrollToBottom className={classes.messages}>
+          <div className={classes.end}>
+            <Button disabled classes={{ label: classes.endText }}>
+              No message left
+            </Button>
+          </div>
+          {boxes.map((page) =>
+            page.message.map((text) => (
+              <ChatBox show={show} message={text.message} from={text.from} />
+              // <CommentBox
+              //   key={i.id}
+              //   author={i.user_name}
+              //   comment={i.content}
+              //   commentId={i.id}
+              //   canDelete={username === i.user_name || username === author}
+              //   canEdit={username === i.user_name}
+              //   refresh={refreshComment}
+              //   isUser={username !== null}
+              //   userId={userId}
+              // />
+            ))
+          )}
         </ScrollToBottom>
         <Divider />
         <form className={classes.sendBox}>
@@ -103,7 +169,9 @@ export default function Chatroom() {
             onKeyDown={handleEnter}
           />
           {isUpload ? (
-            <Loading />
+            <div className={classes.button}>
+              <Loading />
+            </div>
           ) : (
             <Button
               variant="contained"

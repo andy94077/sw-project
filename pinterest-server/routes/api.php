@@ -93,4 +93,5 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
     Route::apiResource('notifications', 'NotificationController');
     Route::resource('chatroom', 'ChatroomController');
+    Route::resource('chatbox', 'ChatBoxController');
 });

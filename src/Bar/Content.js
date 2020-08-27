@@ -50,7 +50,7 @@ export default function Content(props) {
 
   const [content, setContent] = useState({
     type: null,
-    allText: null,
+    allText: [],
     time: null,
   });
 
