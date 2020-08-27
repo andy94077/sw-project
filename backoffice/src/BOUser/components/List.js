@@ -20,6 +20,7 @@ import {
   SearchOutlined,
   UndoOutlined,
   EditOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 
 import EditRoleForm from "./EditRoleForm";
@@ -28,6 +29,7 @@ import { CONCAT_SERVER_URL } from "../../utils";
 import "./List.css";
 import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
+import PermissionDrawer from "./PermissionDrawer";
 
 const useStyles = makeStyles(() => ({
   roles: {
@@ -38,7 +40,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function List(props) {
-  const { allRoles, refresh, setRefresh } = props;
+  const { allRolesWithPermissions, refresh, setRefresh } = props;
   const classes = useStyles();
   const { userId, permissions, apiToken } = useSelector(selectUser);
   const initialSearchText = useMemo(
@@ -69,6 +71,13 @@ export default function List(props) {
   const handleFormOpen = ({ id, roles }) => () => {
     setSelectedUser({ id, roles });
     setEditRolesFormVisible(true);
+  };
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const handleDrawerVisible = (_visible) => () => setDrawerVisible(_visible);
+  const handleDrawerOpen = ({ id, roles }) => () => {
+    setSelectedUser({ id, roles });
+    setDrawerVisible(true);
   };
 
   const handleSearchTextChange = (key) => (event) =>
@@ -116,23 +125,38 @@ export default function List(props) {
         render: (roles, row) => (
           <div className={classes.roles}>
             <span>{roles.map((role) => role.name).join(", ")}</span>
-            <Tooltip
-              title={
-                permissions.includes("change_BO_user_role")
-                  ? "Edit"
-                  : "Permission Denied"
-              }
-            >
-              <Button
-                shape="circle"
-                icon={<EditOutlined />}
-                onClick={handleFormOpen({
-                  id: row.id,
-                  roles: roles.map((role) => role.name),
-                })}
-                disabled={!permissions.includes("change_BO_user_role")}
-              />
-            </Tooltip>
+            <div style={{ display: "flex" }}>
+              {userId !== row.id && (
+                <Tooltip
+                  title={
+                    permissions.includes("change_BO_user_role")
+                      ? "Edit"
+                      : "Permission Denied"
+                  }
+                >
+                  <Button
+                    shape="circle"
+                    icon={<EditOutlined />}
+                    onClick={handleFormOpen({
+                      id: row.id,
+                      roles: roles.map((role) => role.name),
+                    })}
+                    disabled={!permissions.includes("change_BO_user_role")}
+                    style={{ marginRight: 6 }}
+                  />
+                </Tooltip>
+              )}
+              <Tooltip title="view details">
+                <Button
+                  shape="circle"
+                  icon={<EyeOutlined />}
+                  onClick={handleDrawerOpen({
+                    id: row.id,
+                    roles: roles.map((role) => role.name),
+                  })}
+                />
+              </Tooltip>
+            </div>
           </div>
         ),
         renderSearch: (value) => (
@@ -148,6 +172,7 @@ export default function List(props) {
                 closable={closable}
                 onClose={onClose}
                 style={{ borderRadius: 5 }}
+                key={label}
               >
                 {label}
               </Tag>
@@ -160,7 +185,7 @@ export default function List(props) {
               borderRadius: "15px",
             }}
           >
-            {allRoles.map((role) => (
+            {Object.keys(allRolesWithPermissions).map((role) => (
               <Select.Option key={role}>{role}</Select.Option>
             ))}
           </Select>
@@ -192,7 +217,7 @@ export default function List(props) {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allRoles]
+    [allRolesWithPermissions]
   );
 
   const handleDeleteUser = (id) => () => {
@@ -498,11 +523,23 @@ export default function List(props) {
         <EditRoleForm
           id={selectedUser.id}
           userRoles={selectedUser.roles}
-          allRoles={allRoles}
+          allRoles={Object.keys(allRolesWithPermissions)}
           // Do not control `visible` attribute because the form will not get proper props of `id` and `userRoles`
           visible={true}
           onCancel={handleEditRolesFormVisible(false)}
           setRefresh={setRefresh}
+        />
+      )}
+      {drawerVisible && (
+        <PermissionDrawer
+          rolesWithPermissions={Object.fromEntries(
+            selectedUser.roles.map((role) => [
+              role,
+              allRolesWithPermissions[role],
+            ])
+          )}
+          visible={true}
+          onClose={handleDrawerVisible(false)}
         />
       )}
     </>

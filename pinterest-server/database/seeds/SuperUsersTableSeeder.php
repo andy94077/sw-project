@@ -47,6 +47,6 @@ class SuperUsersTableSeeder extends Seeder
         $user4->assignRole('BO_manager');
 
         $user5 = SuperUser::find(6);
-        $user5->assignRole('spokesman');
+        $user5->syncRoles(['BO_manager', 'post_manager', 'spokesman']);
     }
 }
