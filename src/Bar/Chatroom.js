@@ -80,18 +80,18 @@ const useStyles = makeStyles(() => ({
 
 export default function Chatroom(props) {
   const classes = useStyles();
-  const { show, onHide } = props;
+  const { chatInfo, onHide } = props;
   const { userId } = useSelector(selectUser);
 
   const [value, setValue] = useState("");
-  const [isUpload, setIsUpload] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [boxes, setBoxes] = useState([]);
 
   useEffect(() => {
     // Init room
     const jsonData = {
       user_id1: userId,
-      user_id2: show.id,
+      user_id2: chatInfo.userId,
       start: 0,
       number: 20,
     };
@@ -105,9 +105,25 @@ export default function Chatroom(props) {
       .then((res) => setBoxes([res.data]));
   }, []);
 
+  const handleSetValue = (event) => {
+    setValue(event.target.value);
+  };
+
+  const handleRefresh = () => {};
+
   const handleSend = () => {
-    setIsUpload(true);
-    setTimeout(() => setIsUpload(false), 2000);
+    setIsSending(true);
+    axios
+      .post(CONCAT_SERVER_URL("/api/v1/chatbox"), {
+        user_id1: userId,
+        user_id2: chatInfo.userId,
+        last_message: value,
+      })
+      .then(() => {
+        setValue("");
+        handleRefresh();
+      })
+      .finally(() => setIsSending(false));
   };
 
   const handleEnter = (e) => {
@@ -124,16 +140,18 @@ export default function Chatroom(props) {
     <div className={classes.root}>
       <div className={classes.room}>
         <Typography variant="h5" gutterBottom>
-          <Link to={`/profile/${show.name}`} onClick={onHide}>
+          <Link to={`/profile/${chatInfo.username}`} onClick={onHide}>
             <img
               alt="Avatar"
               className={classes.avatar}
-              src={CONCAT_SERVER_URL(show.avatar_url)}
+              src={CONCAT_SERVER_URL(chatInfo.avatar_url)}
             />
-            {show.name}
+            {chatInfo.username}
           </Link>
         </Typography>
+
         <Divider />
+
         <ScrollToBottom className={classes.messages}>
           <div className={classes.end}>
             <Button disabled classes={{ label: classes.endText }}>
@@ -142,7 +160,11 @@ export default function Chatroom(props) {
           </div>
           {boxes.map((page) =>
             page.message.map((text) => (
-              <ChatBox show={show} message={text.message} from={text.from} />
+              <ChatBox
+                chatInfo={chatInfo}
+                message={text.message}
+                from={text.from}
+              />
               // <CommentBox
               //   key={i.id}
               //   author={i.user_name}
@@ -157,7 +179,9 @@ export default function Chatroom(props) {
             ))
           )}
         </ScrollToBottom>
+
         <Divider />
+
         <form className={classes.sendBox}>
           <TextareaAutosize
             id="standard-basic"
@@ -165,10 +189,10 @@ export default function Chatroom(props) {
             rowsMin={1}
             rowsMax={3}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={handleSetValue}
             onKeyDown={handleEnter}
           />
-          {isUpload ? (
+          {isSending ? (
             <div className={classes.button}>
               <Loading />
             </div>

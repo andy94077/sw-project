@@ -57,26 +57,29 @@ export default function Message(props) {
   const classes = useStyles();
   const { type, allText, time } = props;
 
-  const [show, setShow] = useState({
-    id: 0,
+  const [chatInfo, setChatInfo] = useState({
+    roomId: 0,
+    userId: 0,
     avatar_url: "",
+    username: "",
   });
 
   // Toggle function (for chat)
-  const handleSetShow = (id, avatarUrl, name) => () => {
+  const handleSetChatInfo = (roomId, userId, avatarUrl, username) => () => {
     if (type === "chats") {
-      setShow({
-        id,
+      setChatInfo({
+        roomId,
+        userId,
         avatar_url: avatarUrl,
-        name,
+        username,
       });
     }
   };
 
   const onHide = () => {
-    setShow({
-      ...show,
-      id: 0,
+    setChatInfo({
+      ...chatInfo,
+      roomId: 0,
     });
   };
 
@@ -91,12 +94,14 @@ export default function Message(props) {
             return (
               <div
                 key={time + value.id}
-                onClick={handleSetShow(
+                onClick={handleSetChatInfo(
+                  value.id,
                   value.user_id2,
                   value.avatar_url,
                   value.username
                 )}
-                onKeyDown={handleSetShow(
+                onKeyDown={handleSetChatInfo(
+                  value.id,
                   value.user_id2,
                   value.avatar_url,
                   value.username
@@ -148,12 +153,12 @@ export default function Message(props) {
       )}
       {type === "chats" && (
         <CustomModal
-          show={show.id !== 0}
+          show={chatInfo.roomId !== 0}
           onHide={onHide}
           jumpFrame={classes.jumpFrame}
           backdrop
         >
-          <Chatroom show={show} onHide={onHide} />
+          <Chatroom chatInfo={chatInfo} onHide={onHide} />
         </CustomModal>
       )}
     </div>

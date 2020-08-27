@@ -61,7 +61,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function ChatBox(props) {
-  const { show, message, from /* , messageId, refresh */ } = props;
+  const { chatInfo, message, from /* , messageId, refresh */ } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
   // const [menu, setMenu] = useState(null);
@@ -159,7 +159,9 @@ export default function ChatBox(props) {
       <img
         alt="Avatar"
         className={classes.avatar}
-        src={CONCAT_SERVER_URL(from === userId ? userAvatar : show.avatar_url)}
+        src={CONCAT_SERVER_URL(
+          from === userId ? userAvatar : chatInfo.avatar_url
+        )}
       />
       <Paper
         className={clsx(classes.message, {

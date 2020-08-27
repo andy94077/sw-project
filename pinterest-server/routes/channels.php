@@ -14,13 +14,17 @@ use App\Models\User;
 |
 */
 
+Broadcast::channel('Chatroom.{id}', function ($user, $id) {
+    return true;
+});
+
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return true;
 });
 
 Broadcast::channel('Online', function ($user) {
     return [
-        'id' => $user->id, 
+        'id' => $user->id,
         'name' => $user->name,
     ];
 });
