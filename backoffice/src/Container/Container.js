@@ -7,6 +7,7 @@ import {
   TeamOutlined,
   FileTextOutlined,
   UserOutlined,
+  NotificationOutlined,
 } from "@ant-design/icons";
 import { useLocation, useHistory, Link } from "react-router-dom";
 
@@ -69,7 +70,7 @@ export default function Container(props) {
               </Menu.Item>
             )}
             {permissions.includes("make_announcement") && (
-              <Menu.Item key="Announcement" icon={<TeamOutlined />}>
+              <Menu.Item key="Announcement" icon={<NotificationOutlined />}>
                 <Link to="/Announcement">Announcement</Link>
               </Menu.Item>
             )}

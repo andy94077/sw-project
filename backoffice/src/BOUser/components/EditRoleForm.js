@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 
 import "antd/dist/antd.css";
-import { Modal, Form, Select, Tag } from "antd";
+import { Modal, Form, Select, Tag, message } from "antd";
 import { CONCAT_SERVER_URL } from "../../utils";
 import { selectUser } from "../../redux/userSlice";
 
@@ -37,11 +37,16 @@ export default function EditRoleForm(props) {
           }
         )
         .then(() => {
+          message.success(`Updated successfully. (User id = ${id})`);
           setRefresh();
           closeForm();
         })
-        .catch(() => {
+        .catch((err) => {
           setIsLoading(false);
+          message.destroy();
+          if (err.response && err.response.status === 403)
+            message.error("Permission denied.");
+          else message.error("Updated failed. Please try again later.");
         });
     });
   };

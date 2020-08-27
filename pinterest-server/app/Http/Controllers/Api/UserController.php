@@ -117,7 +117,9 @@ class UserController extends BaseController
     public function bucket(Request $request)
     {
         if ($request['id']) {
-            $user = User::find($request['id']);
+            $user = User::withTrashed()->find($request['id']);
+            if ($user === null)
+                return response()->json('user not found', 404);
             $date = new DateTime(null);
             $h = ($request['hour']) ? $request['hour'] : 0;
             $d = ($request['day']) ? $request['day'] : 0;
@@ -134,7 +136,9 @@ class UserController extends BaseController
     public function unBucket(Request $request)
     {
         if ($request['id']) {
-            $user = User::find($request['id']);
+            $user = User::withTrashed()->find($request['id']);
+            if ($user === null)
+                return response()->json('user not found', 404);
             $user->bucket_time = null;
             $user->save();
             return response()->json($user, 200);
@@ -164,7 +168,7 @@ class UserController extends BaseController
                 $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
             }
         }
-        
+
         $size = $query->count();
         $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
@@ -175,6 +179,8 @@ class UserController extends BaseController
     public function adminDelete(Request $request)
     {
         $user = User::find($request['id']);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->delete();
         return $this->sendResponse($user, "success");
     }
@@ -182,6 +188,8 @@ class UserController extends BaseController
     public function adminRecover(Request $request)
     {
         $user = User::withTrashed()->find($request['id']);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->restore();
         return $this->sendResponse($user, "success");
     }
@@ -204,10 +212,10 @@ class UserController extends BaseController
                 unlink(substr($user->avatar_url, 1));
             }
 
-            $output_file = "img/". $request["name"] ."Avatar". ((new DateTime())->format('Y-m-d--H:i:s')).".jpeg";
+            $output_file = "img/" . $request["name"] . "Avatar" . ((new DateTime())->format('Y-m-d--H:i:s')) . ".jpeg";
             $ifp = fopen($output_file, 'wb');
             $data = explode(',', $request["imgBase64"]);
-            fwrite($ifp, base64_decode($data[ 1 ]));
+            fwrite($ifp, base64_decode($data[1]));
             fclose($ifp);
 
             $user = User::where('name', $request['name'])->first();
