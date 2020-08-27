@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { CONCAT_SERVER_URL } from "../../utils";
+import { CONCAT_SERVER_URL, CONCAT_FRONTOFFICE_URL } from "../../utils";
 import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
 import DropOption from "./DropOption";
@@ -295,7 +295,7 @@ export default function List() {
       key: "name",
       width: 120,
       render: (name) => (
-        <a href={CONCAT_SERVER_URL(`/profile/${name}`)}>{name}</a>
+        <a href={CONCAT_FRONTOFFICE_URL(`/profile/${name}`)}>{name}</a>
       ),
       sorter: (a, b) => a.name.localeCompare(b.name),
     },

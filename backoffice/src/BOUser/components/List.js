@@ -40,7 +40,7 @@ const useStyles = makeStyles(() => ({
 export default function List(props) {
   const { allRoles, refresh, setRefresh } = props;
   const classes = useStyles();
-  const { permissions, apiToken } = useSelector(selectUser);
+  const { userId, permissions, apiToken } = useSelector(selectUser);
   const initialSearchText = useMemo(
     () => ({
       id: "",
@@ -277,46 +277,47 @@ export default function List(props) {
           right: "0",
         },
       }),
-      render: (_, row) => (
-        <div style={{ textAlign: "center" }}>
-          {row.deleted_at === "" ? (
-            <Tooltip
-              title={
-                permissions.includes("delete_BO_user")
-                  ? "Delete"
-                  : "Permission Denied"
-              }
-            >
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={handleDeleteUser(row.id)}
-                shape="circle"
-                size="small"
-                type="primary"
-                disabled={!permissions.includes("delete_BO_user")}
-              />
-            </Tooltip>
-          ) : (
-            <Tooltip
-              title={
-                permissions.includes("recover_BO_user")
-                  ? "Recover"
-                  : "Permission Denied"
-              }
-            >
-              <Button
-                icon={<UndoOutlined />}
-                onClick={handleRecoverUser(row.id)}
-                shape="circle"
-                size="small"
-                type="primary"
-                disabled={!permissions.includes("recover_BO_user")}
-              />
-            </Tooltip>
-          )}
-        </div>
-      ),
+      render: (_, row) =>
+        userId !== row.id && (
+          <div style={{ textAlign: "center" }}>
+            {row.deleted_at === "" ? (
+              <Tooltip
+                title={
+                  permissions.includes("delete_BO_user")
+                    ? "Delete"
+                    : "Permission Denied"
+                }
+              >
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteUser(row.id)}
+                  shape="circle"
+                  size="small"
+                  type="primary"
+                  disabled={!permissions.includes("delete_BO_user")}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip
+                title={
+                  permissions.includes("recover_BO_user")
+                    ? "Recover"
+                    : "Permission Denied"
+                }
+              >
+                <Button
+                  icon={<UndoOutlined />}
+                  onClick={handleRecoverUser(row.id)}
+                  shape="circle"
+                  size="small"
+                  type="primary"
+                  disabled={!permissions.includes("recover_BO_user")}
+                />
+              </Tooltip>
+            )}
+          </div>
+        ),
     },
   ];
 
