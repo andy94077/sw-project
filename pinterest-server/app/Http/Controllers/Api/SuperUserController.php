@@ -13,6 +13,7 @@ use App\Models\SuperUser;
 use App\Models\Image;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\RoleHasPermission;
 
 class SuperUserController extends BaseController
 {
@@ -154,8 +155,19 @@ class SuperUserController extends BaseController
 
     public function getAllRoles()
     {
-        $roles = Role::where('guard_name', 'super_users')->orderBy('name')->pluck('name');
-        return response()->json($roles);
+        // get all roles and their permissions
+        $roles_permissions = DB::table('role_has_permissions')
+            ->select('roles.name as role', 'permissions.name as permission')
+            ->leftJoin('roles', 'roles.id', '=', 'role_has_permissions.role_id')
+            ->leftJoin('permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+            ->orderBy('role')->get()
+            ->groupBy('role')->map(function ($role, $key) {
+                return $role->map(function ($permissions, $key2) {
+                    return $permissions->permission;
+                })->sort()->values();
+            });
+        $roles_permissions->prepend(Permission::where('guard_name', 'super_users')->pluck('name'), 'admin');
+        return response()->json($roles_permissions);
     }
 
     public function ChangeRoles(Request $request)
