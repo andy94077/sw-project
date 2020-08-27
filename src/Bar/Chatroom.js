@@ -86,12 +86,12 @@ export default function Chatroom(props) {
   const [value, setValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [boxes, setBoxes] = useState([]);
+  const [newBoxes, setNewBoxes] = useState([]);
 
   useEffect(() => {
     // Init room
     const jsonData = {
-      user_id1: userId,
-      user_id2: chatInfo.userId,
+      room_id: chatInfo.roomId,
       start: 0,
       number: 20,
     };
@@ -109,31 +109,48 @@ export default function Chatroom(props) {
     setValue(event.target.value);
   };
 
-  const handleRefresh = () => {};
+  const handleRefresh = () => {
+    setNewBoxes((nb) => {
+      nb.push({
+        message: value,
+        from: userId,
+      });
+      return nb;
+    });
+    setValue("");
+  };
 
-  const handleSend = () => {
-    setIsSending(true);
+  const handleSendBox = () => {
     axios
       .post(CONCAT_SERVER_URL("/api/v1/chatbox"), {
+        room_id: chatInfo.roomId,
+        from: userId,
+        to: chatInfo.userId,
+        last_message: value,
+      })
+      .then(() => handleRefresh())
+      .finally(() => setIsSending(false));
+  };
+
+  const handleSendRoom = () => {
+    setIsSending(true);
+    axios
+      .post(CONCAT_SERVER_URL("/api/v1/chatroom"), {
         user_id1: userId,
         user_id2: chatInfo.userId,
         last_message: value,
       })
-      .then(() => {
-        setValue("");
-        handleRefresh();
-      })
-      .finally(() => setIsSending(false));
+      .then(() => handleSendBox());
   };
 
   const handleEnter = (e) => {
     if (e.key === "Enter" && !e.shiftKey && /^\s+$/.test(value) === false)
-      handleSend();
+      handleSendRoom();
   };
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    if (/^\s+$/.test(value) === false) handleSend();
+    if (/^\s+$/.test(value) === false) handleSendRoom();
   };
 
   return (
@@ -178,6 +195,13 @@ export default function Chatroom(props) {
               // />
             ))
           )}
+          {newBoxes.map((text) => (
+            <ChatBox
+              chatInfo={chatInfo}
+              message={text.message}
+              from={text.from}
+            />
+          ))}
         </ScrollToBottom>
 
         <Divider />

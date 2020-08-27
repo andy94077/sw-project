@@ -8,21 +8,11 @@ use Illuminate\Http\Request;
 
 class ChatBoxController extends BaseController
 {
-    protected function swap(&$x, &$y)
-    {
-        // Warning: works correctly with numbers ONLY!
-        if ($x > $y) {
-            $x ^= $y ^= $x ^= $y;
-        }
-    }
-
     public function index(Request $request)
     {
-        $user_id1 = intval($request['user_id1']);
-        $user_id2 = intval($request['user_id2']);
-        $this->swap($user_id1, $user_id2);
-        $boxes = DB::table('laravel.chat_' . $user_id1 . '_' . $user_id2);
-        
+        $room_id = intval($request['room_id']);
+        $boxes = DB::table('laravel.chat_' .  $room_id);
+
         $boxes = $boxes->orderBy('updated_at', 'asc')
             ->skip(intval($request['start']))
             ->take(intval($request['number']))->get();
@@ -42,15 +32,15 @@ class ChatBoxController extends BaseController
 
     public function store(Request $request)
     {
-        $user_id1 = $from = intval($request['user_id1']);
-        $user_id2 = $to = intval($request['user_id2']);
-        $this->swap($user_id1, $user_id2);
-        
+        $room_id = intval($request['room_id']);
+        $from = intval($request['from']);
+        $to = intval($request['to']);
+
         DB::insert(
-            'INSERT INTO laravel.chat_' . $user_id1 . '_' . $user_id2 . ' (`from`, `to`, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO laravel.chat_' . $room_id . ' (`from`, `to`, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
             [$from, $to, $request['last_message'], date('Y-m-d H:i:s'), date('Y-m-d H:i:s')]
         );
-        
+
         return response()->json(['message' => $request['last_message']]);
     }
 }

@@ -42,12 +42,9 @@ class ChatroomController extends BaseController
         }
     }
 
-    public function create(Request $request)
+    public function create($id)
     {
-        $user_id1 = intval($request['user_id1']);
-        $user_id2 = intval($request['user_id2']);
-
-        Schema::create('chat_' . $user_id1 . '_' . $user_id2, function (Blueprint $table) {
+        Schema::create('chat_' . $id, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('from');
             $table->unsignedBigInteger('to');
@@ -55,7 +52,7 @@ class ChatroomController extends BaseController
             $table->timestamps();
         });
 
-        return response()->json(['table' => 'chat_' . $user_id1 . '_' . $user_id2]);
+        return response()->json(['table' => 'chat_' . $id]);
     }
 
     protected function update(Request $request)
@@ -65,12 +62,21 @@ class ChatroomController extends BaseController
 
         $room = Chatroom::where('user_id1', $user_id1)->where('user_id2', $user_id2)->get();
         if (count($room) === 0) {
-            if ($user_id1 <= $user_id2) {
-                $this->create($request);
-            }
             $room = new Chatroom();
             $room->user_id1 = $user_id1;
             $room->user_id2 = $user_id2;
+            $room->save();
+
+            $tmp = Chatroom::where('user_id1', $user_id2)->where('user_id2', $user_id1)->get();
+            if (count($tmp) === 0) {
+                $room->room_id = $room->id;
+            } else {
+                $room->room_id = $tmp[0]->id;
+            }
+
+            if ($user_id1 <= $user_id2) {
+                $this->create($room->room_id);
+            }
         } else {
             $room = $room[0];
         }
@@ -80,6 +86,7 @@ class ChatroomController extends BaseController
 
     public function store(Request $request)
     {
+        echo $request['user_id1'] . ' ' . $request['user_id2'] . ' ';
         $this->update($request);
         if ($request['user_id1'] !== $request['user_id2']) {
             // Swap
@@ -87,9 +94,10 @@ class ChatroomController extends BaseController
                 'user_id1' => $request['user_id2'],
                 'user_id2' => $request['user_id1'],
             ]);
+            echo $request['user_id1'] . ' ' . $request['user_id2'] . ' ';
             $this->update($request);
         }
 
-        return response()->json(['message' => $request['last_message']]);
+        return response()->json($request);
     }
 }

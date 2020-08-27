@@ -95,13 +95,13 @@ export default function Message(props) {
               <div
                 key={time + value.id}
                 onClick={handleSetChatInfo(
-                  value.id,
+                  value.room_id,
                   value.user_id2,
                   value.avatar_url,
                   value.username
                 )}
                 onKeyDown={handleSetChatInfo(
-                  value.id,
+                  value.room_id,
                   value.user_id2,
                   value.avatar_url,
                   value.username
