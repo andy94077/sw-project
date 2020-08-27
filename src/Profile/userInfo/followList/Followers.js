@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +8,6 @@ import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
 import FollowButton from "../../upload_follow/FollowButton";
-import Loading from "../../../components/Loading";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -52,9 +51,8 @@ export default function Followers(props) {
   const loadMoreButtonRef = useRef();
   const { userId } = useSelector(selectUser);
   const history = useHistory();
-  const [list, setList] = useState([]);
   const {
-    data,
+    data = [],
     isFetching,
     isFetchingMore,
     fetchMore,
@@ -88,10 +86,9 @@ export default function Followers(props) {
     }
   };
 
-  useEffect(() => {
-    if (isFetching === true) return;
-    setList(
-      data.map((page) =>
+  return (
+    <span className={classes.list}>
+      {data.map((page) =>
         page.message.map((value) => (
           <span
             className={classes.followerDiv}
@@ -113,13 +110,7 @@ export default function Followers(props) {
             )}
           </span>
         ))
-      )
-    );
-  }, [data, isFetching]);
-
-  return (
-    <span className={classes.list}>
-      {isFetching ? <Loading /> : list}
+      )}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}
@@ -128,6 +119,8 @@ export default function Followers(props) {
         >
           {isFetchingMore
             ? "Loading more..."
+            : isFetching
+            ? "is loading..."
             : canFetchMore
             ? "Load More"
             : "Nothing more to load"}
