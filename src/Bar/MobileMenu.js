@@ -159,7 +159,10 @@ export default function MobileMenu() {
             <Content type={mobileContentType} />
           </MenuItem>
         )}
-        <MenuItem onClick={handleMobileContentOpen("notes")}>
+        <MenuItem
+          onClick={handleMobileContentOpen("notes")}
+          style={{ width: "325px" }}
+        >
           <IconButton color="inherit" component="span">
             <Badge badgeContent={notesCount} color="secondary">
               <NotificationsIcon

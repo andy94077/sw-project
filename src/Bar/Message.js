@@ -10,6 +10,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import CustomModal from "../components/CustomModal";
+import Chatroom from "./Chatroom";
 import { CONCAT_SERVER_URL } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -42,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
     margin: "auto",
-    height: "100%",
     maxWidth: "800px",
     [`@media (max-width: 800px)`]: {
       maxWidth: "600px",
@@ -135,7 +135,7 @@ export default function Message(props) {
           jumpFrame={classes.jumpFrame}
           backdrop
         >
-          <h4>Chatroom</h4>
+          <Chatroom />
         </CustomModal>
       )}
     </div>

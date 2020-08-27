@@ -44,7 +44,6 @@ export default function DesktopMenu() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [content, setContent] = useState({
-    anchorEl: null,
     open: false,
     type: "",
   });

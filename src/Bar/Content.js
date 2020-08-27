@@ -41,8 +41,9 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { userId } = useSelector(selectUser);
-  const { chats, notes } = useSelector(selectMenuData);
+  const { chats, notes, chatsLen, notesLen } = useSelector(selectMenuData);
   const { type } = props;
+  const [show, setShow] = useState(true);
 
   const chatsMore = useRef();
   const notesMore = useRef();
@@ -62,7 +63,7 @@ export default function Content(props) {
     canFetchMore: canFetchChats,
   } = useInfiniteQuery(
     "chats",
-    async (_, start = 10) => {
+    async (_, start = chatsLen) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -105,7 +106,7 @@ export default function Content(props) {
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
-    async (_, start = 10) => {
+    async (_, start = notesLen) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -136,6 +137,20 @@ export default function Content(props) {
   });
 
   // Update
+  useEffect(() => {
+    if (statusChats === "success" && type === "chats") {
+      setTimeout(() => setShow(false), 1);
+      setTimeout(() => setShow(true), 2);
+    }
+  }, [statusChats, type]);
+
+  useEffect(() => {
+    if (statusNotes === "success" && type === "notes") {
+      setTimeout(() => setShow(false), 1);
+      setTimeout(() => setShow(true), 2);
+    }
+  }, [statusNotes, type]);
+
   useEffect(() => {
     if (statusChats !== "success" || statusNotes !== "success") return () => {};
     if (type === "chats") {
@@ -179,7 +194,7 @@ export default function Content(props) {
           time={content.time}
         />
 
-        {type === "chats" && (
+        {type === "chats" && show && (
           <div ref={chatsMore} className={classes.end}>
             {!canFetchChats && (
               <Button disabled classes={{ label: classes.endText }}>
@@ -189,7 +204,7 @@ export default function Content(props) {
           </div>
         )}
 
-        {type === "notes" && (
+        {type === "notes" && show && (
           <div ref={notesMore} className={classes.end}>
             {!canFetchNotes && (
               <Button disabled classes={{ label: classes.endText }}>
