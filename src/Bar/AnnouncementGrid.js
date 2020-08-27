@@ -1,9 +1,11 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton, Snackbar } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
 import Message from "./Message";
+import { selectMenuData, setAnnouncementOpen } from "../redux/menuDataSlice";
 
 const useStyles = makeStyles((theme) => ({
   bar: {
@@ -34,19 +36,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AnnouncementGrid(props) {
+export default function AnnouncementGrid() {
   const classes = useStyles();
-  const { content, type, isAnOpen, setIsAnOpen } = props;
+  const dispatch = useDispatch();
+  const {
+    announcementContent,
+    isAnnouncementOpen,
+    announcementType,
+  } = useSelector(selectMenuData);
 
   const handleClose = () => {
-    setIsAnOpen(false);
+    dispatch(setAnnouncementOpen({ isOpen: false }));
   };
 
   return (
     <Snackbar
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       className={classes.bar}
-      open={isAnOpen}
+      open={isAnnouncementOpen}
     >
       <div>
         <IconButton
@@ -60,7 +67,11 @@ export default function AnnouncementGrid(props) {
           <CloseIcon fontSize="small" />
         </IconButton>
         <div className={classes.root}>
-          <Message type={type} text={content} time={null} />
+          <Message
+            type={announcementType}
+            allText={[announcementContent]}
+            time={null}
+          />
         </div>
       </div>
     </Snackbar>

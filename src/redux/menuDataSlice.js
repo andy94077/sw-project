@@ -35,13 +35,21 @@ export const menuDataSlice = createSlice({
             {
               id: Date.now(),
               created_at: Date.now(),
-              ...action.payload.data,
+              ...action.payload.content,
             },
           ],
         },
       ];
-      state.announcementType = "notes";
-      state.isAnnouncementOpen = true;
+      state.isAnnouncementOpen = action.payload.isOpen;
+      state.announcementType = action.payload.type;
+    },
+
+    setAnnouncementOpen: (state, action) => {
+      state.isAnnouncementOpen = action.payload.isOpen;
+    },
+
+    setAnnouncementType: (state, action) => {
+      state.announcementType = action.payload.type;
     },
   },
 });
@@ -51,6 +59,8 @@ export const {
   setChatsCount,
   setNotesCount,
   setAnnouncement,
+  setAnnouncementOpen,
+  setAnnouncementType,
 } = menuDataSlice.actions;
 export default menuDataSlice.reducer;
 export const selectMenuData = (state) => state.menuData;

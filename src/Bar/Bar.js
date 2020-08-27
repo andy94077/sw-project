@@ -103,7 +103,9 @@ export default function Bar() {
       const { data } = event;
       dispatch(
         setAnnouncement({
-          data,
+          content: data,
+          isOpen: true,
+          type: "notes",
         })
       );
     });
@@ -170,7 +172,7 @@ export default function Bar() {
     if (cc > 9) {
       dispatch(setChatsCount({ chatsCount: "10+" }));
     }
-  }, [chats]);
+  }, [chats, userId]);
 
   useEffect(() => {
     if (notes.length === 0) return;
@@ -182,7 +184,7 @@ export default function Bar() {
     if (nc > 9) {
       dispatch(setNotesCount({ notesCount: "10+" }));
     }
-  }, [notes]);
+  }, [notes, userId]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") history.push(`/home/${e.target.value}`);

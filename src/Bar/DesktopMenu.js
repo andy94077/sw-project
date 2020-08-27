@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Badge,
-  ClickAwayListener,
-  IconButton,
-  Popper,
-} from "@material-ui/core";
+import { Badge, ClickAwayListener, IconButton } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -14,6 +9,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import { CONCAT_SERVER_URL } from "../utils";
 import AnnouncementGrid from "./AnnouncementGrid";
 import Content from "./Content";
+import MyPopper from "./MyPopper";
 import RightDrawer from "./RightDrawer";
 
 import { selectUser } from "../redux/userSlice";
@@ -38,12 +34,6 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
     },
   },
-  popperDesktop: {
-    display: "none",
-    [theme.breakpoints.up("md")]: {
-      display: "block",
-    },
-  },
 }));
 
 export default function DesktopMenu() {
@@ -55,13 +45,14 @@ export default function DesktopMenu() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [content, setContent] = useState({
     anchorEl: null,
+    open: false,
     type: "",
   });
 
   // Toggle function
   const handleContentClickAway = () => {
     setContent({
-      anchorEl: null,
+      open: false,
       type: "",
     });
   };
@@ -78,7 +69,7 @@ export default function DesktopMenu() {
     }
   };
 
-  const handleContentOpen = (type) => (event) => {
+  const handleContentOpen = (type) => () => {
     if (content.type === type) {
       // Close itself:
       handleContentClose(type);
@@ -88,7 +79,7 @@ export default function DesktopMenu() {
         handleContentClose(type === "chats" ? "notes" : "chats");
       }
       setContent({
-        anchorEl: event.currentTarget,
+        open: true,
         type,
       });
       if (type === "chats") {
@@ -151,13 +142,11 @@ export default function DesktopMenu() {
               />
             </Badge>
           </IconButton>
-          <Popper
-            anchorEl={content.anchorEl}
-            className={classes.popperDesktop}
-            open // To fix position (keep opened)
-          >
-            <Content type={content.type} />
-          </Popper>
+          {content.open && (
+            <MyPopper className={classes.sectionDesktop}>
+              <Content type={content.type} />
+            </MyPopper>
+          )}
           <AnnouncementGrid />
         </div>
       </ClickAwayListener>

@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow:
       "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
     textAlign: "center",
+    minHeight: "10px",
   },
   endText: {
     color: "#666",
@@ -61,10 +62,10 @@ export default function Content(props) {
     canFetchMore: canFetchChats,
   } = useInfiniteQuery(
     "chats",
-    async (_, start = 0) => {
+    async (_, start = 10) => {
       const jsonData = {
         user_id: userId,
-        start: start + chats.length,
+        start,
         number: 10,
       };
       const res = await axios.request({
@@ -104,10 +105,10 @@ export default function Content(props) {
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
-    async (_, start = 0) => {
+    async (_, start = 10) => {
       const jsonData = {
         user_id: userId,
-        start: start + notes.length,
+        start,
         number: 10,
       };
       const res = await axios.request({
@@ -178,7 +179,7 @@ export default function Content(props) {
           time={content.time}
         />
 
-        {content.type === "chats" && (
+        {type === "chats" && (
           <div ref={chatsMore} className={classes.end}>
             {!canFetchChats && (
               <Button disabled classes={{ label: classes.endText }}>
@@ -188,7 +189,7 @@ export default function Content(props) {
           </div>
         )}
 
-        {content.type === "notes" && (
+        {type === "notes" && (
           <div ref={notesMore} className={classes.end}>
             {!canFetchNotes && (
               <Button disabled classes={{ label: classes.endText }}>
