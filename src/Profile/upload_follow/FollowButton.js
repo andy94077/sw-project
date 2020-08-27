@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function FollowButton(props) {
   const { id, style, setRefresh = () => {} } = props;
-  // console.log(style);
   const { userId } = useSelector(selectUser);
   const [followInfo, setFollowInfo] = useState({
     isFollow: false,

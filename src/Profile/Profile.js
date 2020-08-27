@@ -95,7 +95,6 @@ export default function Profile(props) {
   const stableDispatch = useCallback(dispatch, []);
   const [isUpload, setIsUpload] = useState(false);
   const [isReady, setIsReady] = useState("Loading");
-  const [isMyself, setIsMyself] = useState(false);
   const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
   const { username, bucketTime } = useSelector(selectUser);
@@ -123,7 +122,7 @@ export default function Profile(props) {
         })
         .finally(() => setIsLoading(false));
     }
-  }, [name, isUpload, stableDispatch]);
+  }, [name, username, isUpload, stableDispatch]);
 
   async function refreshInfo() {
     const jsonData = { name };
@@ -137,10 +136,6 @@ export default function Profile(props) {
     if (userExist === false) {
       setIsReady("NoUser");
       return;
-    }
-    // My profile
-    if (username === name) {
-      setIsMyself(true);
     }
     setId(res.data.id);
     axios
@@ -190,7 +185,7 @@ export default function Profile(props) {
         />
         <ProfileInformation name={name} url={url} follow={follow} />
         {username !== null &&
-          (isMyself ? (
+          (username === name ? (
             uploadButton
           ) : (
             <FollowButton id={id} setRefresh={refreshFollow} />
