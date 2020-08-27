@@ -77,6 +77,7 @@ export default function SignUpForm(props) {
       </div>
       <Button
         variant="contained"
+        component="span"
         className={classes.signUpFrame}
         onClick={setModalShow}
       >

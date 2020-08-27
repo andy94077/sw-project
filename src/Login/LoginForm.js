@@ -29,14 +29,6 @@ const useStyles = makeStyles(() => ({
       width: "420px",
     },
   },
-  logoFrame: {
-    backgroundColor: `rgb(255,0,0)`,
-    backgroundSize: "50px auto",
-    width: "50px",
-    height: "50px",
-    borderRadius: "30px",
-    margin: "0px auto 0px",
-  },
   signUpFrame: {
     height: "48px",
     width: "100%",
@@ -72,16 +64,23 @@ const useStyles = makeStyles(() => ({
   textPosition: {
     margin: "0px auto 0px",
   },
+  imgUrl: {
+    margin: "0px auto 0px",
+    width: "70px",
+    height: "70px",
+    color: "red",
+  },
 }));
 
 export default function LoginForm(props) {
   const { onHide, show, otherOption } = props;
   const classes = useStyles();
+  const imgUrl = "pictures/logo.png";
   return (
     <CustomModal show={show} jumpFrame={classes.jumpFrame}>
       <div>
         <div className={classes.outerFrame}>
-          <div className={classes.logoFrame} />
+          <img className={classes.imgUrl} src={imgUrl} alt="" />
           <div style={{ height: "10px" }} />
           <div className={classes.textPosition}>
             <h1 className={classes.mainText}>Welcome</h1>
@@ -93,6 +92,7 @@ export default function LoginForm(props) {
         </div>
         <Button
           variant="contained"
+          component="span"
           className={classes.signUpFrame}
           onClick={onHide}
         >
