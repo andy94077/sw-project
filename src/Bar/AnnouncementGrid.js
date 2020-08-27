@@ -1,22 +1,15 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton, Snackbar } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Content from "./Content";
 
-const useStyles = makeStyles(() => ({
+import Message from "./Message";
+import { selectMenuData, setAnnouncementOpen } from "../redux/menuDataSlice";
+
+const useStyles = makeStyles((theme) => ({
   bar: {
-    marginTop: "60px",
-  },
-  content: {
-    background: "white",
-    color: "black",
-    borderRadius: 10,
-  },
-  contentText: {
-    maxWidth: "275px",
-    minHeight: "10px",
-    overflow: "auto",
+    marginBottom: "10px",
   },
   icon: {
     position: "absolute",
@@ -29,18 +22,38 @@ const useStyles = makeStyles(() => ({
       background: "#aaa",
     },
   },
+  root: {
+    minWidth: "275px",
+    maxWidth: "600px",
+    maxHeight: "300px",
+    overflow: "auto",
+    border: "2px solid #ddd",
+    borderRadius: "5px",
+    zIndex: "2000",
+    [theme.breakpoints.up("md")]: {
+      minWidth: "400px",
+    },
+  },
 }));
 
-export default function AnnouncementGrid(props) {
+export default function AnnouncementGrid() {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const {
+    announcementContent,
+    isAnnouncementOpen,
+    announcementType,
+  } = useSelector(selectMenuData);
 
-  const { isAdOpen, handleAdClose, adMessage } = props;
+  const handleClose = () => {
+    dispatch(setAnnouncementOpen({ isOpen: false }));
+  };
 
   return (
     <Snackbar
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       className={classes.bar}
-      open={isAdOpen}
+      open={isAnnouncementOpen}
     >
       <div>
         <IconButton
@@ -49,11 +62,17 @@ export default function AnnouncementGrid(props) {
           component="span"
           aria-label="close"
           color="inherit"
-          onClick={handleAdClose}
+          onClick={handleClose}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
-        <Content text={[{ ...adMessage, id: 0 }]} type="notes" time={null} />
+        <div className={classes.root}>
+          <Message
+            type={announcementType}
+            allText={[announcementContent]}
+            time={null}
+          />
+        </div>
       </div>
     </Snackbar>
   );

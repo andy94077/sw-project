@@ -1,20 +1,23 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Badge,
-  ClickAwayListener,
-  IconButton,
-  Popper,
-} from "@material-ui/core";
+import { Badge, ClickAwayListener, IconButton } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+
 import { CONCAT_SERVER_URL } from "../utils";
+import AnnouncementGrid from "./AnnouncementGrid";
 import Content from "./Content";
+import MyPopper from "./MyPopper";
 import RightDrawer from "./RightDrawer";
 
 import { selectUser } from "../redux/userSlice";
+import {
+  selectMenuData,
+  setChatsCount,
+  setNotesCount,
+} from "../redux/menuDataSlice";
 import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -33,43 +36,58 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DesktopMenu(props) {
+export default function DesktopMenu() {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const { notesCount, setNotesCount } = props;
+  const { chatsCount, notesCount } = useSelector(selectMenuData);
+  const dispatch = useDispatch();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const [contentAnchorEl, setContentAnchorEl] = useState(null);
-  const [contentType, setContentType] = useState("");
-
-  const isContentOpen = Boolean(contentAnchorEl);
+  const [content, setContent] = useState({
+    anchorEl: null,
+    open: false,
+    type: "",
+  });
 
   // Toggle function
   const handleContentClickAway = () => {
-    setContentType("");
-    setContentAnchorEl(null);
+    setContent({
+      open: false,
+      type: "",
+    });
   };
 
-  const handleContentClose = (text) => {
-    if (text === "notes") {
-      setNotesCount(0);
+  const handleContentClose = (type) => {
+    handleContentClickAway();
+    if (type === "chats") {
+      dispatch(setChatsCount({ chatsCount: 0 }));
+      setCookie(`chatsTime${userId}`, Date.now(), 60);
+    }
+    if (type === "notes") {
+      dispatch(setNotesCount({ notesCount: 0 }));
       setCookie(`notesTime${userId}`, Date.now(), 60);
     }
   };
 
-  const handleContentOpen = (text) => (event) => {
-    if (contentAnchorEl === event.currentTarget) {
+  const handleContentOpen = (type) => () => {
+    if (content.type === type) {
       // Close itself:
-      handleContentClose(text);
-      handleContentClickAway();
+      handleContentClose(type);
     } else {
-      if (contentAnchorEl !== null) {
+      if (content.type !== "") {
         // Switch from another:
-        handleContentClose(text === "chat" ? "notes" : "chat");
+        handleContentClose(type === "chats" ? "notes" : "chats");
       }
-      setContentType(text);
-      setContentAnchorEl(event.currentTarget);
+      setContent({
+        open: true,
+        type,
+      });
+      if (type === "chats") {
+        dispatch(setChatsCount({ chatsCount: 0 }));
+      }
+      if (type === "notes") {
+        dispatch(setNotesCount({ notesCount: 0 }));
+      }
     }
   };
 
@@ -105,38 +123,31 @@ export default function DesktopMenu(props) {
     <div className={classes.sectionDesktop}>
       <ClickAwayListener onClickAway={handleContentClickAway}>
         <div style={{ display: "flex" }}>
-          <IconButton onClick={handleContentOpen("chat")} component="span">
-            <Badge badgeContent={0} color="secondary">
+          <IconButton onClick={handleContentOpen("chats")} component="span">
+            <Badge badgeContent={chatsCount} color="secondary">
               <ChatIcon
                 style={{
-                  color: contentType === "chat" ? "#5ace5a" : "white",
+                  color: content.type === "chats" ? "#5ace5a" : "white",
                 }}
               />
             </Badge>
           </IconButton>
 
-          <IconButton
-            onClick={handleContentOpen("notes")}
-            color="inherit"
-            component="span"
-          >
+          <IconButton onClick={handleContentOpen("notes")} component="span">
             <Badge badgeContent={notesCount} color="secondary">
               <NotificationsIcon
                 style={{
-                  color: contentType === "notes" ? "ffde4c" : "white",
+                  color: content.type === "notes" ? "ffde4c" : "white",
                 }}
               />
             </Badge>
           </IconButton>
-          {/* Notification content */}
-          <Popper
-            anchorEl={contentAnchorEl}
-            className={classes.sectionDesktop}
-            keepMounted
-            open={isContentOpen}
-          >
-            <Content type={contentType} setNotesCount={setNotesCount} />
-          </Popper>
+          {content.open && (
+            <MyPopper className={classes.sectionDesktop}>
+              <Content type={content.type} />
+            </MyPopper>
+          )}
+          <AnnouncementGrid />
         </div>
       </ClickAwayListener>
       <IconButton
@@ -151,7 +162,6 @@ export default function DesktopMenu(props) {
           src={CONCAT_SERVER_URL(userAvatar)}
         />
       </IconButton>
-      {/* Drawer */}
       <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
     </div>
   );

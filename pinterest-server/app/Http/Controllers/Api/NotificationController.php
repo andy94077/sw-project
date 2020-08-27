@@ -12,11 +12,11 @@ class NotificationController extends BaseController
     public function index(Request $request)
     {
         $notes = Notification::where('group', 'public')
-               ->orWhere('user_id', $request['user_id'])
-               ->orderBy('id', 'desc')
-               ->skip($request['start'])
-               ->take(intval($request['number']))->get();
-        
+            ->orWhere('user_id', $request['user_id'])
+            ->orderBy('id', 'desc')
+            ->skip($request['start'])
+            ->take(intval($request['number']))->get();
+
         if (count($notes) > 0) {
             return response()->json([
                 "message" => $notes,
@@ -29,13 +29,13 @@ class NotificationController extends BaseController
             ], 200);
         }
     }
-    
+
     public function store(Request $request)
     {
         $note = new Notification();
         $note->group = $request['group'];
         if ($request['group'] === "personal") {
-            $notes->user_id = $request['user_id'];
+            $note->user_id = $request['user_id'];
         }
         $note->header = $request['header'];
         $note->secondary = $request['secondary'];

@@ -1,17 +1,23 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { useSelector } from "react-redux";
 import { Badge, IconButton, Menu, MenuItem } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import { CONCAT_SERVER_URL } from "../utils";
 
+import { CONCAT_SERVER_URL } from "../utils";
+import AnnouncementGrid from "./AnnouncementGrid";
 import Content from "./Content";
 import RightDrawer from "./RightDrawer";
 
 import { selectUser } from "../redux/userSlice";
+import {
+  selectMenuData,
+  setChatsCount,
+  setNotesCount,
+} from "../redux/menuDataSlice";
 import { setCookie } from "../cookieHelper";
 
 const useStyles = makeStyles((theme) => ({
@@ -27,10 +33,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MobileMenu(props) {
+export default function MobileMenu() {
   const classes = useStyles();
   const { username, userId, userAvatar } = useSelector(selectUser);
-  const { notesCount, setNotesCount } = props;
+  const { chatsCount, notesCount } = useSelector(selectMenuData);
+  const dispatch = useDispatch();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -41,8 +48,12 @@ export default function MobileMenu(props) {
 
   // Toggle functions
   const handleMobileContentClose = (text) => {
+    if (text === "chats") {
+      dispatch(setChatsCount({ chatsCount: 0 }));
+      setCookie(`chatsTime${userId}`, Date.now(), 60);
+    }
     if (text === "notes") {
-      setNotesCount(0);
+      dispatch(setNotesCount({ notesCount: 0 }));
       setCookie(`notesTime${userId}`, Date.now(), 60);
     }
     setMobileContentType("");
@@ -101,7 +112,14 @@ export default function MobileMenu(props) {
         color="inherit"
         component="span"
       >
-        <Badge badgeContent={notesCount} color="secondary">
+        <Badge
+          badgeContent={
+            chatsCount === "10+" || notesCount === "10+"
+              ? "10+"
+              : chatsCount + notesCount
+          }
+          color="secondary"
+        >
           <MoreIcon />
         </Badge>
       </IconButton>
@@ -113,7 +131,6 @@ export default function MobileMenu(props) {
           horizontal: "right",
         }}
         className={classes.sectionMobile}
-        keepMounted
         transformOrigin={{
           vertical: "top",
           horizontal: "right",
@@ -123,23 +140,23 @@ export default function MobileMenu(props) {
         style={{ zIndex: 500, top: "40px" }}
       >
         <MenuItem
-          onClick={handleMobileContentOpen("chat")}
+          onClick={handleMobileContentOpen("chats")}
           style={{ width: "325px" }}
         >
           <IconButton color="inherit" component="span">
-            <Badge badgeContent={0} color="secondary">
+            <Badge badgeContent={chatsCount} color="secondary">
               <ChatIcon
                 style={{
-                  color: mobileContentType === "chat" ? "#5ace5a" : "black",
+                  color: mobileContentType === "chats" ? "#5ace5a" : "black",
                 }}
               />
             </Badge>
           </IconButton>
           <p>Messages</p>
         </MenuItem>
-        {mobileContentType === "chat" && (
+        {mobileContentType === "chats" && (
           <MenuItem>
-            <Content type={mobileContentType} setNotesCount={setNotesCount} />
+            <Content type={mobileContentType} />
           </MenuItem>
         )}
         <MenuItem onClick={handleMobileContentOpen("notes")}>
@@ -156,7 +173,7 @@ export default function MobileMenu(props) {
         </MenuItem>
         {mobileContentType === "notes" && (
           <MenuItem>
-            <Content type={mobileContentType} setNotesCount={setNotesCount} />
+            <Content type={mobileContentType} />
           </MenuItem>
         )}
         <MenuItem onClick={toggleDrawer(true)}>
@@ -169,9 +186,9 @@ export default function MobileMenu(props) {
           </IconButton>
           <p>Profile</p>
         </MenuItem>
-        {/* Drawer */}
         <RightDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
       </Menu>
+      <AnnouncementGrid />
     </div>
   );
 }

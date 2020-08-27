@@ -15,9 +15,9 @@ class ChatroomController extends BaseController
     {
         $user_id = intval($request['user_id']);
         $room = Chatroom::where('user_id1', $user_id)
-              ->orderBy('updated_at', 'desc')
-              ->skip(intval($request['start']))
-              ->take(intval($request['number']))->get();
+            ->orderBy('updated_at', 'desc')
+            ->skip(intval($request['start']))
+            ->take(intval($request['number']))->get();
 
         foreach ($room as &$user) {
             $request->merge([
@@ -57,12 +57,12 @@ class ChatroomController extends BaseController
 
         return response()->json(['table' => 'chat_' . $user_id1 . '_' . $user_id2]);
     }
-    
+
     protected function update(Request $request)
     {
         $user_id1 = intval($request['user_id1']);
         $user_id2 = intval($request['user_id2']);
-        
+
         $room = Chatroom::where('user_id1', $user_id1)->where('user_id2', $user_id2)->get();
         if (count($room) === 0) {
             if ($user_id1 <= $user_id2) {
@@ -77,7 +77,7 @@ class ChatroomController extends BaseController
         $room->last_message = $request['last_message'];
         $room->save();
     }
-    
+
     public function store(Request $request)
     {
         $this->update($request);
@@ -89,7 +89,7 @@ class ChatroomController extends BaseController
             ]);
             $this->update($request);
         }
-        
+
         return response()->json(['message' => $request['last_message']]);
     }
 }
