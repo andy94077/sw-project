@@ -163,6 +163,7 @@ export default function LoginFormInfo() {
         ) : (
           <Button
             variant="contained"
+            component="span"
             className={classes.controlButton}
             onClick={handleSubmit}
           >

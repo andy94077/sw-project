@@ -122,9 +122,11 @@ export default function Followers(props) {
             />
             <span style={{ display: "block", width: "15px" }} />
             {value.username}
-            {value.isFollow === false && value.id !== userId && (
-              <FollowButton id={value.id} style={classes.button} />
-            )}
+            {value.isFollow === false &&
+              value.id !== userId &&
+              userId !== null && (
+                <FollowButton id={value.id} style={classes.button} />
+              )}
           </span>
         ))
       )}

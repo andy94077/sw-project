@@ -357,6 +357,7 @@ export default function SignUpFormInfo() {
         ) : (
           <Button
             variant="contained"
+            component="span"
             className={classes.controlButton}
             onClick={handleSubmit}
           >
