@@ -19,5 +19,6 @@ module.exports = {
     "no-param-reassign": 0,
     "react/no-danger": 0,
     "no-nested-ternary": 0,
+    "no-bitwise": 0,
   },
 };

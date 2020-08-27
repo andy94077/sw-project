@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -49,6 +49,7 @@ export default function Followings(props) {
   const { name } = props;
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
+  const [currentState, setCurrentState] = useState();
   const history = useHistory();
   const { userId } = useSelector(selectUser);
 
@@ -78,14 +79,31 @@ export default function Followings(props) {
     onIntersect: fetchMore,
     enabled: canFetchMore,
   });
+
+  const statement = Array.from({ length: 8 }, (_, index) => {
+    if (index > 3) return "Loading more...";
+    if (index > 1) return "Loading...";
+    if (index > 0) return "Load More";
+    return "Nothing more to load";
+  });
+
   const handleSearch = (target) => () => {
     history.push(`/profile/${target}`);
   };
+
   const handleKeyUp = (e) => {
     if (e.key === "Enter") {
       handleSearch(e);
     }
   };
+
+  useEffect(() => {
+    setCurrentState(
+      (Number(isFetchingMore) << 2) +
+        (Number(isFetching) << 1) +
+        Number(canFetchMore)
+    );
+  }, [isFetchingMore, isFetching, canFetchMore]);
 
   return (
     <span className={classes.list}>
@@ -118,13 +136,7 @@ export default function Followings(props) {
           onClick={() => fetchMore()}
           disabled={!canFetchMore}
         >
-          {isFetchingMore
-            ? "Loading more..."
-            : isFetching
-            ? "is loading..."
-            : canFetchMore
-            ? "Load More"
-            : "Nothing more to load"}
+          {statement[currentState]}
         </Button>
       </span>
     </span>
