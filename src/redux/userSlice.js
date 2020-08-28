@@ -40,8 +40,11 @@ export const userSlice = createSlice({
     setVerified: (state, action) => {
       state.verified = action.payload.verified;
     },
+    setId: (state, action) => {
+      state.userId = action.payload.user_id;
+    },
   },
 });
-export const { setData, setAvatar, setVerified } = userSlice.actions;
+export const { setData, setAvatar, setVerified, setId } = userSlice.actions;
 export default userSlice.reducer;
 export const selectUser = (state) => state.user;

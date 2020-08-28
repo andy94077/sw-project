@@ -35,7 +35,15 @@ class UserController extends BaseController
     public function logIn(Request $request)
     {
         if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
-            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true, 'api_token' => Auth::user()->api_token], 200);
+            return response()->json([
+                'name' => Auth::user()->name,
+                'Message' => "Login success!",
+                'token' => Auth::user()->hasVerifiedEmail() ? Auth::user()->remember_token : "",
+                'isLogin' => true,
+                'api_token' => Auth::user()->api_token,
+                'verified' => Auth::user()->hasVerifiedEmail(),
+                'user_id' => Auth::user()->id,
+            ], 200);
         } else {
             return response()->json(['Message' => "Login fails!", 'isLogin' => false], 200);
         }
@@ -59,7 +67,6 @@ class UserController extends BaseController
                     'Message' => "Sign up seccess!",
                     'isSignUp' => true,
                     'isLogin' => true,
-                    'token' => Auth::user()->remember_token,
                     'user_id' => $user->id,
                 ], 200);
             } else {
@@ -280,7 +287,7 @@ class UserController extends BaseController
             //$user->email_verified_at =  now();
             $user->markEmailAsVerified();
             $user->save();
-            return response()->json('success');
+            return response()->json(['token' => $user->remember_token]);
         }
         return response()->json('failed', 403);
     }

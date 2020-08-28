@@ -60,7 +60,6 @@ export default function App() {
     const accessToken = getCookie();
     setError({ message: "", url: "" });
     if (location.pathname !== "/" || accessToken !== null) {
-      console.log("hihi");
       setIsReady(false);
       axios
         .post(CONCAT_SERVER_URL("/api/v1/user/authentication"), {
@@ -78,7 +77,6 @@ export default function App() {
                 verified: Boolean(res.data.verified),
               })
             );
-            console.log("verified", Boolean(res.data.verified));
             if (location.pathname === "/" && Boolean(res.data.verified))
               history.push("/home");
           } else {
@@ -101,7 +99,7 @@ export default function App() {
           });
         })
         .finally(() => setIsReady(true));
-    } else {
+    } else if (user.verified !== false) {
       stableDispatch(
         setData({
           username: null,

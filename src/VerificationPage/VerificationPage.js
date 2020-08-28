@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Button, TextField } from "@material-ui/core";
 
 import useCountDown from "./useCountDown";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
-import { selectUser } from "../redux/userSlice";
+import { setCookie } from "../cookieHelper";
+import { selectUser, setVerified } from "../redux/userSlice";
 
 export default function VerificationPage() {
   const history = useHistory();
@@ -16,6 +17,7 @@ export default function VerificationPage() {
   const [isConnection, setIsConnection] = useState(true);
   const [code, setCode] = useState("");
   const [time, setTime] = useState(null);
+  const dispatch = useDispatch();
   const { userId } = useSelector(selectUser);
 
   const handleCodeChange = (e) => setCode(e.target.value);
@@ -23,7 +25,7 @@ export default function VerificationPage() {
   const handleClick = () => {
     if (code === "") return;
 
-    const t = Date.now() + 60000;
+    const t = Date.now() + 5000;
     setTime(t);
     axios
       .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
@@ -31,7 +33,11 @@ export default function VerificationPage() {
         user_id: userId,
         code,
       })
-      .then(() => history.push("/home"))
+      .then((response) => {
+        setCookie("accessToken", response.data.token, 1);
+        dispatch(setVerified({ verified: true }));
+        history.push("/home");
+      })
       .catch((error) => {
         if (error.response && error.response.status === 403) {
           console.log(error.response.data);

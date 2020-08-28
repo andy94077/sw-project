@@ -5,9 +5,8 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import Loading from "../components/Loading";
-import { setCookie } from "../cookieHelper";
 import { CONCAT_SERVER_URL } from "../utils";
-import { setVerified } from "../redux/userSlice";
+import { setVerified, setId } from "../redux/userSlice";
 
 const keyNote = {
   "name.required": "Username can't be empty",
@@ -258,8 +257,8 @@ export default function SignUpFormInfo() {
             errorMes: ["", "", ""],
           });
           if (response.data.isLogin) {
-            setCookie("accessToken", response.data.token, 1);
             dispatch(setVerified({ verified: false }));
+            dispatch(setId({ user_id: response.data.user_id }));
           }
         } else {
           setState({
