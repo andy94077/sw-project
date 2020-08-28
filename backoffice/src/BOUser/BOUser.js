@@ -15,7 +15,7 @@ export default function BOUser() {
   const [refresh, setRefresh] = useState(false);
   const handleVisible = (_visible) => () => setVisible(_visible);
   const handleSetRefresh = () => setRefresh((_refresh) => !_refresh);
-  const [allRoles, setAllRoles] = useState([]);
+  const [allRolesWithPermissions, setAllRolesWithPermissions] = useState([]);
 
   useEffect(() => {
     document.title = "BO User";
@@ -29,7 +29,7 @@ export default function BOUser() {
           Authorization: `Bearer ${apiToken}`,
         },
       })
-      .then((res) => setAllRoles(res.data));
+      .then((res) => setAllRolesWithPermissions(res.data));
   }, [apiToken]);
 
   return (
@@ -45,12 +45,12 @@ export default function BOUser() {
         </Button>
       </div>
       <List
-        allRoles={allRoles}
+        allRolesWithPermissions={allRolesWithPermissions}
         refresh={refresh}
         setRefresh={handleSetRefresh}
       />
       <SignUpForm
-        allRoles={allRoles}
+        allRoles={Object.keys(allRolesWithPermissions)}
         visible={visible}
         onCancel={handleVisible(false)}
         setRefresh={handleSetRefresh}

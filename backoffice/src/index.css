@@ -23,3 +23,7 @@ code {
 .ant-tooltip-inner {
   border-radius: 5px !important;
 }
+
+.ant-menu.ant-menu-sub.ant-menu-vertical {
+  border-radius: 10px;
+}
