@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
 
-export default function useCountDown() {
-  const [count, setCount] = useState();
+export default () => {
+  const [now, setNow] = useState(0);
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setCount((preCount) => preCount - 1);
+      setNow((prevNow) => {
+        if (prevNow <= 0) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prevNow - 1;
+      });
     }, 1000);
-    return () => clearInterval(timer);
-  }, [count]);
-}
+    return () => {
+      clearInterval(timer);
+    };
+  }, [now]);
+
+  return [now, setNow];
+};

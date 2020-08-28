@@ -4,41 +4,48 @@ import useCountDown from "./useCountDown";
 import SubmitButtom from "../components/SubmitButtom";
 import TimeOutButtom from "../components/TimeOutButtom";
 import Loading from "../components/Loading";
+import { CONCAT_SERVER_URL } from "../utils";
 
 export default function VerificationPage() {
-  const [count, setCount] = useCountDown(-1);
+  const [count, setCount] = useCountDown();
   const [isLoading, setIsLoading] = useState(true);
   const [isConnection, setIsConnection] = useState(true);
-  const [value, setValue] = useState("");
-  const [time, setTime] = useState(null);
+  const [message, setMessage] = useState("");
 
-  function handleSubmit() {
-    if (value !== "" && count < 0) {
-      const t = Date.now() + 60000;
-      axios
-        .post("http://localhost:8000/api/v1/times", { time: t })
-        .then(() => {
-          setTime(t);
-        })
-        .catch(() => {
-          setIsConnection(false);
-        })
-        .finally(() => {
-          setValue("");
-        });
-    }
-  }
+  const handleSubmit = () => {
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/users/verify"), {
+        params: { user: "Andy" },
+      })
+      .then(() => {
+        setCount(10);
+      })
+      .catch(() => {
+        setIsConnection(false);
+      })
+      .finally(() => {
+        // eslint-disable-next-line prefer-const
+        // let temp = list.slice();
+        // temp.push(message);
+        // setList(temp);
+        setMessage("");
+      });
+  };
 
-  function handleClick(e) {
+  const handleClick = (e) => {
     e.preventDefault();
     handleSubmit();
-  }
+  };
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/v1/times")
-      .then((res) => {
-        setTime(res.data.time);
+      .get(CONCAT_SERVER_URL("/api/v1/users/verify/times"), {
+        params: { id: 1 },
+      })
+      .then((response) => {
+        const value =
+          response.data.time - parseInt(new Date().getTime() / 1000, 10);
+        if (value > 0) setCount(value);
         setIsLoading(false);
       })
       .catch(() => {
@@ -46,21 +53,15 @@ export default function VerificationPage() {
       });
   }, []);
 
-  useEffect(() => {
-    if (time !== null && time > Date.now()) {
-      setCount(Math.floor((time - Date.now()) / 1000));
-    }
-  }, [time]);
-
   if (!isConnection) return <div>Connection failed</div>;
   if (isLoading) return <Loading />;
   return (
     <>
       <form onSubmit={handleClick}>
         <input
-          value={value}
+          value={message}
           onChange={(e) => {
-            setValue(e.target.value);
+            setMessage(e.target.value);
           }}
           onKeyUp={(e) => {
             if (e.key === "Enter") handleSubmit();

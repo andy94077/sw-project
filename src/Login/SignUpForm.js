@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import SignUpFormInfo from "./SignUpFormInfo";
+import VerificationPage from "../VerificationPage/VerificationPage";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
@@ -72,7 +72,7 @@ export default function SignUpForm(props) {
           </h1>
         </div>
         <div className={classes.contentPosition}>
-          <SignUpFormInfo />
+          <VerificationPage />
         </div>
       </div>
       <Button
