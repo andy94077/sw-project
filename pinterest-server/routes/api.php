@@ -53,10 +53,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::apiResource('posts', 'PostController');
 
-    Route::post('users/verify', 'UserController@verify');
-    Route::post('users/intro', 'UserController@setIntro');
-    Route::get('users/intro', 'UserController@getIntro');
-    Route::get('users/info', 'UserController@getUserInfo');
+    Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
+    Route::post('/users/verify', 'UserController@verify');
+    Route::post('/users/intro', 'UserController@setIntro');
+    Route::get('/users/intro', 'UserController@getIntro');
+    Route::get('/users/info', 'UserController@getUserInfo');
     Route::delete('/user/admin', 'UserController@adminDelete')->middleware('BO_can:delete_user');
     Route::post('/user/admin', 'UserController@adminRecover')->middleware('BO_can:recover_user');
     Route::get('/users/admin', 'UserController@adminAll');

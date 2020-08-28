@@ -1,36 +1,47 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
 import axios from "axios";
 import useCountDown from "./useCountDown";
 import SubmitButtom from "../components/SubmitButtom";
 import TimeOutButtom from "../components/TimeOutButtom";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
+import { selectUser } from "../redux/userSlice";
 
 export default function VerificationPage() {
   const [count, setCount] = useCountDown();
   const [isLoading, setIsLoading] = useState(true);
   const [isConnection, setIsConnection] = useState(true);
-  const [message, setMessage] = useState("");
+  const [code, setCode] = useState("");
+  const [time, setTime] = useState(null);
+  const user = useSelector(selectUser);
 
-  const handleSubmit = () => {
-    axios
-      .get(CONCAT_SERVER_URL("/api/v1/users/verify"), {
-        params: { user: "Andy" },
-      })
-      .then(() => {
-        setCount(10);
-      })
-      .catch(() => {
-        setIsConnection(false);
-      })
-      .finally(() => {
-        // eslint-disable-next-line prefer-const
-        // let temp = list.slice();
-        // temp.push(message);
-        // setList(temp);
-        setMessage("");
-      });
-  };
+  function handleSubmit() {
+    if (code !== "" && count < 0) {
+      const t = Date.now() + 60000;
+      setTime(t);
+      axios
+        .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
+          time: t,
+          user_id: user.userId,
+          code,
+        })
+        .then(() => {})
+        .catch(() => {
+          setIsConnection(false);
+        })
+        .finally(() => {
+          setCode("");
+        });
+    }
+  }
+
+  useEffect(() => {
+    if (time !== null && time > Date.now()) {
+      setCount(Math.floor((time - Date.now()) / 1000));
+    }
+  }, [time]);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -39,16 +50,13 @@ export default function VerificationPage() {
 
   useEffect(() => {
     axios
-      .get(CONCAT_SERVER_URL("/api/v1/users/verify/times"), {
-        params: { id: 1 },
-      })
-      .then((response) => {
-        const value =
-          response.data.time - parseInt(new Date().getTime() / 1000, 10);
-        if (value > 0) setCount(value);
+      .get(CONCAT_SERVER_URL(`/api/v1/users/verifytime/1`))
+      .then((res) => {
+        setTime(res.data.time);
         setIsLoading(false);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         setIsConnection(false);
       });
   }, []);
@@ -59,9 +67,9 @@ export default function VerificationPage() {
     <>
       <form onSubmit={handleClick}>
         <input
-          value={message}
+          value={code}
           onChange={(e) => {
-            setMessage(e.target.value);
+            setCode(e.target.value);
           }}
           onKeyUp={(e) => {
             if (e.key === "Enter") handleSubmit();
