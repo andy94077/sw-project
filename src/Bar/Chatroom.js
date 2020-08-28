@@ -89,6 +89,22 @@ export default function Chatroom(props) {
   const [newBoxes, setNewBoxes] = useState([]);
 
   useEffect(() => {
+    if (window.Echo === undefined) return () => {};
+
+    window.Echo.private(`Chatroom.${chatInfo.roomId}`).listen(
+      "ChatSent",
+      (event) => {
+        const { data } = event;
+        setNewBoxes((nb) => {
+          nb.push({
+            message: data.message,
+            from: data.from,
+          });
+          return nb;
+        });
+      }
+    );
+
     // Init room
     const jsonData = {
       room_id: chatInfo.roomId,
@@ -103,6 +119,11 @@ export default function Chatroom(props) {
         params: jsonData,
       })
       .then((res) => setBoxes([res.data]));
+
+    return () =>
+      window.Echo.channel(`Chatroom.${chatInfo.roomId}`).stopListening(
+        "ChatSent"
+      );
   }, []);
 
   const handleSetValue = (event) => {
@@ -110,6 +131,23 @@ export default function Chatroom(props) {
   };
 
   const handleRefresh = () => {
+    const jsonData = {
+      data: {
+        room_id: chatInfo.roomId,
+        message: value,
+        from: userId,
+      },
+    };
+
+    axios
+      .request({
+        method: "POST",
+        url: CONCAT_SERVER_URL("/api/v1/broadcast/chating"),
+        data: jsonData,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+
     setNewBoxes((nb) => {
       nb.push({
         message: value,
