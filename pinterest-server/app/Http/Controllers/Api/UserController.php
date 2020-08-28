@@ -262,8 +262,8 @@ class UserController extends BaseController
 
     public function verify(Request $request){
         $user = User::find($request['user_id']);
-        $code = Verification::where('user_id', $user->id)->first()->code;
-        echo $user->hasVerifiedEmail();
+        $verification = Verification::where('user_id', $user->id)->first();
+        $code = $verification->code;
         if($code === $request['code']){
             //$user->email_verified_at =  now();
             if ($user->markEmailAsVerified()) {

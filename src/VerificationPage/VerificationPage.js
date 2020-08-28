@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
 import axios from "axios";
 import useCountDown from "./useCountDown";
 import SubmitButtom from "../components/SubmitButtom";
 import TimeOutButtom from "../components/TimeOutButtom";
 import Loading from "../components/Loading";
+import { CONCAT_SERVER_URL } from "../utils";
+import { selectUser } from "../redux/userSlice";
 
 export default function VerificationPage() {
   const [count, setCount] = useCountDown(-1);
@@ -11,12 +15,16 @@ export default function VerificationPage() {
   const [isConnection, setIsConnection] = useState(true);
   const [value, setValue] = useState("");
   const [time, setTime] = useState(null);
+  const user = useSelector(selectUser);
 
   function handleSubmit() {
     if (value !== "" && count < 0) {
       const t = Date.now() + 60000;
       axios
-        .post("http://localhost:8000/api/v1/times", { time: t })
+        .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
+          time: t,
+          user_id: user.userId,
+        })
         .then(() => {
           setTime(t);
         })
