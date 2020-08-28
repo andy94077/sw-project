@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
-use App\Models\Post;
+use Illuminate\Support\Str;
 use App\Models\Verification;
 use Auth;
 use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Image;
-use stdClass;
 use DateTime;
 use DateInterval;
-use date;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\test;
@@ -252,19 +247,21 @@ class UserController extends BaseController
         return response()->json($res);
     }
 
-    public function mail(){
+    public function mail()
+    {
         Mail::to('b07902011@ntu.edu.tw')->send(new test('Hello'));
-        if(count(Mail::failures()) > 0){
+        if (count(Mail::failures()) > 0) {
             return "failed";
         }
         return "send mail";
     }
 
-    public function verify(Request $request){
+    public function verify(Request $request)
+    {
         $user = User::find($request['user_id']);
         $code = Verification::where('user_id', $user->id)->first()->code;
         echo $user->hasVerifiedEmail();
-        if($code === $request['code']){
+        if ($code === $request['code']) {
             //$user->email_verified_at =  now();
             if ($user->markEmailAsVerified()) {
                 event(Verified($user));
@@ -273,5 +270,14 @@ class UserController extends BaseController
             return response()->json(['Message' => 'succese']);
         }
         return response()->json(['Message' => 'failed']);
+    }
+
+    public function resend($id)
+    {
+        $user = User::find($id);
+        $verification = Verification::where('user_id', $id)->first();
+        $verification->code = Str::random(10);
+        $user->sendEmailVerificationNotification();
+        return response()->json(['Message' => 'success']);
     }
 }
