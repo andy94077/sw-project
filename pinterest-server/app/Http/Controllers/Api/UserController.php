@@ -276,7 +276,6 @@ class UserController extends BaseController
     {
         $user = User::find($request['user_id']);
         $verification = Verification::where('user_id', $user->id)->first();
-        $verification->block_time = $request['time'];
         $verification->save();
         $code = $verification->code;
         if ($code === $request['code']) {
@@ -295,10 +294,11 @@ class UserController extends BaseController
         return response()->json(['time' => $verification->block_time]);
     }
 
-    public function resend($id)
+    public function resend(Request $request, $id)
     {
         $user = User::find($id);
         $verification = Verification::where('user_id', $id)->first();
+        $verification->block_time = $request['time'];
         $verification->code = Str::random(10);
         $user->sendEmailVerificationNotification();
         return response()->json(['Message' => 'success']);
