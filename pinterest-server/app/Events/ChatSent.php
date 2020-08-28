@@ -20,11 +20,17 @@ class ChatSent implements ShouldBroadcast
      * @return void
      */
     
-    public $data;
+    public $room_id;
     
-    public function __construct($data)
+    public $message;
+    
+    public $from;
+    
+    public function __construct($room_id, $message, $from)
     {
-        $this->data = $data;
+        $this->room_id = $room_id;
+        $this->message = $message;
+        $this->from = $from;
     }
 
     /**
@@ -34,6 +40,6 @@ class ChatSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('Chatroom.' . $data);
+        return new PrivateChannel('Chatroom.' . $this->room_id);
     }
 }

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 
 import { format, formatDistanceToNow } from "date-fns";
 import Message from "./Message";
@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
       "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
     textAlign: "center",
     minHeight: "10px",
+    padding: "5px",
   },
   endText: {
     color: "#666",
@@ -138,14 +139,14 @@ export default function Content(props) {
 
   // Update
   useEffect(() => {
-    if (statusChats === "success" && type === "chats") {
+    if (statusChats === "success" && type === "chats" && show) {
       setTimeout(() => setShow(false), 1);
       setTimeout(() => setShow(true), 2);
     }
   }, [statusChats, type]);
 
   useEffect(() => {
-    if (statusNotes === "success" && type === "notes") {
+    if (statusNotes === "success" && type === "notes" && show) {
       setTimeout(() => setShow(false), 1);
       setTimeout(() => setShow(true), 2);
     }
@@ -197,9 +198,13 @@ export default function Content(props) {
         {type === "chats" && show && (
           <div ref={chatsMore} className={classes.end}>
             {!canFetchChats && (
-              <Button disabled classes={{ label: classes.endText }}>
+              <Typography
+                variant="button"
+                className={classes.endText}
+                gutterBottom
+              >
                 No chatroom left
-              </Button>
+              </Typography>
             )}
           </div>
         )}
@@ -207,9 +212,13 @@ export default function Content(props) {
         {type === "notes" && show && (
           <div ref={notesMore} className={classes.end}>
             {!canFetchNotes && (
-              <Button disabled classes={{ label: classes.endText }}>
+              <Typography
+                variant="button"
+                className={classes.endText}
+                gutterBottom
+              >
                 No notification left
-              </Button>
+              </Typography>
             )}
           </div>
         )}

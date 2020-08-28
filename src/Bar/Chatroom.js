@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useInfiniteQuery } from "react-query";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -13,9 +14,12 @@ import {
 import SendIcon from "@material-ui/icons/Send";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { selectUser } from "../redux/userSlice";
+
 import Loading from "../components/Loading";
 import ChatBox from "./ChatBox";
 import { CONCAT_SERVER_URL } from "../utils";
+import AlertDialog from "../components/AlertDialog";
+import useIntersectionObserver from "../components/useIntersectionObserver";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -41,10 +45,18 @@ const useStyles = makeStyles(() => ({
   },
   messages: {
     overflow: "auto",
-    weight: "100%",
     height: "calc(100% - 120px)",
     flexGrow: "1",
     display: "flex",
+    "& button": {
+      background: "url('/pictures/icon-to-down.jpg')",
+      backgroundSize: "20px",
+      outline: "none",
+    },
+    "& > div": {
+      display: "flex",
+      flexFlow: "column-reverse",
+    },
   },
   input: {
     resize: "none",
@@ -71,7 +83,7 @@ const useStyles = makeStyles(() => ({
   },
   end: {
     textAlign: "center",
-    minHeight: "10px",
+    padding: "5px",
   },
   endText: {
     color: "#666",
@@ -83,10 +95,50 @@ export default function Chatroom(props) {
   const { chatInfo, onHide } = props;
   const { userId } = useSelector(selectUser);
 
+  const boxesMore = useRef();
+  const [show, setShow] = useState(true);
+
   const [value, setValue] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [boxes, setBoxes] = useState([]);
   const [newBoxes, setNewBoxes] = useState([]);
+
+  const [isConnectionFailed, setIsConnectionFailed] = useState(false);
+  const [errMessage, setErrMessage] = useState("");
+
+  // Infinite scroll
+  const { status, data: boxes, fetchMore, canFetchMore } = useInfiniteQuery(
+    "boxes",
+    async (_, start = 0) => {
+      const jsonData = {
+        room_id: chatInfo.roomId,
+        start,
+        number: 20,
+      };
+      const res = await axios.request({
+        method: "GET",
+        url: CONCAT_SERVER_URL("/api/v1/chatbox"),
+        params: jsonData,
+      });
+      return res.data;
+    },
+    {
+      getFetchMore: (lastGroup) => lastGroup.start,
+    }
+  );
+
+  useIntersectionObserver({
+    target: boxesMore,
+    onIntersect: fetchMore,
+    enabled: canFetchMore,
+  });
+
+  // Update
+  useEffect(() => {
+    if (status === "success" && show) {
+      setTimeout(() => setShow(false), 1);
+      setTimeout(() => setShow(true), 2);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
@@ -94,31 +146,17 @@ export default function Chatroom(props) {
     window.Echo.private(`Chatroom.${chatInfo.roomId}`).listen(
       "ChatSent",
       (event) => {
-        const { data } = event;
-        setNewBoxes((nb) => {
-          nb.push({
-            message: data.message,
-            from: data.from,
-          });
-          return nb;
-        });
+        const { message, from } = event;
+        setNewBoxes((nb) =>
+          [
+            {
+              message,
+              from,
+            },
+          ].concat(nb)
+        );
       }
     );
-
-    // Init room
-    const jsonData = {
-      room_id: chatInfo.roomId,
-      start: 0,
-      number: 20,
-    };
-
-    axios
-      .request({
-        method: "GET",
-        url: CONCAT_SERVER_URL("/api/v1/chatbox"),
-        params: jsonData,
-      })
-      .then((res) => setBoxes([res.data]));
 
     return () =>
       window.Echo.channel(`Chatroom.${chatInfo.roomId}`).stopListening(
@@ -132,30 +170,25 @@ export default function Chatroom(props) {
 
   const handleRefresh = () => {
     const jsonData = {
-      data: {
-        room_id: chatInfo.roomId,
-        message: value,
-        from: userId,
-      },
+      room_id: chatInfo.roomId,
+      message: value,
+      from: userId,
     };
 
     axios
       .request({
         method: "POST",
-        url: CONCAT_SERVER_URL("/api/v1/broadcast/chating"),
+        url: CONCAT_SERVER_URL("/api/v1/broadcast/chatting"),
         data: jsonData,
       })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-
-    setNewBoxes((nb) => {
-      nb.push({
-        message: value,
-        from: userId,
-      });
-      return nb;
-    });
-    setValue("");
+      .catch(() => {
+        setErrMessage({
+          title: "Network error",
+          message: "Failed to send the message, please retry",
+        });
+        setIsConnectionFailed(true);
+      })
+      .finally(() => setValue(""));
   };
 
   const handleSendBox = () => {
@@ -167,6 +200,13 @@ export default function Chatroom(props) {
         last_message: value,
       })
       .then(() => handleRefresh())
+      .catch(() => {
+        setErrMessage({
+          title: "Network error",
+          message: "Failed to send the message, please retry",
+        });
+        setIsConnectionFailed(true);
+      })
       .finally(() => setIsSending(false));
   };
 
@@ -178,7 +218,15 @@ export default function Chatroom(props) {
         user_id2: chatInfo.userId,
         last_message: value,
       })
-      .then(() => handleSendBox());
+      .then(() => handleSendBox())
+      .catch(() => {
+        setErrMessage({
+          title: "Network error",
+          message: "Failed to send the message, please retry",
+        });
+        setIsConnectionFailed(true);
+        setIsSending(false);
+      });
   };
 
   const handleEnter = (e) => {
@@ -191,86 +239,116 @@ export default function Chatroom(props) {
     if (/^\s+$/.test(value) === false) handleSendRoom();
   };
 
-  return (
-    <div className={classes.root}>
-      <div className={classes.room}>
-        <Typography variant="h5" gutterBottom>
-          <Link to={`/profile/${chatInfo.username}`} onClick={onHide}>
-            <img
-              alt="Avatar"
-              className={classes.avatar}
-              src={CONCAT_SERVER_URL(chatInfo.avatar_url)}
-            />
-            {chatInfo.username}
-          </Link>
-        </Typography>
+  if (status === "success") {
+    return (
+      <div className={classes.root}>
+        <div className={classes.room}>
+          <Typography variant="h5" gutterBottom>
+            <Link to={`/profile/${chatInfo.username}`} onClick={onHide}>
+              <img
+                alt="Avatar"
+                className={classes.avatar}
+                src={CONCAT_SERVER_URL(chatInfo.avatar_url)}
+              />
+              {chatInfo.username}
+            </Link>
+          </Typography>
 
-        <Divider />
+          <Divider />
 
-        <ScrollToBottom className={classes.messages}>
-          <div className={classes.end}>
-            <Button disabled classes={{ label: classes.endText }}>
-              No message left
-            </Button>
-          </div>
-          {boxes.map((page) =>
-            page.message.map((text) => (
+          <ScrollToBottom className={classes.messages}>
+            {newBoxes.map((text) => (
               <ChatBox
+                key={text.id}
                 chatInfo={chatInfo}
                 message={text.message}
                 from={text.from}
               />
-              // <CommentBox
-              //   key={i.id}
-              //   author={i.user_name}
-              //   comment={i.content}
-              //   commentId={i.id}
-              //   canDelete={username === i.user_name || username === author}
-              //   canEdit={username === i.user_name}
-              //   refresh={refreshComment}
-              //   isUser={username !== null}
-              //   userId={userId}
-              // />
-            ))
-          )}
-          {newBoxes.map((text) => (
-            <ChatBox
-              chatInfo={chatInfo}
-              message={text.message}
-              from={text.from}
+            ))}
+            {boxes.map((page) =>
+              page.message.map((text) => (
+                <ChatBox
+                  key={text.id}
+                  chatInfo={chatInfo}
+                  message={text.message}
+                  from={text.from}
+                />
+                // <CommentBox
+                //   key={i.id}
+                //   author={i.user_name}
+                //   comment={i.content}
+                //   commentId={i.id}
+                //   canDelete={username === i.user_name || username === author}
+                //   canEdit={username === i.user_name}
+                //   refresh={refreshComment}
+                //   isUser={username !== null}
+                //   userId={userId}
+                // />
+              ))
+            )}
+            {show && (
+              <div ref={boxesMore} className={classes.end}>
+                {!canFetchMore && (
+                  <Typography
+                    variant="button"
+                    className={classes.endText}
+                    gutterBottom
+                  >
+                    No message left
+                  </Typography>
+                )}
+              </div>
+            )}
+          </ScrollToBottom>
+
+          <Divider />
+
+          <form className={classes.sendBox}>
+            <TextareaAutosize
+              id="standard-basic"
+              className={classes.input}
+              rowsMin={1}
+              rowsMax={3}
+              value={value}
+              onChange={handleSetValue}
+              onKeyDown={handleEnter}
             />
-          ))}
-        </ScrollToBottom>
-
-        <Divider />
-
-        <form className={classes.sendBox}>
-          <TextareaAutosize
-            id="standard-basic"
-            className={classes.input}
-            rowsMin={1}
-            rowsMax={3}
-            value={value}
-            onChange={handleSetValue}
-            onKeyDown={handleEnter}
-          />
-          {isSending ? (
-            <div className={classes.button}>
-              <Loading />
-            </div>
-          ) : (
+            {isSending ? (
+              <div className={classes.button}>
+                <Loading />
+              </div>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOnSubmit}
+                component="span"
+                className={classes.button}
+              >
+                <SendIcon />
+              </Button>
+            )}
+          </form>
+        </div>
+        <AlertDialog
+          open={isConnectionFailed}
+          alertTitle={errMessage.title}
+          alertDesciption={errMessage.message}
+          alertButton={
             <Button
-              variant="contained"
-              color="primary"
-              onClick={handleOnSubmit}
-              component="span"
-              className={classes.button}
+              onClick={() => {
+                setIsConnectionFailed(false);
+              }}
             >
-              <SendIcon />
+              Got it!
             </Button>
-          )}
-        </form>
+          }
+          onClose={() => {
+            setIsConnectionFailed(false);
+          }}
+        />
       </div>
-    </div>
-  );
+    );
+  }
+  return <Loading />;
 }
