@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector, useDispatch } from "react-redux";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
+import { selectUser, setVerified } from "../redux/userSlice";
 import Loading from "../components/Loading";
 import { setCookie } from "../cookieHelper";
 import { CONCAT_SERVER_URL } from "../utils";
@@ -42,6 +44,8 @@ const useStyles = makeStyles((theme) => ({
 export default function LoginFormInfo() {
   const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const { verified } = useSelector(selectUser);
   const [info, setInfo] = useState({
     email: "",
     password: "",
@@ -99,8 +103,10 @@ export default function LoginFormInfo() {
           });
           setCookie("accessToken", response.data.token, 1);
           const currentPath = history.location.pathname;
-          if (currentPath === "/") history.push("/home");
-          else history.push(currentPath);
+          if (verified) {
+            if (currentPath === "/") history.push("/home");
+            else history.push(currentPath);
+          } else dispatch(setVerified({ verified: false }));
         } else {
           setState({
             isError: true,

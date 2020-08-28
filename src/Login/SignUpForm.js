@@ -1,6 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 import Button from "@material-ui/core/Button";
+import { selectUser } from "../redux/userSlice";
+import SignUpFormInfo from "./SignUpFormInfo";
 import VerificationPage from "../VerificationPage/VerificationPage";
 
 const useStyles = makeStyles(() => ({
@@ -60,6 +63,8 @@ const useStyles = makeStyles(() => ({
 export default function SignUpForm(props) {
   const { setModalShow } = props;
   const classes = useStyles();
+  const { verified } = useSelector(selectUser);
+
   return (
     <div className={classes.formFrame}>
       <div className={classes.formPosition}>
@@ -72,7 +77,7 @@ export default function SignUpForm(props) {
           </h1>
         </div>
         <div className={classes.contentPosition}>
-          <VerificationPage />
+          {verified === null ? <SignUpFormInfo /> : <VerificationPage />}
         </div>
       </div>
       <Button

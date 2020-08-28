@@ -1,41 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-
 import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Button, TextField } from "@material-ui/core";
+
 import useCountDown from "./useCountDown";
-import SubmitButtom from "../components/SubmitButtom";
-import TimeOutButtom from "../components/TimeOutButtom";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
 
 export default function VerificationPage() {
+  const history = useHistory();
   const [count, setCount] = useCountDown();
   const [isLoading, setIsLoading] = useState(true);
   const [isConnection, setIsConnection] = useState(true);
   const [code, setCode] = useState("");
   const [time, setTime] = useState(null);
-  const user = useSelector(selectUser);
+  const { userId } = useSelector(selectUser);
 
-  function handleSubmit() {
-    if (code !== "" && count < 0) {
-      const t = Date.now() + 60000;
-      setTime(t);
-      axios
-        .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
-          time: t,
-          user_id: user.userId,
-          code,
-        })
-        .then(() => {})
-        .catch(() => {
-          setIsConnection(false);
-        })
-        .finally(() => {
-          setCode("");
-        });
-    }
-  }
+  const handleCodeChange = (e) => setCode(e.target.value);
+
+  const handleClick = () => {
+    if (code === "") return;
+
+    const t = Date.now() + 60000;
+    setTime(t);
+    axios
+      .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
+        time: t,
+        user_id: userId,
+        code,
+      })
+      .then(() => history.push("/home"))
+      .catch((error) => {
+        if (error.response && error.response.status === 403) {
+          console.log(error.response.data);
+        } else setIsConnection(false);
+      })
+      .finally(() => {
+        setCode("");
+      });
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.key === "Enter") handleClick();
+  };
 
   useEffect(() => {
     if (time !== null && time > Date.now()) {
@@ -43,14 +52,10 @@ export default function VerificationPage() {
     }
   }, [time]);
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    handleSubmit();
-  };
-
   useEffect(() => {
+    if (userId === null) return;
     axios
-      .get(CONCAT_SERVER_URL(`/api/v1/users/verifytime/1`))
+      .get(CONCAT_SERVER_URL(`/api/v1/users/verifytime/${userId}`))
       .then((res) => {
         setTime(res.data.time);
         setIsLoading(false);
@@ -59,28 +64,27 @@ export default function VerificationPage() {
         console.log(e);
         setIsConnection(false);
       });
-  }, []);
+  }, [userId]);
 
   if (!isConnection) return <div>Connection failed</div>;
   if (isLoading) return <Loading />;
   return (
     <>
-      <form onSubmit={handleClick}>
-        <input
-          value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-          }}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") handleSubmit();
-          }}
-        />
-        {count >= 0 ? (
-          <TimeOutButtom count={count} />
-        ) : (
-          <SubmitButtom type="submit" />
-        )}
-      </form>
+      <TextField
+        label="verification code"
+        value={code}
+        onChange={handleCodeChange}
+        onKeyUp={handleKeyUp}
+      />
+      {count > 0 ? (
+        <Button variant="contained" color="primary">
+          {`${count} s`}
+        </Button>
+      ) : (
+        <Button variant="contained" color="primary" onClick={handleClick}>
+          Submit
+        </Button>
+      )}
     </>
   );
 }
