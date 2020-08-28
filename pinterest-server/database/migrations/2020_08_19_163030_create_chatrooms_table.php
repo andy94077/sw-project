@@ -17,7 +17,8 @@ class CreateChatroomsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id1');
             $table->unsignedBigInteger('user_id2');
-            $table->string('last_message');
+            $table->unsignedBigInteger('room_id')->nullable();
+            $table->string('last_message')->nullable();
             $table->timestamps();
         });
     }

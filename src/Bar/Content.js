@@ -3,10 +3,11 @@ import { useSelector } from "react-redux";
 import { useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 
 import { format, formatDistanceToNow } from "date-fns";
 import Message from "./Message";
+import Loading from "../components/Loading";
 import useIntersectionObserver from "../components/useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
@@ -32,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
       "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
     textAlign: "center",
     minHeight: "10px",
+    padding: "5px",
   },
   endText: {
     color: "#666",
@@ -41,15 +43,16 @@ const useStyles = makeStyles((theme) => ({
 export default function Content(props) {
   const classes = useStyles();
   const { userId } = useSelector(selectUser);
-  const { chats, notes } = useSelector(selectMenuData);
+  const { chats, notes, chatsLen, notesLen } = useSelector(selectMenuData);
   const { type } = props;
+  const [show, setShow] = useState(true);
 
   const chatsMore = useRef();
   const notesMore = useRef();
 
   const [content, setContent] = useState({
     type: null,
-    allText: null,
+    allText: [],
     time: null,
   });
 
@@ -59,10 +62,11 @@ export default function Content(props) {
     status: statusChats,
     data: newChats,
     fetchMore: fetchChats,
+    isFetchingMore: isFetchingChats,
     canFetchMore: canFetchChats,
   } = useInfiniteQuery(
     "chats",
-    async (_, start = 10) => {
+    async (_, start = chatsLen) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -102,10 +106,11 @@ export default function Content(props) {
     status: statusNotes,
     data: newNotes,
     fetchMore: fetchNotes,
+    isFetchingMore: isFetchingNotes,
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
-    async (_, start = 10) => {
+    async (_, start = notesLen) => {
       const jsonData = {
         user_id: userId,
         start,
@@ -136,6 +141,20 @@ export default function Content(props) {
   });
 
   // Update
+  useEffect(() => {
+    if (statusChats === "success" && type === "chats" && show) {
+      setTimeout(() => setShow(false), 1);
+      setTimeout(() => setShow(true), 2);
+    }
+  }, [statusChats, type]);
+
+  useEffect(() => {
+    if (statusNotes === "success" && type === "notes" && show) {
+      setTimeout(() => setShow(false), 1);
+      setTimeout(() => setShow(true), 2);
+    }
+  }, [statusNotes, type]);
+
   useEffect(() => {
     if (statusChats !== "success" || statusNotes !== "success") return () => {};
     if (type === "chats") {
@@ -179,27 +198,41 @@ export default function Content(props) {
           time={content.time}
         />
 
-        {type === "chats" && (
+        {type === "chats" && show && (
           <div ref={chatsMore} className={classes.end}>
             {!canFetchChats && (
-              <Button disabled classes={{ label: classes.endText }}>
+              <Typography
+                variant="button"
+                className={classes.endText}
+                gutterBottom
+              >
                 No chatroom left
-              </Button>
+              </Typography>
             )}
+            {isFetchingChats && <Loading />}
           </div>
         )}
 
-        {type === "notes" && (
+        {type === "notes" && show && (
           <div ref={notesMore} className={classes.end}>
             {!canFetchNotes && (
-              <Button disabled classes={{ label: classes.endText }}>
+              <Typography
+                variant="button"
+                className={classes.endText}
+                gutterBottom
+              >
                 No notification left
-              </Button>
+              </Typography>
             )}
+            {isFetchingNotes && <Loading />}
           </div>
         )}
       </div>
     );
   }
-  return <div style={{ display: "none" }} />;
+  return (
+    <div className={classes.root}>
+      <Loading />
+    </div>
+  );
 }

@@ -44,39 +44,36 @@ export default function DesktopMenu() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [content, setContent] = useState({
-    anchorEl: null,
     open: false,
     type: "",
   });
 
   // Toggle function
+  const handleSetCookie = (type) => {
+    if (type === "chats") {
+      setCookie(`chatsTime${userId}`, Date.now(), 60);
+    }
+    if (type === "notes") {
+      setCookie(`notesTime${userId}`, Date.now(), 60);
+    }
+  };
+
   const handleContentClickAway = () => {
+    handleSetCookie(content.type);
     setContent({
       open: false,
       type: "",
     });
   };
 
-  const handleContentClose = (type) => {
-    handleContentClickAway();
-    if (type === "chats") {
-      dispatch(setChatsCount({ chatsCount: 0 }));
-      setCookie(`chatsTime${userId}`, Date.now(), 60);
-    }
-    if (type === "notes") {
-      dispatch(setNotesCount({ notesCount: 0 }));
-      setCookie(`notesTime${userId}`, Date.now(), 60);
-    }
-  };
-
   const handleContentOpen = (type) => () => {
     if (content.type === type) {
       // Close itself:
-      handleContentClose(type);
+      handleContentClickAway();
     } else {
       if (content.type !== "") {
         // Switch from another:
-        handleContentClose(type === "chats" ? "notes" : "chats");
+        handleSetCookie(type === "chats" ? "notes" : "chats");
       }
       setContent({
         open: true,

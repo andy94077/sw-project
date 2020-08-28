@@ -6,6 +6,10 @@ const useStyles = makeStyles(() => ({
     position: "fixed",
     top: "60px",
     right: "10px",
+    background: "white",
+    color: "black",
+    border: "1px solid",
+    borderRadius: "5px",
   },
 }));
 

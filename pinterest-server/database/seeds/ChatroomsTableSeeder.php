@@ -18,7 +18,8 @@ class ChatroomsTableSeeder extends Seeder
                     [
                         'user_id1' => $i + 1,
                         'user_id2' => $j + 1,
-                        'last_message' => "Hi!",
+                        'room_id' => $i * 4 - 3 + 2 * ($j - $i - 11),
+                        'last_message' => "",
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
                     ]
@@ -27,7 +28,8 @@ class ChatroomsTableSeeder extends Seeder
                     [
                         'user_id1' => $j + 1,
                         'user_id2' => $i + 1,
-                        'last_message' => "Hi!",
+                        'room_id' => $i * 4 - 3 + 2 * ($j - $i - 11),
+                        'last_message' => "",
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s')
                     ]

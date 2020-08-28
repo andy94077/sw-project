@@ -10,6 +10,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import CustomModal from "../components/CustomModal";
+import Chatroom from "./Chatroom";
 import { CONCAT_SERVER_URL } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -42,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
     margin: "auto",
-    height: "100%",
     maxWidth: "800px",
     [`@media (max-width: 800px)`]: {
       maxWidth: "600px",
@@ -57,17 +57,30 @@ export default function Message(props) {
   const classes = useStyles();
   const { type, allText, time } = props;
 
-  const [show, setShow] = useState(false);
+  const [chatInfo, setChatInfo] = useState({
+    roomId: -1,
+    userId: 0,
+    avatar_url: "",
+    username: "",
+  });
 
   // Toggle function (for chat)
-  const handleSetShow = () => {
+  const handleSetChatInfo = (roomId, userId, avatarUrl, username) => () => {
     if (type === "chats") {
-      setShow(true);
+      setChatInfo({
+        roomId,
+        userId,
+        avatar_url: avatarUrl,
+        username,
+      });
     }
   };
 
   const onHide = () => {
-    setShow(false);
+    setChatInfo({
+      ...chatInfo,
+      roomId: -1,
+    });
   };
 
   return (
@@ -81,8 +94,18 @@ export default function Message(props) {
             return (
               <div
                 key={time + value.id}
-                onClick={handleSetShow}
-                onKeyDown={handleSetShow}
+                onClick={handleSetChatInfo(
+                  value.room_id,
+                  value.user_id2,
+                  value.avatar_url,
+                  value.username
+                )}
+                onKeyDown={handleSetChatInfo(
+                  value.room_id,
+                  value.user_id2,
+                  value.avatar_url,
+                  value.username
+                )}
                 tabIndex={0}
                 role="button"
                 style={{ outline: "none" }}
@@ -130,12 +153,12 @@ export default function Message(props) {
       )}
       {type === "chats" && (
         <CustomModal
-          show={show}
+          show={chatInfo.roomId !== -1}
           onHide={onHide}
           jumpFrame={classes.jumpFrame}
           backdrop
         >
-          <h4>Chatroom</h4>
+          <Chatroom chatInfo={chatInfo} onHide={onHide} />
         </CustomModal>
       )}
     </div>

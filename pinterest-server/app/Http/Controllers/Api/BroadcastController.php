@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Events\Announced;
+use App\Events\ChatSent;
 
 class BroadcastController extends BaseController
 {
@@ -15,8 +16,17 @@ class BroadcastController extends BaseController
      */
     public function store(Request $request)
     {
-        $data = $request->input('data');
+        $data = $request['data'];
         event(new Announced($data)); // trigger
         return response()->json("Event announced!", 200);
+    }
+    
+    public function chatting(Request $request)
+    {
+        $room_id = $request['room_id'];
+        $message = $request['message'];
+        $from = $request['from'];
+        event(new ChatSent($room_id, $message, $from)); // trigger
+        return response()->json("Message sent!", 200);
     }
 }
