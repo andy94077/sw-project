@@ -74,10 +74,11 @@ export default function App() {
                 userAvatar: res.data.avatar_url,
                 bucket_time: res.data.bucket_time,
                 api_token: res.data.api_token,
+                verified: Boolean(res.data.verified),
               })
             );
-
-            if (location.pathname === "/") history.push("/home");
+            if (location.pathname === "/" && Boolean(res.data.verified))
+              history.push("/home");
           } else {
             stableDispatch(
               setData({
@@ -86,6 +87,7 @@ export default function App() {
                 userAvatar: null,
                 bucket_time: null,
                 api_token: null,
+                verified: null,
               })
             );
           }
@@ -97,7 +99,7 @@ export default function App() {
           });
         })
         .finally(() => setIsReady(true));
-    } else {
+    } else if (user.verified !== false) {
       stableDispatch(
         setData({
           username: null,
@@ -105,10 +107,11 @@ export default function App() {
           userAvatar: null,
           bucket_time: null,
           api_token: null,
+          verified: null,
         })
       );
     }
-  }, [getCookie()]);
+  }, [user.verified]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -130,7 +133,7 @@ export default function App() {
     };
   }, [user.userId]);
 
-  if (isReady) {
+  if (isReady || location.pathname === "/") {
     if (error.message !== "") {
       return <ErrorMsg message={error.message} imgUrl={error.url} />;
     }

@@ -50,15 +50,16 @@ class RegisterController extends Controller
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public static function validator(Request $data)
-    { 
+    {
         //echo $data->toArray()["email"];
-        return Validator::make($data->all(),
+        return Validator::make(
+            $data->all(),
             [
                 'name' => ['required', 'string', 'max:64', 'unique:users', 'alpha_num'],
                 'email' => ['required', 'string', 'email', 'max:64', 'unique:users'],
-                'password' => [ 'required', 'string', 'min:8', 'max:255', 'regex:/^[A-Za-z0-9]+$/'],
+                'password' => ['required', 'string', 'min:8', 'max:255', 'regex:/^[A-Za-z0-9]+$/'],
             ],
-            [  
+            [
                 'name.required' => 'Username can\'t be empty',
                 'name.unique' => 'This username is already registered',
                 'name.max' => 'Username must be less than 64 character',
@@ -72,7 +73,8 @@ class RegisterController extends Controller
                 'password.unique' => 'This password is already registered',
                 'password.min' => 'Password must be at least 8 character',
                 'password.max' => 'Password must be less than 255 character',
-            ]);
+            ]
+        );
     }
 
     /**
@@ -87,7 +89,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'avatar_url' => "/img/avatar.jpeg",
+            'avatar_url' => $data['avatar_url'],
             'api_token' => hash('sha256', Str::random(80)),
         ]);
     }

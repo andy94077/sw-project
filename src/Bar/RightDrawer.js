@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Drawer,
@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 import { CONCAT_SERVER_URL } from "../utils";
 import { deleteCookie } from "../cookieHelper";
 import LoginForm from "../Login/LoginForm";
-import { selectUser } from "../redux/userSlice";
+import { selectUser, setData } from "../redux/userSlice";
 
 const useStyles = makeStyles({
   list: {
@@ -37,6 +37,7 @@ const useStyles = makeStyles({
 export default function RightDrawer(props) {
   const classes = useStyles();
   const { open, toggleDrawer } = props;
+  const dispatch = useDispatch();
   const { username, userAvatar } = useSelector(selectUser);
   const [modalShow, setModalShow] = useState(false);
 
@@ -47,6 +48,16 @@ export default function RightDrawer(props) {
 
   const logOut = () => {
     deleteCookie();
+    dispatch(
+      setData({
+        username: null,
+        user_id: null,
+        userAvatar: null,
+        bucket_time: null,
+        api_token: null,
+        verified: null,
+      })
+    );
     window.Echo.disconnect();
   };
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -60,27 +61,31 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
-    public function getBucketTimeAttribute($value){
-        if($value != null)
+    public function getBucketTimeAttribute($value)
+    {
+        if ($value != null)
             return (new DateTime($value))->format('c');
         return null;
     }
 
-    public function getOnlineTimeAttribute($value){
-        if($value != null)
+    public function getOnlineTimeAttribute($value)
+    {
+        if ($value != null)
             return (new DateTime($value))->format('c');
         return null;
     }
 
-    public function generateCode(){
+    public function generateCode()
+    {
         $verification = new Verification();
         $verification->user_id = $this->id;
         $verification->code = Str::random(10);
         $verification->save();
     }
 
-    public function sendEmailVerificationNotification(){
+    public function sendEmailVerificationNotification()
+    {
         $verification = Verification::where('user_id', $this->id)->first();
-        Mail::to($this->email)->send(new test($verification ->code));
+        Mail::to($this->email)->send(new test($verification->code));
     }
 }
