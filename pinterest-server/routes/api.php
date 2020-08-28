@@ -36,7 +36,6 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments/admin', 'CommentController@adminAll');
     Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket', 'verified']);
     Route::post('/comments/{id}', 'CommentController@update')->middleware(['bucket']);
-    ;
     Route::apiResource('comments', 'CommentController');
 
     Route::get('/mail', 'UserController@mail');
