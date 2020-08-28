@@ -69,7 +69,7 @@ export default function DesktopMenu() {
   const handleContentOpen = (type) => () => {
     if (content.type === type) {
       // Close itself:
-      handleSetCookie(type);
+      handleContentClickAway();
     } else {
       if (content.type !== "") {
         // Switch from another:

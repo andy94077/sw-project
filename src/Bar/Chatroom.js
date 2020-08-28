@@ -106,9 +106,16 @@ export default function Chatroom(props) {
   const [errMessage, setErrMessage] = useState("");
 
   // Infinite scroll
-  const { status, data: boxes, fetchMore, canFetchMore } = useInfiniteQuery(
+  const {
+    status,
+    data: boxes,
+    fetchMore,
+    isFetchingMore,
+    canFetchMore,
+  } = useInfiniteQuery(
     "boxes",
     async (_, start = 0) => {
+      if (chatInfo.roomId === 0) return [];
       const jsonData = {
         room_id: chatInfo.roomId,
         start,
@@ -147,11 +154,23 @@ export default function Chatroom(props) {
       "ChatSent",
       (event) => {
         const { message, from } = event;
+        const now = new Date();
+        const date = `${now.getFullYear()}-${
+          now.getMonth() + 1
+        }-${now.getDate()}`;
+        const time = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        const dateTime = `${date} ${time}`.replace(
+          /(^|[^0-9])([0-9])(?=($|[^0-9]))/gi,
+          function zero($0) {
+            return `${$0[0]}0${$0[1]}`;
+          }
+        );
         setNewBoxes((nb) =>
           [
             {
               message,
               from,
+              created_at: dateTime,
             },
           ].concat(nb)
         );
@@ -263,6 +282,7 @@ export default function Chatroom(props) {
                 chatInfo={chatInfo}
                 message={text.message}
                 from={text.from}
+                time={text.created_at}
               />
             ))}
             {boxes.map((page) =>
@@ -272,6 +292,7 @@ export default function Chatroom(props) {
                   chatInfo={chatInfo}
                   message={text.message}
                   from={text.from}
+                  time={text.created_at}
                 />
                 // <CommentBox
                 //   key={i.id}
@@ -297,6 +318,7 @@ export default function Chatroom(props) {
                     No message left
                   </Typography>
                 )}
+                {isFetchingMore && <Loading />}
               </div>
             )}
           </ScrollToBottom>
@@ -350,5 +372,9 @@ export default function Chatroom(props) {
       </div>
     );
   }
-  return <Loading />;
+  return (
+    <div className={classes.root}>
+      <Loading />
+    </div>
+  );
 }

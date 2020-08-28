@@ -10,6 +10,7 @@ import {
   // MenuItem,
   Paper,
   // TextField,
+  Typography,
 } from "@material-ui/core";
 // import MoreVertIcon from "@material-ui/icons/MoreVert";
 
@@ -54,14 +55,14 @@ const useStyles = makeStyles(() => ({
     padding: "0",
     lineHeight: "20px",
   },
-  TextField: {
-    marginLeft: "5%",
-    marginRight: "5%",
+  time: {
+    color: "#777",
+    margin: "auto 2px",
   },
 }));
 
 export default function ChatBox(props) {
-  const { chatInfo, message, from /* , messageId, refresh */ } = props;
+  const { chatInfo, message, from, time /* , messageId, refresh */ } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
   // const [menu, setMenu] = useState(null);
@@ -75,6 +76,13 @@ export default function ChatBox(props) {
   // const [newMessage, setNewMessage] = useState(message);
   // const [errMessage, setErrMessage] = useState("");
   const classes = useStyles();
+
+  const getTimeFormat = (t) => {
+    // HH:MM
+    const HMS = t.split(" ")[1];
+    const [HH, MM] = HMS.split(":");
+    return `${HH}:${MM}`;
+  };
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -170,6 +178,9 @@ export default function ChatBox(props) {
       >
         <div className={classes.content}>{message}</div>
       </Paper>
+      <Typography variant="button" className={classes.time}>
+        {getTimeFormat(time)}
+      </Typography>
       {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
           <MoreVertIcon />

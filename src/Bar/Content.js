@@ -7,6 +7,7 @@ import { Typography } from "@material-ui/core";
 
 import { format, formatDistanceToNow } from "date-fns";
 import Message from "./Message";
+import Loading from "../components/Loading";
 import useIntersectionObserver from "../components/useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../utils";
 import { selectUser } from "../redux/userSlice";
@@ -61,6 +62,7 @@ export default function Content(props) {
     status: statusChats,
     data: newChats,
     fetchMore: fetchChats,
+    isFetchingMore: isFetchingChats,
     canFetchMore: canFetchChats,
   } = useInfiniteQuery(
     "chats",
@@ -104,6 +106,7 @@ export default function Content(props) {
     status: statusNotes,
     data: newNotes,
     fetchMore: fetchNotes,
+    isFetchingMore: isFetchingNotes,
     canFetchMore: canFetchNotes,
   } = useInfiniteQuery(
     "notes",
@@ -206,6 +209,7 @@ export default function Content(props) {
                 No chatroom left
               </Typography>
             )}
+            {isFetchingChats && <Loading />}
           </div>
         )}
 
@@ -220,10 +224,15 @@ export default function Content(props) {
                 No notification left
               </Typography>
             )}
+            {isFetchingNotes && <Loading />}
           </div>
         )}
       </div>
     );
   }
-  return <div style={{ display: "none" }} />;
+  return (
+    <div className={classes.root}>
+      <Loading />
+    </div>
+  );
 }

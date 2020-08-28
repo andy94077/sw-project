@@ -13,7 +13,7 @@ class ChatBoxController extends BaseController
         $room_id = intval($request['room_id']);
         $boxes = DB::table('laravel.chat_' .  $room_id);
 
-        $boxes = $boxes->orderBy('updated_at', 'desc')
+        $boxes = $boxes->orderBy('created_at', 'desc')
             ->skip(intval($request['start']))
             ->take(intval($request['number']))->get();
 

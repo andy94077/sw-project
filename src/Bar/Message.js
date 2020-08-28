@@ -58,7 +58,7 @@ export default function Message(props) {
   const { type, allText, time } = props;
 
   const [chatInfo, setChatInfo] = useState({
-    roomId: 0,
+    roomId: -1,
     userId: 0,
     avatar_url: "",
     username: "",
@@ -79,7 +79,7 @@ export default function Message(props) {
   const onHide = () => {
     setChatInfo({
       ...chatInfo,
-      roomId: 0,
+      roomId: -1,
     });
   };
 
@@ -153,7 +153,7 @@ export default function Message(props) {
       )}
       {type === "chats" && (
         <CustomModal
-          show={chatInfo.roomId !== 0}
+          show={chatInfo.roomId !== -1}
           onHide={onHide}
           jumpFrame={classes.jumpFrame}
           backdrop
