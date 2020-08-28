@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, TextField } from "@material-ui/core";
 
@@ -10,7 +11,37 @@ import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie } from "../cookieHelper";
 import { selectUser, setVerified } from "../redux/userSlice";
 
+const useStyles = makeStyles(() => ({
+  frame: {
+    padding: "40px 0 20px 0",
+  },
+  controlSpace: {
+    marginTop: "10px",
+    width: "300px",
+    [`@media (max-width: 400px)`]: {
+      width: "80%",
+    },
+  },
+  buttonFrame: {
+    position: "relative",
+    marginTop: "20px",
+  },
+  submit: {
+    position: "absolute",
+    right: "180px",
+    margin: "auto 20px",
+    fontSize: "16px",
+  },
+  resend: {
+    position: "absolute",
+    right: "18px",
+    width: "150px",
+    fontSize: "16px",
+  },
+}));
+
 export default function VerificationPage() {
+  const classes = useStyles();
   const history = useHistory();
   const [count, setCount] = useCountDown();
   const [isLoading, setIsLoading] = useState(true);
@@ -85,30 +116,38 @@ export default function VerificationPage() {
   if (!isConnection) return <div>Connection failed</div>;
   if (isLoading) return <Loading />;
   return (
-    <>
+    <div className={classes.frame}>
       <div>
+        <TextField
+          label="verification code"
+          value={code}
+          required
+          error={state.isError}
+          helperText={state.errorMes}
+          placeholder="Please enter code"
+          className={classes.controlSpace}
+          InputProps={{ style: { borderRadius: "50px" } }}
+          onChange={handleCodeChange}
+          onKeyUp={handleKeyUp}
+        />
+      </div>
+      <div className={classes.buttonFrame}>
         <Button
-          variant="contained"
           color="primary"
+          className={classes.submit}
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
+        <Button
+          color="primary"
+          className={classes.resend}
           disabled={count > 0}
           onClick={handleResend}
         >
-          {`Resend after ${count}s`}
+          {count <= 0 ? "Resend " : `Resend (${count}s)`}
         </Button>
       </div>
-      <TextField
-        label="verification code"
-        value={code}
-        required
-        error={state.isError}
-        helperText={state.errorMes}
-        placeholder="Please enter code"
-        onChange={handleCodeChange}
-        onKeyUp={handleKeyUp}
-      />
-      <Button variant="contained" color="primary" onClick={handleSubmit}>
-        Submit
-      </Button>
-    </>
+    </div>
   );
 }
