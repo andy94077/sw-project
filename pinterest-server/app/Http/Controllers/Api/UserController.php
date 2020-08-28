@@ -6,16 +6,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
-use App\Models\Post;
+use Illuminate\Support\Str;
 use App\Models\Verification;
 use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Image;
-use stdClass;
 use DateTime;
 use DateInterval;
-use date;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\test;
@@ -64,13 +60,13 @@ class UserController extends BaseController
             if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
                 return response()->json([
                     'name' => Auth::user()->name,
-                    'Message' => "Sign up seccess!",
+                    'Message' => "Sign up success!",
                     'isSignUp' => true,
                     'isLogin' => true,
                     'user_id' => $user->id,
                 ], 200);
             } else {
-                return response()->json(['Message' => "Sign up seccess but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
+                return response()->json(['Message' => "Sign up success but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
             }
         }
     }
@@ -297,5 +293,14 @@ class UserController extends BaseController
         $user = User::find($id);
         $verification = Verification::where('user_id', $id)->first();
         return response()->json(['time' => $verification->block_time]);
+    }
+
+    public function resend($id)
+    {
+        $user = User::find($id);
+        $verification = Verification::where('user_id', $id)->first();
+        $verification->code = Str::random(10);
+        $user->sendEmailVerificationNotification();
+        return response()->json(['Message' => 'success']);
     }
 }

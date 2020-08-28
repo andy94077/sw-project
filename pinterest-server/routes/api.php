@@ -53,6 +53,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::apiResource('posts', 'PostController');
 
+    Route::post('users/resend/{id}', 'UserController@resend');
     Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
     Route::post('/users/verify', 'UserController@verify');
     Route::post('/users/intro', 'UserController@setIntro');
