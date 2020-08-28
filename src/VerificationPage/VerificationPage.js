@@ -18,12 +18,14 @@ export default function VerificationPage() {
   const user = useSelector(selectUser);
 
   function handleSubmit() {
+    setIsLoading(true);
     if (value !== "" && count < 0) {
       const t = Date.now() + 60000;
       axios
         .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
           time: t,
           user_id: user.userId,
+          code: value,
         })
         .then(() => {
           setTime(t);
@@ -35,6 +37,7 @@ export default function VerificationPage() {
           setValue("");
         });
     }
+    setIsLoading(false);
   }
 
   function handleClick(e) {
@@ -44,7 +47,7 @@ export default function VerificationPage() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/v1/times")
+      .get(CONCAT_SERVER_URL(`/api/v1/users/verifytime/${user.userId}`))
       .then((res) => {
         setTime(res.data.time);
         setIsLoading(false);
