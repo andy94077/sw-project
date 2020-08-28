@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Verification;
-use Auth;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
@@ -35,7 +35,15 @@ class UserController extends BaseController
     public function logIn(Request $request)
     {
         if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
-            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true, 'api_token' => Auth::user()->api_token], 200);
+            return response()->json([
+                'name' => Auth::user()->name,
+                'Message' => "Login success!",
+                'token' => Auth::user()->hasVerifiedEmail() ? Auth::user()->remember_token : "",
+                'isLogin' => true,
+                'api_token' => Auth::user()->api_token,
+                'verified' => Auth::user()->hasVerifiedEmail(),
+                'user_id' => Auth::user()->id,
+            ], 200);
         } else {
             return response()->json(['Message' => "Login fails!", 'isLogin' => false], 200);
         }
@@ -54,7 +62,13 @@ class UserController extends BaseController
             $user->generateCode();
             $user->sendEmailVerificationNotification();
             if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
-                return response()->json(['name' => Auth::user()->name, 'Message' => "Sign up seccess!", 'isSignUp' => true, 'isLogin' => true, 'token' => Auth::user()->remember_token], 200);
+                return response()->json([
+                    'name' => Auth::user()->name,
+                    'Message' => "Sign up seccess!",
+                    'isSignUp' => true,
+                    'isLogin' => true,
+                    'user_id' => $user->id,
+                ], 200);
             } else {
                 return response()->json(['Message' => "Sign up seccess but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
             }
@@ -84,6 +98,7 @@ class UserController extends BaseController
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
                 'isValid' => true,
+                'verified' => $userInfo->hasVerifiedEmail(),
                 'avatar_url' => $userInfo->avatar_url,
                 'bucket_time' => $userInfo->bucket_time,
                 'api_token' => $userInfo->api_token,
@@ -252,26 +267,35 @@ class UserController extends BaseController
         return response()->json($res);
     }
 
-    public function mail(){
+    public function mail()
+    {
         Mail::to('b07902011@ntu.edu.tw')->send(new test('Hello'));
-        if(count(Mail::failures()) > 0){
+        if (count(Mail::failures()) > 0) {
             return "failed";
         }
         return "send mail";
     }
 
-    public function verify(Request $request){
+    public function verify(Request $request)
+    {
         $user = User::find($request['user_id']);
-        $code = Verification::where('user_id', $user->id)->first()->code;
-        echo $user->hasVerifiedEmail();
-        if($code === $request['code']){
+        $verification = Verification::where('user_id', $user->id)->first();
+        $verification->block_time = $request['time'];
+        $verification->save();
+        $code = $verification->code;
+        if ($code === $request['code']) {
             //$user->email_verified_at =  now();
-            if ($user->markEmailAsVerified()) {
-                event(Verified($user));
-            }
+            $user->markEmailAsVerified();
             $user->save();
-            return response()->json(['Message' => 'succese']);
+            return response()->json(['token' => $user->remember_token]);
         }
-        return response()->json(['Message' => 'failed']);
+        return response()->json('failed', 403);
+    }
+
+    public function getVerifyTime($id)
+    {
+        $user = User::find($id);
+        $verification = Verification::where('user_id', $id)->first();
+        return response()->json(['time' => $verification->block_time]);
     }
 }

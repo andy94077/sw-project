@@ -1,9 +1,12 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
+import { selectUser } from "../redux/userSlice";
 import LoginFormInfo from "./LoginFormInfo";
 import "./LoginForm.css";
+import VerificationPage from "../VerificationPage/VerificationPage";
 import CustomModal from "../components/CustomModal";
 
 const useStyles = makeStyles(() => ({
@@ -74,6 +77,7 @@ const useStyles = makeStyles(() => ({
 
 export default function LoginForm(props) {
   const { onHide, show, otherOption } = props;
+  const { verified } = useSelector(selectUser);
   const classes = useStyles();
   const imgUrl = "pictures/logo.png";
   return (
@@ -87,7 +91,7 @@ export default function LoginForm(props) {
             <h1 className={classes.subText}>Login to enjoy your new day</h1>
           </div>
           <div className={classes.formPosition}>
-            <LoginFormInfo />
+            {verified === null ? <LoginFormInfo /> : <VerificationPage />}
           </div>
         </div>
         <Button

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import Loading from "../components/Loading";
-import { setCookie } from "../cookieHelper";
 import { CONCAT_SERVER_URL } from "../utils";
+import { setVerified, setId } from "../redux/userSlice";
 
 const keyNote = {
   "name.required": "Username can't be empty",
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUpFormInfo() {
   const classes = useStyles();
-  const history = useHistory();
+  const dispatch = useDispatch();
   const [info, setInfo] = useState({
     username: "",
     email: "",
@@ -245,23 +245,20 @@ export default function SignUpFormInfo() {
     formdata.append("email", info.email);
     formdata.append("password", info.password);
     // must remove before demo
-    formdata.append("avatar_url", "/img/avatar.jpeg");
+    formdata.append("avatar_url", "/img/avatar1.jpeg");
     //
     axios
       .post(CONCAT_SERVER_URL("/api/v1/user/register"), formdata, config)
       .then((response) => {
-        console.log(typeof response.data, response.data);
         if (response.data.isSignUp) {
-          console.log("isSignUp");
           setState({
             isError: [false, false, false],
             nowLoading: false,
             errorMes: ["", "", ""],
           });
           if (response.data.isLogin) {
-            console.log("isLogin");
-            setCookie("accessToken", response.data.token, 1);
-            if (history.location.pathname === "/") history.push("/home");
+            dispatch(setVerified({ verified: false }));
+            dispatch(setId({ user_id: response.data.user_id }));
           }
         } else {
           setState({
@@ -286,7 +283,6 @@ export default function SignUpFormInfo() {
         }
       })
       .catch((error) => {
-        console.log("error ", error);
         if (error === null) return;
         setState({
           isError: [true, true, true],
