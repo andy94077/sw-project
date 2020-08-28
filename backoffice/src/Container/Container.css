@@ -38,7 +38,7 @@
   margin-left: 200px;
 }
 
-.ant-layout-sider-collapsed + .ant-layout > .content {
+.ant-layout-sider-collapsed+.ant-layout>.content {
   margin-left: 80px;
 }
 
@@ -58,7 +58,6 @@
   float: left;
   font-size: 20px;
 }
-
 
 .role:hover {
   background-color: inherit !important;
