@@ -300,6 +300,7 @@ class UserController extends BaseController
         $verification = Verification::where('user_id', $id)->first();
         $verification->block_time = $request['time'];
         $verification->code = Str::random(10);
+        $verification->save();
         $user->sendEmailVerificationNotification();
         return response()->json(['Message' => 'success']);
     }

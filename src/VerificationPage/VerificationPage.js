@@ -19,17 +19,18 @@ export default function VerificationPage() {
   const [time, setTime] = useState(null);
   const dispatch = useDispatch();
   const { userId } = useSelector(selectUser);
+  const [state, setState] = useState({ isError: false, errorMes: "" });
 
   const handleCodeChange = (e) => setCode(e.target.value);
 
-  const handleClick = () => {
+  const handleSubmit = () => {
     if (code === "") return;
 
-    const t = Date.now() + 5000;
-    setTime(t);
+    // const t = Date.now() + 5000;
+    // setTime(t);
     axios
       .post(CONCAT_SERVER_URL("/api/v1/users/verify"), {
-        time: t,
+        // time: t,
         user_id: userId,
         code,
       })
@@ -40,7 +41,8 @@ export default function VerificationPage() {
       })
       .catch((error) => {
         if (error.response && error.response.status === 403) {
-          console.log(error.response.data);
+          // error verification code
+          setState({ isError: true, errorMes: "Uncorrect Verification Code" });
         } else setIsConnection(false);
       })
       .finally(() => {
@@ -49,7 +51,16 @@ export default function VerificationPage() {
   };
 
   const handleKeyUp = (e) => {
-    if (e.key === "Enter") handleClick();
+    if (e.key === "Enter") handleSubmit();
+  };
+
+  const handleResend = () => {
+    const t = Date.now() + 60000;
+    setTime(t);
+    axios
+      .post(CONCAT_SERVER_URL(`/api/v1/users/resend/${userId}`), { time: t })
+      .catch(() => setIsConnection(false))
+      .finally(() => setCode(""));
   };
 
   useEffect(() => {
@@ -66,8 +77,7 @@ export default function VerificationPage() {
         setTime(res.data.time);
         setIsLoading(false);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setIsConnection(false);
       });
   }, [userId]);
@@ -76,21 +86,29 @@ export default function VerificationPage() {
   if (isLoading) return <Loading />;
   return (
     <>
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={count > 0}
+          onClick={handleResend}
+        >
+          {`Resend after ${count}s`}
+        </Button>
+      </div>
       <TextField
         label="verification code"
         value={code}
+        required
+        error={state.isError}
+        helperText={state.errorMes}
+        placeholder="Please enter code"
         onChange={handleCodeChange}
         onKeyUp={handleKeyUp}
       />
-      {count > 0 ? (
-        <Button variant="contained" color="primary">
-          {`${count} s`}
-        </Button>
-      ) : (
-        <Button variant="contained" color="primary" onClick={handleClick}>
-          Submit
-        </Button>
-      )}
+      <Button variant="contained" color="primary" onClick={handleSubmit}>
+        Submit
+      </Button>
     </>
   );
 }
