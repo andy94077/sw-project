@@ -58,29 +58,31 @@ export default function Message(props) {
   const { type, allText, time } = props;
 
   const [chatInfo, setChatInfo] = useState({
-    roomId: -1,
-    userId: 0,
+    isOpen: false,
+    roomId: 0,
+    id: 0,
     avatar_url: "",
-    username: "",
+    name: "",
   });
 
   // Toggle function (for chat)
-  const handleSetChatInfo = (roomId, userId, avatarUrl, username) => () => {
+  const handleSetChatInfo = (roomId, id, avatarUrl, name) => () => {
     if (type === "chats") {
       setChatInfo({
+        isOpen: true,
         roomId,
-        userId,
+        id,
         avatar_url: avatarUrl,
-        username,
+        name,
       });
     }
   };
 
   const onHide = () => {
-    setChatInfo({
-      ...chatInfo,
-      roomId: -1,
-    });
+    setChatInfo((state) => ({
+      ...state,
+      isOpen: false,
+    }));
   };
 
   return (
@@ -153,7 +155,7 @@ export default function Message(props) {
       )}
       {type === "chats" && (
         <CustomModal
-          show={chatInfo.roomId !== -1}
+          show={chatInfo.isOpen}
           onHide={onHide}
           jumpFrame={classes.jumpFrame}
           backdrop
