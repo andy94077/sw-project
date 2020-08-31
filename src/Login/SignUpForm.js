@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import Button from "@material-ui/core/Button";
 import { selectUser } from "../redux/userSlice";
 import SignUpFormInfo from "./SignUpFormInfo";
+import useCountDown from "./useCountDown";
+import CircularStatic from "./CircularStatic";
 import VerificationPage from "../VerificationPage/VerificationPage";
+import "./login.css";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
@@ -58,16 +61,32 @@ const useStyles = makeStyles(() => ({
   contentPosition: {
     margin: "30px auto 0px",
   },
+  imgUrl: {
+    margin: "0px auto 0px",
+    width: "70px",
+    height: "70px",
+    color: "red",
+  },
 }));
 
 export default function SignUpForm(props) {
   const { setModalShow } = props;
   const classes = useStyles();
   const { verified } = useSelector(selectUser);
+  const [isWait, setIsWait] = useState(false);
+  const [count, setCount] = useCountDown();
 
   return (
     <div className={classes.formFrame}>
       <div className={classes.formPosition}>
+        {isWait ? (
+          <div className="centerImage">
+            <img src="/pictures/logo.svg" className="App-logo" alt="logo" />
+            <CircularStatic value={count * 5} />
+          </div>
+        ) : verified !== null ? (
+          <img className={classes.imgUrl} src="/pictures/logo.png" alt="" />
+        ) : null}
         <div style={{ height: "10px" }} />
         <div className={classes.textPosition}>
           <h1 className={classes.mainText}>Sign Up</h1>
@@ -77,7 +96,15 @@ export default function SignUpForm(props) {
           </h1>
         </div>
         <div className={classes.contentPosition}>
-          {verified === null ? <SignUpFormInfo /> : <VerificationPage />}
+          {verified === null ? (
+            <SignUpFormInfo />
+          ) : (
+            <VerificationPage
+              count={count}
+              setCount={setCount}
+              setIsWait={setIsWait}
+            />
+          )}
         </div>
       </div>
       <Button

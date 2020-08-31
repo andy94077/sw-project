@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "@material-ui/core/Button";
 import { selectUser } from "../redux/userSlice";
 import LoginFormInfo from "./LoginFormInfo";
-import "./LoginForm.css";
+import useCountDown from "./useCountDown";
+import CircularStatic from "./CircularStatic";
 import VerificationPage from "../VerificationPage/VerificationPage";
 import CustomModal from "../components/CustomModal";
+import "./login.css";
+import "./LoginForm.css";
 
 const useStyles = makeStyles(() => ({
   formFrame: {
@@ -78,20 +81,37 @@ const useStyles = makeStyles(() => ({
 export default function LoginForm(props) {
   const { onHide, show, otherOption } = props;
   const { verified } = useSelector(selectUser);
+  const [isWait, setIsWait] = useState(false);
+  const [count, setCount] = useCountDown();
   const classes = useStyles();
-  const imgUrl = "pictures/logo.png";
+  const imgUrl = "/pictures/logo.png";
   return (
     <CustomModal show={show} jumpFrame={classes.jumpFrame}>
       <div>
         <div className={classes.outerFrame}>
-          <img className={classes.imgUrl} src={imgUrl} alt="" />
+          {isWait ? (
+            <div className="centerImage">
+              <img src="/pictures/logo.svg" className="App-logo" alt="logo" />
+              <CircularStatic value={count * 5} />
+            </div>
+          ) : (
+            <img className={classes.imgUrl} src={imgUrl} alt="" />
+          )}
           <div style={{ height: "10px" }} />
           <div className={classes.textPosition}>
             <h1 className={classes.mainText}>Welcome</h1>
             <h1 className={classes.subText}>Login to enjoy your new day</h1>
           </div>
           <div className={classes.formPosition}>
-            {verified === null ? <LoginFormInfo /> : <VerificationPage />}
+            {verified === null ? (
+              <LoginFormInfo />
+            ) : (
+              <VerificationPage
+                count={count}
+                setCount={setCount}
+                setIsWait={setIsWait}
+              />
+            )}
           </div>
         </div>
         <Button
