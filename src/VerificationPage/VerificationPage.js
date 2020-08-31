@@ -5,11 +5,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, TextField } from "@material-ui/core";
 
-import useCountDown from "./useCountDown";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
 import { setCookie } from "../cookieHelper";
 import { selectUser, setVerified } from "../redux/userSlice";
+import "./App.css";
 
 const useStyles = makeStyles(() => ({
   frame: {
@@ -24,6 +24,7 @@ const useStyles = makeStyles(() => ({
   },
   buttonFrame: {
     position: "relative",
+    height: "65px",
     marginTop: "20px",
   },
   submit: {
@@ -40,10 +41,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function VerificationPage() {
+export default function VerificationPage(props) {
+  const { count, setCount, setIsWait } = props;
   const classes = useStyles();
   const history = useHistory();
-  const [count, setCount] = useCountDown();
   const [isLoading, setIsLoading] = useState(true);
   const [isConnection, setIsConnection] = useState(true);
   const [code, setCode] = useState("");
@@ -86,13 +87,18 @@ export default function VerificationPage() {
   };
 
   const handleResend = () => {
-    const t = Date.now() + 60000;
+    const t = Date.now() + 20000;
     setTime(t);
     axios
       .post(CONCAT_SERVER_URL(`/api/v1/users/resend/${userId}`), { time: t })
       .catch(() => setIsConnection(false))
       .finally(() => setCode(""));
   };
+
+  useEffect(() => {
+    if (count <= 0) setIsWait(false);
+    else setIsWait(true);
+  }, [count]);
 
   useEffect(() => {
     if (time !== null && time > Date.now()) {
