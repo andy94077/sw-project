@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { makeStyles } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import {
   Table,
@@ -19,6 +20,7 @@ import {
   SearchOutlined,
   UndoOutlined,
   EditOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 
 import EditRoleForm from "./EditRoleForm";
@@ -27,10 +29,20 @@ import { CONCAT_SERVER_URL } from "../../utils";
 import "./List.css";
 import { format } from "date-fns";
 import { selectUser } from "../../redux/userSlice";
+import PermissionDrawer from "./PermissionDrawer";
+
+const useStyles = makeStyles(() => ({
+  roles: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+}));
 
 export default function List(props) {
-  const { allRoles, refresh, setRefresh } = props;
-  const { apiToken } = useSelector(selectUser);
+  const { allRolesWithPermissions, refresh, setRefresh } = props;
+  const classes = useStyles();
+  const { userId, permissions, apiToken } = useSelector(selectUser);
   const initialSearchText = useMemo(
     () => ({
       id: "",
@@ -61,14 +73,18 @@ export default function List(props) {
     setEditRolesFormVisible(true);
   };
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const handleDrawerVisible = (_visible) => () => setDrawerVisible(_visible);
+  const handleDrawerOpen = ({ id, roles }) => () => {
+    setSelectedUser({ id, roles });
+    setDrawerVisible(true);
+  };
+
   const handleSearchTextChange = (key) => (event) =>
     setSearchText({ ...searchText, [key]: event.target.value });
 
-  const handleSearchArrayChange = useCallback(
-    (key) => (value) =>
-      setSearchText((prevSearchText) => ({ ...prevSearchText, [key]: value })),
-    []
-  );
+  const handleSearchArrayChange = (key) => (value) =>
+    setSearchText((prevSearchText) => ({ ...prevSearchText, [key]: value }));
 
   const [data, setData] = useState({
     info: [],
@@ -107,36 +123,56 @@ export default function List(props) {
             .join(", ")
             .localeCompare(b.roles.map((role) => role.name).join(", ")),
         render: (roles, row) => (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <div className={classes.roles}>
             <span>{roles.map((role) => role.name).join(", ")}</span>
-            <Button
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={handleFormOpen({
-                id: row.id,
-                roles: roles.map((role) => role.name),
-              })}
-            />
+            <div style={{ display: "flex" }}>
+              {userId !== row.id && (
+                <Tooltip
+                  title={
+                    permissions.includes("change_BO_user_role")
+                      ? "Edit"
+                      : "Permission Denied"
+                  }
+                >
+                  <Button
+                    shape="circle"
+                    icon={<EditOutlined />}
+                    onClick={handleFormOpen({
+                      id: row.id,
+                      roles: roles.map((role) => role.name),
+                    })}
+                    disabled={!permissions.includes("change_BO_user_role")}
+                    style={{ marginRight: 6 }}
+                  />
+                </Tooltip>
+              )}
+              <Tooltip title="view details">
+                <Button
+                  shape="circle"
+                  icon={<EyeOutlined />}
+                  onClick={handleDrawerOpen({
+                    id: row.id,
+                    roles: roles.map((role) => role.name),
+                  })}
+                />
+              </Tooltip>
+            </div>
           </div>
         ),
-        renderSearch: (
+        renderSearch: (value) => (
           <Select
             className="BOUser-select"
             mode="multiple"
             placeholder="Roles..."
             allowClear
+            value={value}
             onChange={handleSearchArrayChange("roles")}
             tagRender={({ label, closable, onClose }) => (
               <Tag
                 closable={closable}
                 onClose={onClose}
                 style={{ borderRadius: 5 }}
+                key={label}
               >
                 {label}
               </Tag>
@@ -149,7 +185,7 @@ export default function List(props) {
               borderRadius: "15px",
             }}
           >
-            {allRoles.map((role) => (
+            {Object.keys(allRolesWithPermissions).map((role) => (
               <Select.Option key={role}>{role}</Select.Option>
             ))}
           </Select>
@@ -180,11 +216,11 @@ export default function List(props) {
         timeZone: "Asia/Taipei",
       },
     ],
-    [allRoles, handleSearchArrayChange]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allRolesWithPermissions]
   );
 
-  const handleDeleteUser = (event) => {
-    const id = event.currentTarget.value;
+  const handleDeleteUser = (id) => () => {
     const modal = Modal.confirm({
       title: "Do you want to delete this user?",
       content: `(User id = ${id})`,
@@ -213,8 +249,7 @@ export default function List(props) {
     });
   };
 
-  const handleRecoverUser = (event) => {
-    const id = event.currentTarget.value;
+  const handleRecoverUser = (id) => () => {
     const modal = Modal.confirm({
       title: "Do you want to recover this user?",
       icon: <ExclamationCircleOutlined />,
@@ -267,34 +302,47 @@ export default function List(props) {
           right: "0",
         },
       }),
-      render: (_, row) => (
-        <div style={{ textAlign: "center" }}>
-          {row.deleted_at === "" ? (
-            <Tooltip title="Delete">
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={handleDeleteUser}
-                shape="circle"
-                size="small"
-                type="primary"
-                value={row.id}
-              />
-            </Tooltip>
-          ) : (
-            <Tooltip title="Recover">
-              <Button
-                icon={<UndoOutlined />}
-                onClick={handleRecoverUser}
-                shape="circle"
-                size="small"
-                type="primary"
-                value={row.id}
-              />
-            </Tooltip>
-          )}
-        </div>
-      ),
+      render: (_, row) =>
+        userId !== row.id && (
+          <div style={{ textAlign: "center" }}>
+            {row.deleted_at === "" ? (
+              <Tooltip
+                title={
+                  permissions.includes("delete_BO_user")
+                    ? "Delete"
+                    : "Permission Denied"
+                }
+              >
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteUser(row.id)}
+                  shape="circle"
+                  size="small"
+                  type="primary"
+                  disabled={!permissions.includes("delete_BO_user")}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip
+                title={
+                  permissions.includes("recover_BO_user")
+                    ? "Recover"
+                    : "Permission Denied"
+                }
+              >
+                <Button
+                  icon={<UndoOutlined />}
+                  onClick={handleRecoverUser(row.id)}
+                  shape="circle"
+                  size="small"
+                  type="primary"
+                  disabled={!permissions.includes("recover_BO_user")}
+                />
+              </Tooltip>
+            )}
+          </div>
+        ),
     },
   ];
 
@@ -384,7 +432,8 @@ export default function List(props) {
   };
 
   const searchFields = tableColumns.map((col) => {
-    if (col.hasOwnProperty("renderSearch")) return col.renderSearch;
+    if (col.hasOwnProperty("renderSearch"))
+      return col.renderSearch(searchText[col.dataIndex]);
     if (col.hasOwnProperty("timeFormat"))
       return (
         <DatePicker.RangePicker
@@ -474,11 +523,23 @@ export default function List(props) {
         <EditRoleForm
           id={selectedUser.id}
           userRoles={selectedUser.roles}
-          allRoles={allRoles}
+          allRoles={Object.keys(allRolesWithPermissions)}
           // Do not control `visible` attribute because the form will not get proper props of `id` and `userRoles`
           visible={true}
           onCancel={handleEditRolesFormVisible(false)}
           setRefresh={setRefresh}
+        />
+      )}
+      {drawerVisible && (
+        <PermissionDrawer
+          rolesWithPermissions={Object.fromEntries(
+            selectedUser.roles.map((role) => [
+              role,
+              allRolesWithPermissions[role],
+            ])
+          )}
+          visible={true}
+          onClose={handleDrawerVisible(false)}
         />
       )}
     </>

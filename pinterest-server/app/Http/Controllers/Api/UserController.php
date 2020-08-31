@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
-use App\Models\Post;
-use Auth;
+use Illuminate\Support\Str;
+use App\Models\Verification;
 use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Image;
-use stdClass;
 use DateTime;
 use DateInterval;
-use date;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\test;
 
 class UserController extends BaseController
 {
@@ -32,7 +31,15 @@ class UserController extends BaseController
     public function logIn(Request $request)
     {
         if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
-            return response()->json(['name' => Auth::user()->name, 'Message' => "Login success!", 'token' => Auth::user()->remember_token, 'isLogin' => true, 'api_token' => Auth::user()->api_token], 200);
+            return response()->json([
+                'name' => Auth::user()->name,
+                'Message' => "Login success!",
+                'token' => Auth::user()->hasVerifiedEmail() ? Auth::user()->remember_token : "",
+                'isLogin' => true,
+                'api_token' => Auth::user()->api_token,
+                'verified' => Auth::user()->hasVerifiedEmail(),
+                'user_id' => Auth::user()->id,
+            ], 200);
         } else {
             return response()->json(['Message' => "Login fails!", 'isLogin' => false], 200);
         }
@@ -48,10 +55,18 @@ class UserController extends BaseController
             return response()->json(['Message' => "Sign up fails!", 'isSignUp' => false, "isContentInvalid" => $isContentInvalid, "errorMesContent" => $errorMesContent], 200);
         } else {
             $user = RegisterController::create($request);
+            $user->generateCode();
+            $user->sendEmailVerificationNotification();
             if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], true)) {
-                return response()->json(['name' => Auth::user()->name, 'Message' => "Sign up seccess!", 'isSignUp' => true, 'isLogin' => true, 'token' => Auth::user()->remember_token], 200);
+                return response()->json([
+                    'name' => Auth::user()->name,
+                    'Message' => "Sign up success!",
+                    'isSignUp' => true,
+                    'isLogin' => true,
+                    'user_id' => $user->id,
+                ], 200);
             } else {
-                return response()->json(['Message' => "Sign up seccess but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
+                return response()->json(['Message' => "Sign up success but Login fails!", 'isSignUp' => false, 'isLogin' => false], 200);
             }
         }
     }
@@ -79,6 +94,7 @@ class UserController extends BaseController
                 'username' => $userInfo->name,
                 'user_id' => $userInfo->id,
                 'isValid' => true,
+                'verified' => $userInfo->hasVerifiedEmail(),
                 'avatar_url' => $userInfo->avatar_url,
                 'bucket_time' => $userInfo->bucket_time,
                 'api_token' => $userInfo->api_token,
@@ -117,7 +133,9 @@ class UserController extends BaseController
     public function bucket(Request $request)
     {
         if ($request['id']) {
-            $user = User::find($request['id']);
+            $user = User::withTrashed()->find($request['id']);
+            if ($user === null)
+                return response()->json('user not found', 404);
             $date = new DateTime(null);
             $h = ($request['hour']) ? $request['hour'] : 0;
             $d = ($request['day']) ? $request['day'] : 0;
@@ -134,7 +152,9 @@ class UserController extends BaseController
     public function unBucket(Request $request)
     {
         if ($request['id']) {
-            $user = User::find($request['id']);
+            $user = User::withTrashed()->find($request['id']);
+            if ($user === null)
+                return response()->json('user not found', 404);
             $user->bucket_time = null;
             $user->save();
             return response()->json($user, 200);
@@ -164,7 +184,7 @@ class UserController extends BaseController
                 $query = $query->where($col, '<=', gmdate('Y.m.d H:i:s', strtotime($request[$col][1])));
             }
         }
-        
+
         $size = $query->count();
         $users['data'] = $query->skip(($request['page'] - 1) * $request['size'])->take($request['size'])->get();
         $users['total'] = $size;
@@ -175,6 +195,8 @@ class UserController extends BaseController
     public function adminDelete(Request $request)
     {
         $user = User::find($request['id']);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->delete();
         return $this->sendResponse($user, "success");
     }
@@ -182,6 +204,8 @@ class UserController extends BaseController
     public function adminRecover(Request $request)
     {
         $user = User::withTrashed()->find($request['id']);
+        if ($user === null)
+            return response()->json('user not found', 404);
         $user->restore();
         return $this->sendResponse($user, "success");
     }
@@ -204,10 +228,10 @@ class UserController extends BaseController
                 unlink(substr($user->avatar_url, 1));
             }
 
-            $output_file = "img/". $request["name"] ."Avatar". ((new DateTime())->format('Y-m-d--H:i:s')).".jpeg";
+            $output_file = "img/" . $request["name"] . "Avatar" . ((new DateTime())->format('Y-m-d--H:i:s')) . ".jpeg";
             $ifp = fopen($output_file, 'wb');
             $data = explode(',', $request["imgBase64"]);
-            fwrite($ifp, base64_decode($data[ 1 ]));
+            fwrite($ifp, base64_decode($data[1]));
             fclose($ifp);
 
             $user = User::where('name', $request['name'])->first();
@@ -237,5 +261,47 @@ class UserController extends BaseController
         $user = User::where('name', $request['name'])->first();
         $res['intro'] = $user->intro;
         return response()->json($res);
+    }
+
+    public function mail()
+    {
+        Mail::to('b07902011@ntu.edu.tw')->send(new test('Hello'));
+        if (count(Mail::failures()) > 0) {
+            return "failed";
+        }
+        return "send mail";
+    }
+
+    public function verify(Request $request)
+    {
+        $user = User::find($request['user_id']);
+        $verification = Verification::where('user_id', $user->id)->first();
+        $verification->save();
+        $code = $verification->code;
+        if ($code === $request['code']) {
+            //$user->email_verified_at =  now();
+            $user->markEmailAsVerified();
+            $user->save();
+            return response()->json(['token' => $user->remember_token]);
+        }
+        return response()->json('failed', 403);
+    }
+
+    public function getVerifyTime($id)
+    {
+        $user = User::find($id);
+        $verification = Verification::where('user_id', $id)->first();
+        return response()->json(['time' => $verification->block_time]);
+    }
+
+    public function resend(Request $request, $id)
+    {
+        $user = User::find($id);
+        $verification = Verification::where('user_id', $id)->first();
+        $verification->block_time = $request['time'];
+        $verification->code = Str::random(10);
+        $verification->save();
+        $user->sendEmailVerificationNotification();
+        return response()->json(['Message' => 'success']);
     }
 }

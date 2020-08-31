@@ -24,7 +24,7 @@ import { selectUser } from "../redux/userSlice";
 import Comment from "./Comment";
 
 export default function Post() {
-  const { apiToken } = useSelector(selectUser);
+  const { permissions, apiToken } = useSelector(selectUser);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState([]);
   const columnTitle = {
@@ -107,8 +107,7 @@ export default function Post() {
       .finally(() => setLoading(false));
   }, [motion, filter]);
 
-  const handleDeletePost = (event) => {
-    const id = event.currentTarget.value;
+  const handleDeletePost = (id) => () => {
     const modal = Modal.confirm({
       title: "Are you sure you want to delete this post?",
       content: `(Post id = ${id})`,
@@ -141,8 +140,7 @@ export default function Post() {
     });
   };
 
-  const handleRecoverPost = (event) => {
-    const id = event.currentTarget.value;
+  const handleRecoverPost = (id) => () => {
     const modal = Modal.confirm({
       title: "Are you sure you want to recover this post?",
       content: `(Post id = ${id})`,
@@ -368,26 +366,38 @@ export default function Post() {
       render: (_, row) => (
         <div style={{ textAlign: "center" }}>
           {row.deleted_at === "" ? (
-            <Tooltip title="Delete">
+            <Tooltip
+              title={
+                permissions.includes("delete_post")
+                  ? "Delete"
+                  : "Permission Denied"
+              }
+            >
               <Button
                 danger
                 icon={<DeleteOutlined />}
-                onClick={handleDeletePost}
+                onClick={handleDeletePost(row.id)}
                 shape="circle"
                 size="small"
                 type="primary"
-                value={row.id}
+                disabled={!permissions.includes("delete_post")}
               />
             </Tooltip>
           ) : (
-            <Tooltip title="Recover">
+            <Tooltip
+              title={
+                permissions.includes("recover_post")
+                  ? "Recover"
+                  : "Permission Denied"
+              }
+            >
               <Button
                 icon={<UndoOutlined />}
-                onClick={handleRecoverPost}
+                onClick={handleRecoverPost(row.id)}
                 shape="circle"
                 size="small"
                 type="primary"
-                value={row.id}
+                disabled={!permissions.includes("recover_post")}
               />
             </Tooltip>
           )}

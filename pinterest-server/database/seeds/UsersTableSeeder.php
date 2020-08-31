@@ -31,12 +31,13 @@ class UsersTableSeeder extends Seeder
                     'name' => "user{$i}",
                     'email' => "cms{$i}@funpodium.net",
                     'password' => Hash::make("user{$i}"),
-                    'avatar_url' => "/img/avatar.jpeg",
+                    'avatar_url' => "/img/avatar".($i%5).".jpeg",
                     'created_at' => date("Y-m-d H:i:s"),
                     'api_token' => hash('sha256', Str::random(80)),
                     'intro' => "<p>Hi I am user${i}</p>",
                     'followers' => max(40 - $i, 0), // cooperate with FollowTableSeeder
                     'followings' => $i < 40 ? $i - 1 : 0,
+                    'email_verified_at' =>  date("Y-m-d H:i:s"),
                 ]
             );
         }

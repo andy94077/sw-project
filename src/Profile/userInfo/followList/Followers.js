@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +8,6 @@ import { selectUser } from "../../../redux/userSlice";
 import useIntersectionObserver from "./useIntersectionObserver";
 import { CONCAT_SERVER_URL } from "../../../utils";
 import FollowButton from "../../upload_follow/FollowButton";
-import Loading from "../../../components/Loading";
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -51,10 +50,10 @@ export default function Followers(props) {
   const classes = useStyles();
   const loadMoreButtonRef = useRef();
   const { userId } = useSelector(selectUser);
+  const [currentState, setCurrentState] = useState();
   const history = useHistory();
-  const [list, setList] = useState([]);
   const {
-    data,
+    data = [],
     isFetching,
     isFetchingMore,
     fetchMore,
@@ -79,6 +78,14 @@ export default function Followers(props) {
     onIntersect: fetchMore,
     enabled: canFetchMore,
   });
+
+  const statement = Array.from({ length: 8 }, (_, index) => {
+    if (index > 3) return "Loading more...";
+    if (index > 1) return "Loading...";
+    if (index > 0) return "Load More";
+    return "Nothing more to load";
+  });
+
   const handleSearch = (target) => () => {
     history.push(`/profile/${target}`);
   };
@@ -89,9 +96,16 @@ export default function Followers(props) {
   };
 
   useEffect(() => {
-    if (isFetching === true) return;
-    setList(
-      data.map((page) =>
+    setCurrentState(
+      (Number(isFetchingMore) << 2) +
+        (Number(isFetching) << 1) +
+        Number(canFetchMore)
+    );
+  }, [isFetchingMore, isFetching, canFetchMore]);
+
+  return (
+    <span className={classes.list}>
+      {data.map((page) =>
         page.message.map((value) => (
           <span
             className={classes.followerDiv}
@@ -108,29 +122,21 @@ export default function Followers(props) {
             />
             <span style={{ display: "block", width: "15px" }} />
             {value.username}
-            {value.isFollow === false && value.id !== userId && (
-              <FollowButton id={value.id} style={classes.button} />
-            )}
+            {value.isFollow === false &&
+              value.id !== userId &&
+              userId !== null && (
+                <FollowButton id={value.id} style={classes.button} />
+              )}
           </span>
         ))
-      )
-    );
-  }, [data, isFetching]);
-
-  return (
-    <span className={classes.list}>
-      {isFetching ? <Loading /> : list}
+      )}
       <span className={classes.divLike}>
         <Button
           ref={loadMoreButtonRef}
           onClick={() => fetchMore()}
           disabled={!canFetchMore}
         >
-          {isFetchingMore
-            ? "Loading more..."
-            : canFetchMore
-            ? "Load More"
-            : "Nothing more to load"}
+          {statement[currentState]}
         </Button>
       </span>
     </span>

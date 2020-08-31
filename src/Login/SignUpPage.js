@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch } from "react-redux";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
+import { setVerified } from "../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   Background: {
@@ -61,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUpPage() {
   const [modalShow, setModalShow] = useState(false);
   const classes = useStyles();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     document.title = "賭ケグルイ";
@@ -71,7 +74,10 @@ export default function SignUpPage() {
       {modalShow ? (
         <LoginForm
           show={modalShow}
-          onHide={() => setModalShow(false)}
+          onHide={() => {
+            dispatch(setVerified({ verified: null }));
+            setModalShow(false);
+          }}
           otherOption="Create a new account"
         />
       ) : (
@@ -89,7 +95,10 @@ export default function SignUpPage() {
               <div className={classes.itemFormat}>
                 <SignUpForm
                   show={modalShow}
-                  setModalShow={() => setModalShow(true)}
+                  setModalShow={() => {
+                    dispatch(setVerified({ verified: null }));
+                    setModalShow(true);
+                  }}
                 />
               </div>
             </div>

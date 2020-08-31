@@ -11,6 +11,9 @@ const useStyles = makeStyles({
   },
   icon: {
     color: "#eeeeee",
+    "&:disabled": {
+      color: "#eeeeee",
+    },
   },
   bar: {
     borderRadius: "0 0 20px 20px",
@@ -44,6 +47,7 @@ export default function Photo(props) {
             <IconButton
               aria-label={`info about ${image}`}
               className={classes.icon}
+              disabled
             >
               <InfoIcon />
             </IconButton>

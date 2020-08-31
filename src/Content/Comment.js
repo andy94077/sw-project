@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SendIcon from "@material-ui/icons/Send";
 import { makeStyles, Button, TextareaAutosize } from "@material-ui/core";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { useDispatch, useSelector } from "react-redux";
-import Axios from "axios";
+import axios from "axios";
 
 import CommentBox from "./CommentBox";
 import { selectUser } from "../redux/userSlice";
@@ -55,8 +55,9 @@ export default function Comment(props) {
   const [isUpload, setIsUpload] = useState(false);
   const dispatch = useDispatch();
 
-  function refreshComment() {
-    Axios.get(CONCAT_SERVER_URL(`/api/v1/comments/${id}`))
+  const refreshComment = useCallback(() => {
+    axios
+      .get(CONCAT_SERVER_URL(`/api/v1/comments/${id}`))
       .then(({ data }) => {
         setComments(data.reverse());
         setIsUpload(false);
@@ -64,7 +65,7 @@ export default function Comment(props) {
       .catch(() => {
         setIsUpload(false);
       });
-  }
+  }, [id]);
 
   function upload() {
     if (isBucket) {
@@ -76,12 +77,13 @@ export default function Comment(props) {
       );
     } else {
       setIsUpload(true);
-      Axios.post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
-        content: value,
-        user_id: userId,
-        post_id: id,
-        user: true,
-      })
+      axios
+        .post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
+          content: value,
+          user_id: userId,
+          post_id: id,
+          user: true,
+        })
         .then(() => {
           refreshComment();
           setValue("");
@@ -118,7 +120,7 @@ export default function Comment(props) {
 
   useEffect(() => {
     refreshComment();
-  }, [id]);
+  }, [refreshComment]);
 
   const handleOnSubmit = (e) => {
     e.preventDefault();

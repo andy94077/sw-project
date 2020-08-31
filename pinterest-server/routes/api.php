@@ -34,12 +34,11 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
     Route::get('/comments/admin', 'CommentController@adminAll');
-    Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket']);
+    Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket', 'verified']);
     Route::post('/comments/{id}', 'CommentController@update')->middleware(['bucket']);
-    ;
     Route::apiResource('comments', 'CommentController');
 
-
+    Route::get('/mail', 'UserController@mail');
     Route::get('/users/{:userID}/posts', 'PostController@index');
 
     Route::get('/my/orders/1/payments/3/verify', 'PostController@index');
@@ -54,9 +53,12 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
     Route::apiResource('posts', 'PostController');
 
-    Route::post('users/intro', 'UserController@setIntro');
-    Route::get('users/intro', 'UserController@getIntro');
-    Route::get('users/info', 'UserController@getUserInfo');
+    Route::post('users/resend/{id}', 'UserController@resend');
+    Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
+    Route::post('/users/verify', 'UserController@verify');
+    Route::post('/users/intro', 'UserController@setIntro');
+    Route::get('/users/intro', 'UserController@getIntro');
+    Route::get('/users/info', 'UserController@getUserInfo');
     Route::delete('/user/admin', 'UserController@adminDelete')->middleware('BO_can:delete_user');
     Route::post('/user/admin', 'UserController@adminRecover')->middleware('BO_can:recover_user');
     Route::get('/users/admin', 'UserController@adminAll');
