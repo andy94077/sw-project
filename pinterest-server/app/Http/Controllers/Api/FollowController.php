@@ -103,78 +103,82 @@ class FollowController extends BaseController
         return response()->json(['followers' => $user->followers, 'followings' => $user->followings]);
     }
 
-    public function getFollower(Request $request){
+    public function getFollower(Request $request)
+    {
         $user = User::where('name', $request['name'])->first();
         $user_id = $user->id;
         $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.follower_id')->where('target_id', $user_id)->select('users.id as id', 'users.name as username', 'users.avatar_url as avatar_url');
         $followers = $slex->skip(($request['nextId']) * 10)->take(10)->orderBy('users.id')->get();
-        
+
         $viewer_followings = Follow::where('follower_id', $request['viewer_id'])->select('follows.target_id as target_id')
-                                    ->orderBy('target_id')->get();
+            ->orderBy('target_id')->get();
         $i = 0;
         $j = 0;
-        while($i < count($followers) && $j < count($viewer_followings)){
-            if($followers[$i]->id === $viewer_followings[$j]->target_id){
+        while ($i < count($followers) && $j < count($viewer_followings)) {
+            if ($followers[$i]->id === $viewer_followings[$j]->target_id) {
                 $followers[$i]['isFollow'] = true;
                 $i++;
                 $j++;
-            }
-            else if ($followers[$i]->id < $viewer_followings[$j]->target_id){
+            } else if ($followers[$i]->id < $viewer_followings[$j]->target_id) {
                 $followers[$i]['isFollow'] = false;
                 $i++;
-            }
-            else{
+            } else {
                 $j++;
             }
         }
-        while($i < count($followers)){
+        while ($i < count($followers)) {
             $followers[$i]['isFollow'] = false;
             $i++;
         }
 
-        if(count($followers) > 0){
-            return response()->json(["message" => $followers, 'nextId' => $request['nextId']+1], 200);
+        if (count($followers) > 0) {
+            return response()->json(["message" => $followers, 'nextId' => $request['nextId'] + 1], 200);
         } else {
             return response()->json(["message" => $followers, 'nextId' => false], 200);
         }
     }
 
-    public function getFollowing(Request $request){
+    public function getFollowing(Request $request)
+    {
         $user = User::where('name', $request['name'])->first();
         $user_id = $user->id;
         $slex = Follow::LeftJoin('users', 'users.id', '=', 'follows.target_id')->where('follower_id', $user_id)->select('users.id as id', 'users.name as username', 'users.avatar_url as avatar_url');
         $followings = $slex->skip(($request['nextId']) * 10)->take(10)->get();
 
-        $mutual = DB::table('follows')->select(DB::raw('target_id , users.name, count(target_id) as same_follow'))
-                        ->LeftJoin('users', 'users.id', '=', 'follows.target_id')
-                        ->where(function ($query) use ($user_id, $request) {
-                            $query->where('follower_id', $user_id)->orWhere('follower_id', $request['viewer_id']);
-                        })
-                        ->where('follows.deleted_at', null)
-                        ->groupBy('target_id')->having('same_follow', 2)->orderBy('target_id')->get();
-        $i = 0;
-        $j = 0;
-        while($i < count($followings) && $j < count($mutual)){
-            if($followings[$i]->id === $mutual[$j]->target_id){
-                $followings[$i]['isFollow'] = true;
-                $i++;
-                $j++;
+        if ($user_id === intval($request['viewer_id'])) {
+            foreach ($followings as $following) {
+                $following['isFollow'] = true;
             }
-            else if($followings[$i]->id < $mutual[$j]->target_id){
+        } else {
+            $mutual = DB::table('follows')->select(DB::raw('target_id , users.name, count(target_id) as same_follow'))
+                ->LeftJoin('users', 'users.id', '=', 'follows.target_id')
+                ->where(function ($query) use ($user_id, $request) {
+                    $query->where('follower_id', $user_id)->orWhere('follower_id', $request['viewer_id']);
+                })
+                ->where('follows.deleted_at', null)
+                ->groupBy('target_id')->having('same_follow', 2)->orderBy('target_id')->get();
+
+            $i = 0;
+            $j = 0;
+            while ($i < count($followings) && $j < count($mutual)) {
+                if ($followings[$i]->id === $mutual[$j]->target_id) {
+                    $followings[$i]['isFollow'] = true;
+                    $i++;
+                    $j++;
+                } else if ($followings[$i]->id < $mutual[$j]->target_id) {
+                    $followings[$i]['isFollow'] = false;
+                    $i++;
+                } else {
+                    $j++;
+                }
+            }
+            while ($i < count($followings)) {
                 $followings[$i]['isFollow'] = false;
                 $i++;
             }
-            else{
-                $j++;
-            }
         }
-        while($i < count($followings)){
-            $followings[$i]['isFollow'] = false;
-            $i++;
-        }
-
-        if(count($followings) > 0){
-            return response()->json(["message" => $followings, 'nextId' => $request['nextId']+1], 200);
+        if (count($followings) > 0) {
+            return response()->json(["message" => $followings, 'nextId' => $request['nextId'] + 1], 200);
         } else {
             return response()->json(["message" => $followings, 'nextId' => false], 200);
         }
