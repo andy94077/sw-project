@@ -51,7 +51,7 @@ export default function Followings(props) {
   const loadMoreButtonRef = useRef();
   const [currentState, setCurrentState] = useState();
   const history = useHistory();
-  const { userId } = useSelector(selectUser);
+  const { userId, username } = useSelector(selectUser);
 
   const {
     data = [],
@@ -124,9 +124,9 @@ export default function Followings(props) {
             />
             <span style={{ display: "block", width: "15px" }} />
             {value.username}
-            {value.isFollow === false &&
+            {userId !== null &&
               value.id !== userId &&
-              userId !== null && (
+              (username === name || value.isFollow === false) && (
                 <FollowButton id={value.id} style={classes.button} />
               )}
           </span>
