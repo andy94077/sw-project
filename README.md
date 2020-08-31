@@ -4,7 +4,7 @@ A social website project inspired by `pinterest`, and `instagram`.
 
 ## Dependencies
 
-* Node.js 12.18.3
+* Node.js 12.18.2
 * Mysql 5.7
 * redis-server
 * PHP 7.4.8 
