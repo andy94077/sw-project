@@ -13,6 +13,7 @@ import CustomModal from "../components/CustomModal";
 import AvatarUpload from "./AvatarUpload";
 import "./css/Profile.css";
 import FollowButton from "./upload_follow/FollowButton";
+import ChatButton from "./upload_follow/ChatButton";
 import UploadButton from "./upload_follow/UploadButton";
 import ProfileAvatar from "./userInfo/ProfileAvatar";
 import ProfileInformation from "./userInfo/ProfileInformation";
@@ -66,6 +67,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "50px",
     paddingBottom: "50px",
     marginTop: "100px",
+  },
+  follow_chat: {
+    display: "inline-flex",
+    marginLeft: "calc(50% - 60px)",
   },
 }));
 
@@ -188,7 +193,10 @@ export default function Profile(props) {
           (username === name ? (
             uploadButton
           ) : (
-            <FollowButton id={id} setRefresh={refreshFollow} />
+            <div className={classes.follow_chat}>
+              <FollowButton id={id} setRefresh={refreshFollow} />
+              <ChatButton id={id} name={name} />
+            </div>
           ))}
         <div className={classes.central}>
           <PhotoGrid userId={id} />
