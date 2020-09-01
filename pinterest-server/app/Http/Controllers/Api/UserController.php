@@ -224,7 +224,13 @@ class UserController extends BaseController
             return response()->json(["message" => "no file"], 404);
         } else {
             $user = User::where('name', $request['name'])->first();
-            if ($user->avatar_url !== "/img/avatar.jpeg") {
+            $flag = true;
+            for ($i = 0; $i < 5; $i++) {
+                if ($user->avatar_url === "/img/avatar" . $i . ".jpeg") {
+                    $flag = false;
+                }
+            }
+            if ($flag === true) {
                 unlink(substr($user->avatar_url, 1));
             }
 
