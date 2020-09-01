@@ -93,8 +93,9 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
     // for broadcasting
     Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
-    Route::post('broadcast/chatting', 'BroadcastController@chatting')->name('broadcast.chatting');
+    Route::post('/broadcast/chatting', 'BroadcastController@chatting')->name('broadcast.chatting');
     Route::apiResource('notifications', 'NotificationController');
+    Route::get('/chatroom/getRoomByUser', 'ChatroomController@getRoomByUser');
     Route::resource('chatroom', 'ChatroomController');
     Route::resource('chatbox', 'ChatBoxController');
 });

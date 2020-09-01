@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class ChatroomsTableSeeder extends Seeder
 {
@@ -12,29 +14,43 @@ class ChatroomsTableSeeder extends Seeder
      */
     public function run()
     {
-        for ($i = 1; $i <= 10; $i++) {
-            for ($j = $i + 11; $j <= $i + 12; $j++) {
-                DB::table('chatrooms')->insert(
-                    [
-                        'user_id1' => $i + 1,
-                        'user_id2' => $j + 1,
-                        'room_id' => $i * 4 - 3 + 2 * ($j - $i - 11),
-                        'last_message' => "",
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]
-                );
-                DB::table('chatrooms')->insert(
-                    [
-                        'user_id1' => $j + 1,
-                        'user_id2' => $i + 1,
-                        'room_id' => $i * 4 - 3 + 2 * ($j - $i - 11),
-                        'last_message' => "",
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]
-                );
-            }
+        DB::table('chatrooms')->insert(
+            [
+                'user_id1' => 2,
+                'user_id2' => 3,
+                'room_id' => 1,
+                'last_message' => "Hi!",
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]
+        );
+        DB::table('chatrooms')->insert(
+            [
+                'user_id1' => 3,
+                'user_id2' => 2,
+                'room_id' => 1,
+                'last_message' => "Hi!",
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]
+        );
+        Schema::create('chat_1', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('from');
+            $table->unsignedBigInteger('to');
+            $table->string('message');
+            $table->timestamps();
+        });
+        for ($i = 1; $i <= 30; $i++) {
+            DB::table('chat_1')->insert(
+                [
+                    'from' => 2 + $i % 2,
+                    'to' => 3 - $i % 2,
+                    'message' => "Hi " . $i . " !",
+                    'created_at' => date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($i . " minutes")),
+                    'updated_at' => date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($i . " minutes"))
+                ]
+            );
         }
     }
 }

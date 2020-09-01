@@ -31,5 +31,11 @@ class CreateChatroomsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('chatrooms');
+        $queries = DB::select("SELECT CONCAT('DROP TABLE IF EXISTS ', TABLE_NAME, ';') AS 'query' 
+                               FROM information_schema.TABLES 
+                               WHERE TABLE_SCHEMA = 'laravel' AND TABLE_NAME LIKE 'chat_%';");
+        foreach ($queries as $query) {
+            DB::statement($query->query);
+        }
     }
 }

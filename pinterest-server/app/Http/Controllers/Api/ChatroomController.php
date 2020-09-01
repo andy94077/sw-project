@@ -41,6 +41,21 @@ class ChatroomController extends BaseController
             ], 200);
         }
     }
+    
+    public function getRoomByUser(Request $request)
+    {
+        $user_id1 = intval($request['user_id1']);
+        $user_id2 = intval($request['user_id2']);
+
+        $room = Chatroom::where('user_id1', $user_id1)
+              ->where('user_id2', $user_id2)->get();
+        
+        if (count($room) > 0) {
+            return response()->json(["room_id" => $room[0]->room_id]);
+        } else {
+            return response()->json(["room_id" => 0]);
+        }
+    }
 
     public function create($id)
     {
@@ -82,11 +97,12 @@ class ChatroomController extends BaseController
         }
         $room->last_message = $request['last_message'];
         $room->save();
+        
+        return response()->json(["room_id" => $room->room_id]);
     }
 
     public function store(Request $request)
     {
-        echo $request['user_id1'] . ' ' . $request['user_id2'] . ' ';
         $this->update($request);
         if ($request['user_id1'] !== $request['user_id2']) {
             // Swap
@@ -94,10 +110,9 @@ class ChatroomController extends BaseController
                 'user_id1' => $request['user_id2'],
                 'user_id2' => $request['user_id1'],
             ]);
-            echo $request['user_id1'] . ' ' . $request['user_id2'] . ' ';
-            $this->update($request);
+            $response = $this->update($request);
         }
 
-        return response()->json($request);
+        return response()->json(["room_id" => $response->original["room_id"]]);
     }
 }
