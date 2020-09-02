@@ -13,7 +13,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  TextField,
 } from "@material-ui/core";
+
 import { CONCAT_SERVER_URL } from "../utils";
 import Errormsg from "../components/ErrorMsg";
 import Loading from "../components/Loading";
@@ -123,6 +125,12 @@ export default function ContentCard(props) {
   const dispatch = useDispatch();
 
   const [tag, setTag] = useState("");
+  const [newTag, setNewTag] = useState({
+    select: false,
+    value: "",
+  });
+  const [allTags, setAllTags] = useState(null);
+  const [isTagReady, setIsTagReady] = useState(false);
   const [empty, setEmpty] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isReady, setIsReady] = useState("");
@@ -131,9 +139,37 @@ export default function ContentCard(props) {
     setIsReady(src === "Error" ? "Error" : "Init");
   }, [src]);
 
+  useEffect(() => {
+    const jsonData = {
+      start: 0,
+      number: 10,
+    };
+
+    axios
+      .request({
+        method: "GET",
+        url: CONCAT_SERVER_URL("/api/v1/tags"),
+        params: jsonData,
+      })
+      .then((res) => setAllTags(res.data.tags));
+  }, []);
+
+  useEffect(() => {
+    if (allTags !== null) setIsTagReady(true);
+  }, [allTags]);
+
   const handleSelectTag = (event) => {
     setEmpty(false);
     setTag(event.target.value);
+  };
+
+  const handleSetNewTag = () => {
+    setTag(newTag.value);
+    setNewTag((state) => ({ ...state, select: true }));
+  };
+
+  const handleNewTagOK = () => {
+    setNewTag({ select: false, value: tag });
   };
 
   const handleUploadDesc = () => {
@@ -198,26 +234,60 @@ export default function ContentCard(props) {
             className={classes.select}
             error={empty}
           >
-            <InputLabel id="demo-simple-select-outlined-label">
-              Tag *
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={tag}
-              onChange={handleSelectTag}
-              label="Tag *"
-            >
-              <MenuItem value="">
-                <em className={classes.none}>None</em>
-              </MenuItem>
-              <MenuItem value="cat">cat</MenuItem>
-              <MenuItem value="dog">dog</MenuItem>
-            </Select>
-            {empty ? <FormHelperText>A tag is necessary</FormHelperText> : null}
+            {newTag.select ? (
+              <TextField
+                required
+                label="New tag"
+                variant="outlined"
+                onChange={handleSelectTag}
+                defaultValue={newTag.value}
+              />
+            ) : (
+              <>
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Tag *
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  value={tag}
+                  onChange={handleSelectTag}
+                  label="Tag *"
+                >
+                  <MenuItem value="">
+                    <em className={classes.none}>None</em>
+                  </MenuItem>
+                  <MenuItem value={tag} onClick={handleSetNewTag}>
+                    <strong>{newTag.value}</strong>
+                    <em className={classes.none}>(New tag)</em>
+                  </MenuItem>
+                  {isTagReady ? (
+                    allTags.map((t) => (
+                      <MenuItem key={t.id} value={t.name}>
+                        {t.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <Loading />
+                  )}
+                </Select>
+                {empty ? (
+                  <FormHelperText>A tag is necessary</FormHelperText>
+                ) : null}
+              </>
+            )}
           </FormControl>
           <FormControl>
-            {isReady === "Loading" ? (
+            {newTag.select ? (
+              <Button
+                variant="contained"
+                color={tag === "" ? "default" : "primary"}
+                className={`${classes.central} ${classes.rounded} ${classes.text}`}
+                onClick={handleNewTagOK}
+              >
+                {tag === "" ? "Cancel" : "OK"}
+              </Button>
+            ) : isReady === "Loading" ? (
               <div className={classes.descLoad}>
                 <Loading />
               </div>
