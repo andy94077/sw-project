@@ -112,18 +112,16 @@ export default function Post() {
       title: "Are you sure you want to delete this post?",
       content: `(Post id = ${id})`,
       onOk() {
-        const jsonData = { id };
         modal.update({ cancelButtonProps: { disabled: true } });
         setLoading(true);
 
         axios
           .request({
             method: "DELETE",
-            url: CONCAT_SERVER_URL("/api/v1/post"),
+            url: CONCAT_SERVER_URL(`/api/v1/posts/${id}`),
             headers: {
               Authorization: `Bearer ${apiToken}`,
             },
-            data: jsonData,
           })
           .then(() => {
             setMotion(true);

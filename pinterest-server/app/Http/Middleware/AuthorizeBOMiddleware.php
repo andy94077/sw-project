@@ -17,6 +17,9 @@ class AuthorizeBOMiddleware
     public function handle($request, Closure $next, $guard)
     {
         //echo $request->bearerToken();
+        if ($guard === 'delete_post' && $request->method() !== "DELETE") {
+            return $next($request);
+        }
         $user = SuperUser::where('api_token', $request->bearerToken())->first();
         // echo $user->count() . ' ' . $guard;
         // echo 'user ' . $users[0]->permissions;

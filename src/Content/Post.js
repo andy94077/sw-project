@@ -96,9 +96,7 @@ export default function Post(props) {
   const handleDelete = () => {
     setOnDelete(1);
     axios
-      .delete(CONCAT_SERVER_URL("/api/v1/post"), {
-        data: { id },
-      })
+      .delete(CONCAT_SERVER_URL(`/api/v1/posts/${id}`))
       .then(() => {
         setOnDelete(2);
       })
@@ -132,8 +130,7 @@ export default function Post(props) {
     if (onEdit === 0) {
       setOnEdit(1);
       axios
-        .post(CONCAT_SERVER_URL("/api/v1/post/modification"), {
-          id,
+        .put(CONCAT_SERVER_URL(`/api/v1/posts/${id}`), {
           content: newPost,
           user: true,
           user_id: userId,
