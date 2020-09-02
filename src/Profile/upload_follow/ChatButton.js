@@ -107,7 +107,11 @@ export default function ChatButton(props) {
           jumpFrame={classes.jumpFrame}
           backdrop
         >
-          <Chatroom chatInfo={chatInfo} onHide={onHide} />
+          <Chatroom
+            chatInfo={chatInfo}
+            setChatInfo={setChatInfo}
+            onHide={onHide}
+          />
         </CustomModal>
       </>
     );
