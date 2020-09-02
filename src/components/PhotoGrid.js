@@ -28,6 +28,7 @@ export default function PhotoGrid(props) {
   const [error, setError] = useState({ message: "", url: "" });
   const [imageListWithid, setImageListWithId] = useState([]);
   useEffect(() => {
+    console.log(order);
     setIsReady(false);
     setError({ message: "", url: "" });
     const url =

@@ -78,7 +78,7 @@ export default function Comment(props) {
     } else {
       setIsUpload(true);
       axios
-        .post(CONCAT_SERVER_URL("/api/v1/comment/upload"), {
+        .post(CONCAT_SERVER_URL("/api/v1/comments"), {
           content: value,
           user_id: userId,
           post_id: id,

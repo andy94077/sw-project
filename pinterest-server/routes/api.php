@@ -34,9 +34,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::get('/comments/info', 'CommentController@getCommentInfo');
     Route::post('/comment/recovery', 'CommentController@recover');
     Route::get('/comments/admin', 'CommentController@adminAll');
-    Route::post('/comment/upload', 'CommentController@upload')->middleware(['bucket', 'verified']);
-    Route::post('/comments/{id}', 'CommentController@update')->middleware(['bucket']);
-    Route::apiResource('comments', 'CommentController');
+    Route::apiResource('comments', 'CommentController')->middleware(['bucket']);
 
     Route::get('/mail', 'UserController@mail');
     Route::get('/users/{:userID}/posts', 'PostController@index');
@@ -48,10 +46,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/post/recovery', 'PostController@recover')->middleware('BO_can:recover_post');
     Route::get('/posts/admin', 'PostController@adminAll');
     Route::delete('/image', 'PostController@deleteImage');
-    Route::delete('/post', 'PostController@delete')->middleware('BO_can:delete_post');
-    Route::post('/post/modification', 'PostController@update')->middleware(['bucket']);
-    Route::post('/post/forcedelete', 'PostController@forcedelete')->name('post.forcedelete');
-    Route::apiResource('posts', 'PostController');
+    Route::apiResource('posts', 'PostController')->middleware(['bucket', 'BO_can:delete_post']);
 
     Route::post('users/resend/{id}', 'UserController@resend');
     Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
