@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
     display: "flex",
   },
   room: {
-    border: "5px solid #5ace5a",
+    border: "5px solid #9fbfdf",
     borderRadius: "10px",
     padding: "10px",
     height: "90%",
@@ -42,6 +42,12 @@ const useStyles = makeStyles(() => ({
     padding: "1px",
     border: "2px solid #3f51b5",
     borderRadius: "25px",
+  },
+  chatroomStyle: {
+    display: "inline",
+    marginLeft: "10px",
+    fontSize: "26px",
+    color: "black",
   },
   messages: {
     overflow: "auto",
@@ -259,7 +265,7 @@ export default function Chatroom(props) {
                 className={classes.avatar}
                 src={CONCAT_SERVER_URL(chatInfo.avatar_url)}
               />
-              {chatInfo.name}
+              <p className={classes.chatroomStyle}>{chatInfo.name}</p>
             </Link>
           </Typography>
 
