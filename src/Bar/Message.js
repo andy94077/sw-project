@@ -82,6 +82,7 @@ export default function Message(props) {
     setChatInfo((state) => ({
       ...state,
       isOpen: false,
+      roomId: 0,
     }));
   };
 
@@ -160,7 +161,11 @@ export default function Message(props) {
           jumpFrame={classes.jumpFrame}
           backdrop
         >
-          <Chatroom chatInfo={chatInfo} onHide={onHide} />
+          <Chatroom
+            chatInfo={chatInfo}
+            setChatInfo={setChatInfo}
+            onHide={onHide}
+          />
         </CustomModal>
       )}
     </div>

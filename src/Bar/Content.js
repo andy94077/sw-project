@@ -186,7 +186,16 @@ export default function Content(props) {
         // );
       }
     };
-  }, [statusChats, statusNotes, type, newChats, newNotes, userId]);
+  }, [
+    statusChats,
+    statusNotes,
+    type,
+    chats,
+    notes,
+    newChats,
+    newNotes,
+    userId,
+  ]);
 
   // Wait for content updating
   if (content.type === type) {

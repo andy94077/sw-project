@@ -92,12 +92,11 @@ const useStyles = makeStyles(() => ({
 
 export default function Chatroom(props) {
   const classes = useStyles();
-  const { chatInfo, onHide } = props;
+  const { chatInfo, setChatInfo, onHide } = props;
   const { userId } = useSelector(selectUser);
 
   const boxesMore = useRef();
   const [isReady, setIsReady] = useState(false);
-  const [roomId, setRoomId] = useState(chatInfo.roomId);
   const [show, setShow] = useState(true);
 
   const [value, setValue] = useState("");
@@ -113,7 +112,7 @@ export default function Chatroom(props) {
 
   const handleRefresh = () => {
     const jsonData = {
-      room_id: roomId,
+      room_id: chatInfo.roomId,
       message: value,
       from: userId,
     };
@@ -135,9 +134,10 @@ export default function Chatroom(props) {
   };
 
   const handleSendBox = () => {
+    if (value === "") return;
     axios
       .post(CONCAT_SERVER_URL("/api/v1/chatbox"), {
-        room_id: roomId,
+        room_id: chatInfo.roomId,
         from: userId,
         to: chatInfo.id,
         last_message: value,
@@ -164,8 +164,11 @@ export default function Chatroom(props) {
         last_message: value,
       })
       .then((res) => {
-        if (roomId === 0) {
-          setRoomId(res.data.room_id);
+        if (chatInfo.roomId === 0) {
+          setChatInfo((state) => ({
+            ...state,
+            roomId: res.data.room_id,
+          }));
         } else {
           handleSendBox();
         }
@@ -194,6 +197,7 @@ export default function Chatroom(props) {
   const {
     status,
     data: boxes,
+    isFetching,
     fetchMore,
     isFetchingMore,
     canFetchMore,
@@ -201,9 +205,9 @@ export default function Chatroom(props) {
   } = useInfiniteQuery(
     "boxes",
     async (_, start = 0) => {
-      if (roomId === 0) return { message: [] };
+      if (chatInfo.roomId === 0) return { message: [] };
       const jsonData = {
-        room_id: roomId,
+        room_id: chatInfo.roomId,
         start,
         number: 20,
       };
@@ -235,18 +239,21 @@ export default function Chatroom(props) {
 
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
-    refetch(); // Clear last chatroom
-    if (roomId === 0) return () => {};
-    if (value !== "") handleSendBox();
+    if (chatInfo.roomId === 0) return () => {};
+    handleSendBox();
 
-    window.Echo.private(`Chatroom.${roomId}`).listen(
+    window.Echo.private(`Chatroom.${chatInfo.roomId}`).listen(
       "ChatSent",
       () => refetch() // New message
     );
 
-    return () =>
-      window.Echo.channel(`Chatroom.${roomId}`).stopListening("ChatSent");
-  }, [roomId]);
+    return () => {
+      window.Echo.channel(`Chatroom.${chatInfo.roomId}`).stopListening(
+        "ChatSent"
+      );
+      refetch(); // Clear last chatroom
+    };
+  }, [chatInfo.roomId, refetch]);
 
   if (isReady) {
     return (
@@ -291,16 +298,19 @@ export default function Chatroom(props) {
             )}
             {show && (
               <div ref={boxesMore} className={classes.end}>
-                {!canFetchMore && (
-                  <Typography
-                    variant="button"
-                    className={classes.endText}
-                    gutterBottom
-                  >
-                    No message left
-                  </Typography>
+                {isFetching || isFetchingMore ? (
+                  <Loading />
+                ) : (
+                  !canFetchMore && (
+                    <Typography
+                      variant="button"
+                      className={classes.endText}
+                      gutterBottom
+                    >
+                      No message left
+                    </Typography>
+                  )
                 )}
-                {isFetchingMore && <Loading />}
               </div>
             )}
           </ScrollToBottom>
