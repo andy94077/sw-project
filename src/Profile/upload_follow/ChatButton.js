@@ -59,7 +59,7 @@ export default function ChatButton(props) {
           avatar_url: CONCAT_SERVER_URL(`${res.data}`),
         }))
       );
-  }, []);
+  }, [name]);
 
   useEffect(() => {
     if (chatInfo.avatar_url === "") return;
@@ -70,7 +70,7 @@ export default function ChatButton(props) {
       .then((res) => {
         setChatInfo((state) => ({ ...state, roomId: res.data.room_id }));
       });
-  }, [chatInfo.avatar_url]);
+  }, [chatInfo.avatar_url, id, userId]);
 
   useEffect(() => {
     if (chatInfo.avatar_url !== "" && chatInfo.roomId !== -1) setIsReady(true);

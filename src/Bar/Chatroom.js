@@ -134,6 +134,7 @@ export default function Chatroom(props) {
   };
 
   const handleSendBox = () => {
+    if (value === "") return;
     axios
       .post(CONCAT_SERVER_URL("/api/v1/chatbox"), {
         room_id: chatInfo.roomId,
@@ -239,7 +240,7 @@ export default function Chatroom(props) {
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
     if (chatInfo.roomId === 0) return () => {};
-    if (value !== "") handleSendBox();
+    handleSendBox();
 
     window.Echo.private(`Chatroom.${chatInfo.roomId}`).listen(
       "ChatSent",
@@ -251,9 +252,8 @@ export default function Chatroom(props) {
         "ChatSent"
       );
       refetch(); // Clear last chatroom
-      console.log(chatInfo.roomId);
     };
-  }, [chatInfo.roomId]);
+  }, [chatInfo.roomId, refetch]);
 
   if (isReady) {
     return (
