@@ -110,7 +110,7 @@ export default function CommentBox(props) {
   function handleEdit() {
     if (!onEdit && newComment !== "") {
       setOnEdit(true);
-      Axios.post(CONCAT_SERVER_URL(`/api/v1/comments/${commentId}`), {
+      Axios.put(CONCAT_SERVER_URL(`/api/v1/comments/${commentId}`), {
         content: newComment,
         user: true,
         user_id: userId,
