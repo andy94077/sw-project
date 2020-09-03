@@ -44,6 +44,7 @@ export default function ChatButton(props) {
     id,
     avatar_url: "",
     name,
+    last_read: null,
   });
 
   useEffect(() => {

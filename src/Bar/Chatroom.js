@@ -116,10 +116,22 @@ export default function Chatroom(props) {
     setValue(event.target.value);
   };
 
+  const handleRead = () => {
+    axios.post(CONCAT_SERVER_URL("/api/v1/chatroom/read"), {
+      user_id1: userId,
+      user_id2: chatInfo.id,
+    });
+
+    axios.post(CONCAT_SERVER_URL("/api/v1/broadcast/chatread"), {
+      room_id: chatInfo.roomId,
+      from: userId,
+    });
+  };
+
   const handleRefresh = () => {
     const jsonData = {
       room_id: chatInfo.roomId,
-      message: value,
+      last_message: value,
       from: userId,
     };
 
@@ -171,6 +183,7 @@ export default function Chatroom(props) {
       })
       .then((res) => {
         if (chatInfo.roomId === 0) {
+          // New chatroom
           setChatInfo((state) => ({
             ...state,
             roomId: res.data.room_id,
@@ -246,12 +259,22 @@ export default function Chatroom(props) {
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
     if (chatInfo.roomId === 0) return () => {};
-    handleSendBox();
+    handleSendBox(); // New chatroom
+    handleRead();
 
-    window.Echo.private(`Chatroom.${chatInfo.roomId}`).listen(
-      "ChatSent",
-      () => refetch() // New message
-    );
+    window.Echo.private(`Chatroom.${chatInfo.roomId}`)
+      .listen("ChatSent", () => {
+        refetch(); // New message
+        handleRead(); // Tell the other side read
+      })
+      .listen("ChatRead", (event) => {
+        const { from, lastRead } = event;
+        if (from === userId) return;
+        setChatInfo((state) => ({
+          ...state,
+          last_read: lastRead,
+        }));
+      });
 
     return () => {
       window.Echo.channel(`Chatroom.${chatInfo.roomId}`).stopListening(
@@ -287,19 +310,9 @@ export default function Chatroom(props) {
                   message={text.message}
                   from={text.from}
                   time={text.created_at}
+                  // canDelete={username === i.user_name || username === author}
+                  // canEdit={username === i.user_name}
                 />
-
-                // <CommentBox
-                //   key={i.id}
-                //   author={i.user_name}
-                //   comment={i.content}
-                //   commentId={i.id}
-                //   canDelete={username === i.user_name || username === author}
-                //   canEdit={username === i.user_name}
-                //   refresh={refreshComment}
-                //   isUser={username !== null}
-                //   userId={userId}
-                // />
               ))
             )}
             {show && (

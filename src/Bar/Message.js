@@ -63,6 +63,7 @@ export default function Message(props) {
     id: 0,
     avatar_url: "",
     name: "",
+    last_read: null,
   });
 
   // Toggle function (for chat)
@@ -145,7 +146,7 @@ export default function Message(props) {
                       {value.secondary}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails>
+                  <AccordionDetails style={{ cursor: "auto" }}>
                     <div dangerouslySetInnerHTML={{ __html: value.content }} />
                   </AccordionDetails>
                 </Accordion>

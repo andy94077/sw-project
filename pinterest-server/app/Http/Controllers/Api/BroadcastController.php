@@ -34,7 +34,9 @@ class BroadcastController extends BaseController
     public function chatread(Request $request)
     {
         $room_id = $request['room_id'];
-        event(new ChatRead($room_id)); // trigger
+        $from = $request['from'];
+        $lastRead = date('Y-m-d H:i:s');
+        event(new ChatRead($room_id, $from, $lastRead)); // trigger
         return response()->json("Message read!", 200);
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChatRead
+class ChatRead implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,10 +22,15 @@ class ChatRead
 
     public $room_id;
 
-    public function __construct($room_id)
+    public $from;
+
+    public $lastRead;
+
+    public function __construct($room_id, $from, $lastRead)
     {
         $this->room_id = $room_id;
-        $this->last_read = date('Y-m-d H:i:s');
+        $this->from = $from;
+        $this->lastRead = $lastRead;
     }
 
     /**
