@@ -67,7 +67,7 @@ export default function Message(props) {
   });
 
   // Toggle function (for chat)
-  const handleSetChatInfo = (roomId, id, avatarUrl, name) => () => {
+  const handleSetChatInfo = (roomId, id, avatarUrl, name, lastRead) => () => {
     if (type === "chats") {
       setChatInfo({
         isOpen: true,
@@ -75,6 +75,7 @@ export default function Message(props) {
         id,
         avatar_url: avatarUrl,
         name,
+        last_read: lastRead,
       });
     }
   };
@@ -102,13 +103,15 @@ export default function Message(props) {
                   value.room_id,
                   value.user_id2,
                   value.avatar_url,
-                  value.username
+                  value.username,
+                  value.last_read
                 )}
                 onKeyDown={handleSetChatInfo(
                   value.room_id,
                   value.user_id2,
                   value.avatar_url,
-                  value.username
+                  value.username,
+                  value.last_read
                 )}
                 tabIndex={0}
                 role="button"

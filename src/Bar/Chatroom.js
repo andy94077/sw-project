@@ -263,9 +263,10 @@ export default function Chatroom(props) {
     handleRead();
 
     window.Echo.private(`Chatroom.${chatInfo.roomId}`)
-      .listen("ChatSent", () => {
+      .listen("ChatSent", (event) => {
+        const { from } = event;
         refetch(); // New message
-        handleRead(); // Tell the other side read
+        if (from !== userId) handleRead(); // Tell the other side read
       })
       .listen("ChatRead", (event) => {
         const { from, lastRead } = event;
@@ -277,9 +278,9 @@ export default function Chatroom(props) {
       });
 
     return () => {
-      window.Echo.channel(`Chatroom.${chatInfo.roomId}`).stopListening(
-        "ChatSent"
-      );
+      window.Echo.channel(`Chatroom.${chatInfo.roomId}`)
+        .stopListening("ChatSent")
+        .stopListening("ChatRead");
       refetch(); // Clear last chatroom
     };
   }, [chatInfo.roomId, refetch]);

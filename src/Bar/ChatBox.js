@@ -55,6 +55,12 @@ const useStyles = makeStyles(() => ({
     padding: "0",
     lineHeight: "20px",
   },
+  read: {
+    color: "#777",
+    fontSize: "12px",
+    textAlign: "right",
+    display: "block",
+  },
   time: {
     color: "#777",
     margin: "auto 2px",
@@ -80,9 +86,14 @@ export default function ChatBox(props) {
   const getTimeFormat = (t) => {
     // HH:MM
     const HMS = t.split(" ")[1];
-    const [HH, MM] = HMS.split(":");
-    return `${HH}:${MM}`;
+    const [HH, MM, SS] = HMS.split(":");
+    return `${HH}:${MM}:${SS}`;
   };
+
+  const lastRead = getTimeFormat(chatInfo.last_read);
+  const messageTime = getTimeFormat(time);
+
+  const readOrNot = lastRead >= messageTime;
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -179,7 +190,10 @@ export default function ChatBox(props) {
         <div className={classes.content}>{message}</div>
       </Paper>
       <Typography variant="button" className={classes.time}>
-        {getTimeFormat(time)}
+        <Typography variant="button" className={classes.read}>
+          {readOrNot && from === userId && "Read"}
+        </Typography>
+        {messageTime.slice(0, -3)}
       </Typography>
       {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
