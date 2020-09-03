@@ -48,6 +48,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::delete('/image', 'PostController@deleteImage');
     Route::apiResource('posts', 'PostController')->middleware(['bucket', 'BO_can:delete_post']);
 
+    Route::apiResource('tags', 'TagController');
+
     Route::post('users/resend/{id}', 'UserController@resend');
     Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
     Route::post('/users/verify', 'UserController@verify');

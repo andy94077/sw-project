@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             FollowTableSeeder::class,
             NotificationsTableSeeder::class,
             ChatroomsTableSeeder::class,
+            TagsTableSeeder::class,
         ]);
     }
 }
