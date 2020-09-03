@@ -20,6 +20,7 @@ class CreateChatroomsTable extends Migration
             $table->unsignedBigInteger('user_id2');
             $table->unsignedBigInteger('room_id')->nullable();
             $table->string('last_message')->nullable();
+            $table->dateTime('last_read')->nullable();
             $table->timestamps();
         });
     }

@@ -88,11 +88,17 @@ Route::namespace('Api')->prefix('v1')->group(function () {
     Route::post('/profile/uploadImage', 'PostController@uploadImage')->name('profile.uploadImage')->middleware(['bucket']);
     Route::post('/profile/deleteImage', 'PostController@deleteImage')->name('profile.deleteImage');
     Route::post('/profile/uploadDesc', 'PostController@uploadDesc')->name('profile.uploadDesc')->middleware(['bucket']);
+
     // for broadcasting
-    Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
     Route::post('/broadcast/chatting', 'BroadcastController@chatting')->name('broadcast.chatting');
+    Route::post('/broadcast/chatread', 'BroadcastController@chatread')->name('broadcast.chatread');
+    Route::apiResource('broadcast', 'BroadcastController')->middleware('BO_can:make_announcement');
+
     Route::apiResource('notifications', 'NotificationController');
-    Route::get('/chatroom/getRoomByUser', 'ChatroomController@getRoomByUser');
+
+    Route::get('/chatroom/getRoomByUser', 'ChatroomController@getRoomByUser')->name('chatroom.getRoomByUser');
+    Route::post('chatroom/read', 'ChatroomController@read')->name('chatroom.read');
     Route::resource('chatroom', 'ChatroomController');
+
     Route::resource('chatbox', 'ChatBoxController');
 });
