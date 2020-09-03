@@ -99,7 +99,7 @@ export default function Profile(props) {
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, []);
   const [isUpload, setIsUpload] = useState(false);
-  const [isReady, setIsReady] = useState("Loading");
+  const [readyStates, setReadyStates] = useState("Loading");
   const [isAvatarUpload, setIsAvatarUpload] = useState(false);
   const [id, setId] = useState(0);
   const { username, bucketTime } = useSelector(selectUser);
@@ -139,7 +139,7 @@ export default function Profile(props) {
     const userExist = res.data.isValid;
     // Not existed user
     if (userExist === false) {
-      setIsReady("NoUser");
+      setReadyStates("NoUser");
       return;
     }
     setId(res.data.id);
@@ -150,7 +150,7 @@ export default function Profile(props) {
       .then(({ data }) => {
         setFollow({ followers: data.followers, followings: data.followings });
       });
-    setIsReady("OK");
+    setReadyStates("OK");
   }
 
   function refreshFollow() {
@@ -161,12 +161,12 @@ export default function Profile(props) {
       .then(({ data }) => {
         setFollow({ followers: data.followers, followings: data.followings });
       })
-      .catch(() => setIsReady("Error"));
+      .catch(() => setReadyStates("Error"));
   }
 
   useEffect(() => {
-    setIsReady("Loading");
-    refreshInfo().catch(() => setIsReady("Error"));
+    setReadyStates("Loading");
+    refreshInfo().catch(() => setReadyStates("Error"));
   }, [username, name]);
 
   const uploadButton = isBucket ? (
@@ -179,7 +179,7 @@ export default function Profile(props) {
     setIsAvatarUpload(false);
   };
 
-  if (isReady === "OK") {
+  if (readyStates === "OK") {
     return (
       <div>
         <ProfileAvatar
@@ -220,10 +220,10 @@ export default function Profile(props) {
       </div>
     );
   }
-  if (isReady === "NoUser") {
+  if (readyStates === "NoUser") {
     return <ErrorGrid mes="user" />;
   }
-  if (isReady === "Error") {
+  if (readyStates === "Error") {
     return <Errormsg />;
   }
   return <Loading />;

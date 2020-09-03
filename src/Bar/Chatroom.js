@@ -288,18 +288,6 @@ export default function Chatroom(props) {
                   from={text.from}
                   time={text.created_at}
                 />
-
-                // <CommentBox
-                //   key={i.id}
-                //   author={i.user_name}
-                //   comment={i.content}
-                //   commentId={i.id}
-                //   canDelete={username === i.user_name || username === author}
-                //   canEdit={username === i.user_name}
-                //   refresh={refreshComment}
-                //   isUser={username !== null}
-                //   userId={userId}
-                // />
               ))
             )}
             {show && (
