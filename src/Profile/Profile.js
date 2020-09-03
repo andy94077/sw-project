@@ -93,7 +93,6 @@ export default function Profile(props) {
   } = props;
 
   const classes = useStyles();
-  const url = "localhost:3000";
 
   const [image, setImage] = useState("");
   const dispatch = useDispatch();
@@ -188,7 +187,7 @@ export default function Profile(props) {
           isLoading={isLoading}
           setIsAvatarUpload={setIsAvatarUpload}
         />
-        <ProfileInformation name={name} url={url} follow={follow} />
+        <ProfileInformation name={name} follow={follow} />
         {username !== null &&
           (username === name ? (
             uploadButton
