@@ -191,7 +191,10 @@ export default function Bar() {
   }, [notes, userId]);
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") history.push(`/home/${e.target.value}`);
+    if (e.key === "Enter") {
+      setSearchValue("");
+      history.push(`/home/${e.target.value}`);
+    }
   };
 
   const handleSetSearchValue = (event) => {
