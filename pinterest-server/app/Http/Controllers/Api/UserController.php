@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 use App\Models\Verification;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
+use App\Models\Post;
+use App\Models\Follow;
+use App\Models\Comment;
 use DateTime;
 use DateInterval;
 use Carbon\Carbon;
@@ -100,6 +103,7 @@ class UserController extends BaseController
                 'api_token' => $userInfo->api_token,
                 'followers' => $userInfo->followers,
                 'followings' => $userInfo->followings,
+                'point' => $userInfo->point,
             ], 200);
         }
     }
@@ -295,7 +299,6 @@ class UserController extends BaseController
 
     public function getVerifyTime($id)
     {
-        $user = User::find($id);
         $verification = Verification::where('user_id', $id)->first();
         return response()->json(['time' => $verification->block_time]);
     }
