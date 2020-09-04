@@ -16,6 +16,7 @@ import {
 import { selectUser } from "../redux/userSlice";
 import Loading from "../components/Loading";
 import { CONCAT_SERVER_URL } from "../utils";
+import "./PostList.css";
 
 export default function PostList() {
   const user = useSelector(selectUser);
@@ -52,7 +53,7 @@ export default function PostList() {
     return <Redirect to="/home" />;
   }
   return (
-    <TableContainer component={Paper}>
+    <TableContainer className="tableContainer" component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
