@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+use App\Models\Like;
+use App\Models\Comment;
 
 use App\Events\PostChanged;
 
@@ -16,7 +17,7 @@ class Post extends Model
     public $timestamps = true;
     protected $table = 'posts';
     protected $primaryKey = 'id';
-    protected $fillable = ['url', 'user_id', 'username', 'content', 'tag', 'publish_time', 'like'];
+    protected $fillable = ['url', 'user_id', 'username', 'content', 'tag', 'publish_time', 'like', 'comment'];
     public $image;
 
     protected static function boot()
@@ -24,8 +25,12 @@ class Post extends Model
         parent::boot();
         static::retrieved(function ($model) {
             $model->image = Image::find($model->banner_id);
+            $model->like = Like::where('post_id', $model->id)->count();
+            $model->comment = Comment::where('post_id', $model->id)->count();
         });
     }
+
+
 
     public function getRouteKeyName()
     {
@@ -46,7 +51,7 @@ class Post extends Model
     // {
     //     return $this->belongsToMany('App\Models\Label', 'post_label', 'post_id', 'label_id')->withTimestamps();
     // }
-    
+
     // Post events
     protected $dispatchesEvents = [
         'saved' => PostChanged::class,
