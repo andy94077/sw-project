@@ -34,6 +34,7 @@ const useStyles = makeStyles(() => ({
     margin: "3px",
     display: "flex",
     background: "#fafafa",
+    textAlign: "left",
   },
   messageByMe: {
     background: "#c9cfed",

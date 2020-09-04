@@ -128,6 +128,7 @@ function ScrollController(props) {
   useObserveScrollPosition(observe);
 
   useEffect(() => {
+    if (data[0].message[0] === undefined) return () => {};
     if (position >= -40) scrollToBottom();
     else if (data[0].message[0].from === userId) scrollToBottom();
     else {
@@ -213,7 +214,10 @@ export default function Chatroom(props) {
         });
         setIsConnectionFailed(true);
       })
-      .finally(() => setValue(""));
+      .finally(() => {
+        setValue("");
+        setIsSending(false);
+      });
   };
 
   const handleSendBox = () => {
@@ -232,8 +236,7 @@ export default function Chatroom(props) {
           message: "Failed to send the message, please retry",
         });
         setIsConnectionFailed(true);
-      })
-      .finally(() => setIsSending(false));
+      });
   };
 
   const handleSendRoom = () => {
