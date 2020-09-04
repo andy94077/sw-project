@@ -21,6 +21,7 @@ import AlertDialog from "./components/AlertDialog";
 import ErrorMsg from "./components/ErrorMsg";
 import Loading from "./components/Loading";
 import { closeDialog, selectDialog } from "./redux/dialogSlice";
+import PostList from "./PostList/PostList";
 
 export default function App() {
   const [isReady, setIsReady] = useState(true);
@@ -156,6 +157,7 @@ export default function App() {
           />
           <Route exact path="/setting" component={() => <>setting</>} />
           <Route exact path="/logout" component={() => <>logout</>} />
+          <Route exact path="/postlist" component={() => <PostList />} />
         </Switch>
         <AlertDialog
           open={dialog.isOpen}

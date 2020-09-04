@@ -16,7 +16,8 @@ const useStyles = makeStyles(() => ({
   },
   formControl: {
     margin: "5px",
-    minWidth: 120,
+    minWidth: 60,
+    overflow: "hidden",
   },
 }));
 
@@ -44,6 +45,7 @@ export default function Homepage(props) {
                 sequence: preOrder.sequence,
               }));
             }}
+            style={{ height: "30px" }}
           >
             <MenuItem value="id">id</MenuItem>
             <MenuItem value="like">like</MenuItem>
@@ -58,6 +60,7 @@ export default function Homepage(props) {
                 sequence: e.target.value,
               }));
             }}
+            style={{ height: "30px" }}
           >
             <MenuItem value="desc">desc</MenuItem>
             <MenuItem value="asc">asc</MenuItem>

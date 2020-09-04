@@ -32,9 +32,9 @@ class PostController extends BaseController
 {
     public function index(Request $request)
     {
-        if ($request->has('tag'))
-            $query = Post::where('tag', $request['tag']);
-        else if ($request->has('user_id'))
+        if ($request->has('tag')) {
+            $query = Post::where('tag', $request['tag'])->orWhere('username', 'like', "%{$request['tag']}%")->orWhere('content', 'like', "%{$request['tag']}%");
+        } else if ($request->has('user_id'))
             $query = Post::where('user_id', $request['user_id']);
         else if (!$request->has('number')) {
             if ($request->has('order')) {

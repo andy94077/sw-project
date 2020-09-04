@@ -34,6 +34,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       display: "block",
     },
+    [theme.breakpoints.down("xs")]: {
+      display: "block",
+      marginRight: "20px",
+    },
   },
   search: {
     position: "relative",
@@ -42,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginLeft: 0,
+    marginLeft: "15px",
     width: "100%",
     [theme.breakpoints.up("sm")]: {
       marginLeft: theme.spacing(3),
@@ -187,7 +191,10 @@ export default function Bar() {
   }, [notes, userId]);
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") history.push(`/home/${e.target.value}`);
+    if (e.key === "Enter") {
+      setSearchValue("");
+      history.push(`/home/${e.target.value}`);
+    }
   };
 
   const handleSetSearchValue = (event) => {
