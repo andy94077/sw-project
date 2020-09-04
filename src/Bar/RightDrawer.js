@@ -82,7 +82,7 @@ export default function RightDrawer(props) {
   const classes = useStyles();
   const { open, toggleDrawer } = props;
   const dispatch = useDispatch();
-  const { username, userAvatar } = useSelector(selectUser);
+  const { username, userAvatar, point } = useSelector(selectUser);
   const [modalShow, setModalShow] = useState(false);
 
   const logIn = (e) => {
@@ -97,6 +97,7 @@ export default function RightDrawer(props) {
         username: null,
         user_id: null,
         userAvatar: null,
+        point: null,
         bucket_time: null,
         api_token: null,
         verified: null,
@@ -193,8 +194,10 @@ export default function RightDrawer(props) {
               >
                 {username}
               </p>
-              <p style={{ display: "block" }}>身份：小萌新</p>
-              <p style={{ display: "block" }}>目前熱度：1000</p>
+              <p style={{ display: "block" }}>
+                身份：{point > 300 ? "大佬" : "小萌新"}
+              </p>
+              <p style={{ display: "block" }}>目前熱度：{point}</p>
             </div>
           </div>
         ) : null}

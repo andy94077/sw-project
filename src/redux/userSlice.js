@@ -9,6 +9,7 @@ export const userSlice = createSlice({
     username: null,
     userId: null,
     userAvatar: null,
+    point: null,
     BucketTime: null,
     apiToken: null,
     verified: null,
@@ -30,6 +31,7 @@ export const userSlice = createSlice({
       state.username = action.payload.username;
       state.userId = action.payload.user_id;
       state.userAvatar = action.payload.userAvatar;
+      state.point = action.payload.point;
       state.BucketTime = action.payload.bucket_time;
       state.apiToken = action.payload.api_token;
       state.verified = action.payload.verified;
