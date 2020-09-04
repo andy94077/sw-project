@@ -313,12 +313,4 @@ class UserController extends BaseController
         $user->sendEmailVerificationNotification();
         return response()->json(['Message' => 'success']);
     }
-
-    public function getActivities($id)
-    {
-        $post = Post::where('user_id', $id)->get()->toArray();
-        $follow = Follow::where('follower_id', $id)->get()->toArray();
-        $comment = Comment::where('user_id', $id)->get()->toArray();
-        return response()->json(array_merge($post, array_merge($follow, $comment)));
-    }
 }
