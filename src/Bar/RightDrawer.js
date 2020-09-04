@@ -22,13 +22,40 @@ import { selectUser, setData } from "../redux/userSlice";
 const useStyles = makeStyles({
   profile: {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    position: "relative",
+    flexDirection: "column",
     width: 250,
+    height: 300,
   },
   profileRound: {
+    display: "block",
+    margin: "10px auto",
+    height: 120,
+    width: 120,
+  },
+  circleRound: {
+    display: "block",
+    position: "relative",
     height: 150,
     width: 150,
+    margin: "10px auto",
+    borderRadius: 75,
+    borderStyle: "solid",
+    borderColor: "#9aa4ad6e",
+    borderWidth: 6,
+  },
+  userInfo: {
+    position: "relative",
+    display: "flex",
+    flexGrow: 1,
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  frame: {
+    position: "absolute",
+    height: "100%",
+    width: "80%",
+    borderBottom: "4px #e6e9ec solid",
   },
   list: {
     position: "relative",
@@ -82,19 +109,7 @@ export default function RightDrawer(props) {
   const menuList = [
     {
       label: "My account",
-      icon: (
-        <img
-          alt="Avatar"
-          className={classes.rounded}
-          src={
-            username !== null ? (
-              CONCAT_SERVER_URL(userAvatar)
-            ) : (
-              <OpenInNewIcon />
-            )
-          }
-        />
-      ),
+      icon: <AccountCircleIcon />,
       link: `/profile/${username}`,
       event: null,
       user: username !== null,
@@ -143,17 +158,18 @@ export default function RightDrawer(props) {
       <Drawer
         anchor="right"
         style={{ display: "flex" }}
+        PaperProps={{ style: { backgroundColor: "#FFFAFA" } }}
         open={open}
         onClose={toggleDrawer(false)}
       >
         {username !== null ? (
           <div
-            style={{ margin: "10px 0" }}
+            className={classes.profile}
             role="presentation"
             onClick={toggleDrawer(false)}
             onKeyDown={toggleDrawer(false)}
           >
-            <div className={classes.profile}>
+            <div className={classes.circleRound}>
               <img
                 alt="Avatar"
                 className={classes.profileRound}
@@ -165,6 +181,20 @@ export default function RightDrawer(props) {
                   )
                 }
               />
+            </div>
+            <div className={classes.userInfo}>
+              <div className={classes.frame} />
+              <p
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  marginBottom: "10px",
+                }}
+              >
+                {username}
+              </p>
+              <p style={{ display: "block" }}>身份：小萌新</p>
+              <p style={{ display: "block" }}>目前熱度：1000</p>
             </div>
           </div>
         ) : null}
