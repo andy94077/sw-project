@@ -50,7 +50,8 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::apiResource('tags', 'TagController');
 
-    Route::post('users/resend/{id}', 'UserController@resend');
+    Route::get('/users/activity/{id}', 'UserController@getActivities');
+    Route::post('/users/resend/{id}', 'UserController@resend');
     Route::get('/users/verifytime/{id}', 'UserController@getVerifyTime');
     Route::post('/users/verify', 'UserController@verify');
     Route::post('/users/intro', 'UserController@setIntro');

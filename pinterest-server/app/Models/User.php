@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\test;
 use App\Models\Verification;
+use App\Models\Post;
+use App\Models\Follow;
 use DateTime;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -24,7 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar_url', 'api_token', 'followers', 'followings'
+        'name', 'email', 'password', 'avatar_url', 'api_token', 'followers', 'followings', 'point'
     ];
 
     /**
@@ -44,6 +46,17 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::retrieved(function ($model) {
+            $follow_num = Follow::where('target_id', $model->id)->count();
+            $posts = Post::where('user_id', $model->id)->get();
+            $like = $posts->sum('like');
+            $model->point = ($follow_num * 100 + $like) / 10;
+        });
+    }
 
     /**
      * Send the password reset notification.
