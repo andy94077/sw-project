@@ -22,11 +22,10 @@ class CreatePostsTable extends Migration
             $table->string('content')->nullable();
             $table->string('tag')->nullable();
             $table->dateTime('publish_time')->nullable();
-            $table->unsignedBigInteger('like')->default(0);
+            //$table->unsignedBigInteger('like')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });
-
     }
 
     /**

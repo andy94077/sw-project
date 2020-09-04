@@ -11,6 +11,7 @@ import {
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import ListIcon from "@material-ui/icons/List";
 // import SettingsIcon from "@material-ui/icons/Settings";
 import { Link } from "react-router-dom";
 import { CONCAT_SERVER_URL } from "../utils";
@@ -93,6 +94,13 @@ export default function RightDrawer(props) {
         />
       ),
       link: `/profile/${username}`,
+      event: null,
+      user: username !== null,
+    },
+    {
+      label: "My Post",
+      icon: <ListIcon />,
+      link: `/postlist`,
       event: null,
       user: username !== null,
     },
