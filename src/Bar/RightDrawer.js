@@ -215,7 +215,10 @@ export default function RightDrawer(props) {
                 >
                   <ListItem button>
                     <ListItemIcon>{page.icon}</ListItemIcon>
-                    <ListItemText primary={page.label} />
+                    <ListItemText
+                      style={{ color: "black" }}
+                      primary={page.label}
+                    />
                   </ListItem>
                 </Link>
               ))}
@@ -235,7 +238,7 @@ export default function RightDrawer(props) {
                   <ListItemIcon>
                     <ExitToAppIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Log out" />
+                  <ListItemText style={{ color: "black" }} primary="Log out" />
                 </ListItem>
               </Link>
             </div>
