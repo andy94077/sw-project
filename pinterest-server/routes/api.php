@@ -96,7 +96,7 @@ Route::namespace('Api')->prefix('v1')->group(function () {
 
     Route::apiResource('notifications', 'NotificationController');
 
-    Route::get('/chatroom/getRoomByUser', 'ChatroomController@getRoomByUser')->name('chatroom.getRoomByUser');
+    Route::get('/chatroom/getInfoByUser', 'ChatroomController@getInfoByUser')->name('chatroom.getInfoByUser');
     Route::post('chatroom/read', 'ChatroomController@read')->name('chatroom.read');
     Route::resource('chatroom', 'ChatroomController');
 

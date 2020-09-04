@@ -5,14 +5,19 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+import clsx from "clsx";
 import {
   Button,
   Divider,
   TextareaAutosize,
   Typography,
+  Paper,
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
-import ScrollToBottom from "react-scroll-to-bottom";
+import ScrollToBottom, {
+  useScrollToBottom,
+  useObserveScrollPosition,
+} from "react-scroll-to-bottom";
 import { selectUser } from "../redux/userSlice";
 
 import Loading from "../components/Loading";
@@ -64,6 +69,11 @@ const useStyles = makeStyles(() => ({
       flexFlow: "column-reverse",
     },
   },
+  hideButton: {
+    "& button": {
+      display: "none",
+    },
+  },
   input: {
     resize: "none",
     width: "100%",
@@ -94,17 +104,72 @@ const useStyles = makeStyles(() => ({
   endText: {
     color: "#666",
   },
+  newMessage: {
+    position: "absolute",
+    width: "100%",
+    height: "35px",
+    background: "#fff8e5",
+    padding: "5px 60px 5px 5px",
+    textAlign: "left",
+    overflow: "hidden",
+  },
 }));
+
+function ScrollController(props) {
+  const classes = useStyles();
+  const { children, data, name, setIsHide } = props;
+  const { userId } = useSelector(selectUser);
+
+  const [isNew, setIsNew] = useState(false);
+
+  const [position, setPosition] = useState(1);
+  const scrollToBottom = useScrollToBottom();
+  const observe = (pos) => setPosition(pos.scrollTop);
+  useObserveScrollPosition(observe);
+
+  useEffect(() => {
+    if (position >= -40) scrollToBottom();
+    else if (data[0].message[0].from === userId) scrollToBottom();
+    else {
+      setIsNew(true);
+      const timeout = setTimeout(() => setIsNew(false), 5000);
+      return () => clearTimeout(timeout);
+    }
+    return () => {};
+  }, [data[0].message[0]]);
+
+  useEffect(() => {
+    if (position <= -110) setIsHide(false);
+    else {
+      setIsHide(true);
+      setIsNew(false);
+    }
+  }, [position <= -110]);
+
+  return (
+    <>
+      {isNew && (
+        <Paper className={classes.newMessage}>
+          {name} : {data[0].message[0].message}
+        </Paper>
+      )}
+      {children}
+    </>
+  );
+}
 
 export default function Chatroom(props) {
   const classes = useStyles();
   const { chatInfo, setChatInfo, onHide } = props;
   const { userId } = useSelector(selectUser);
 
+  // For infinite scroll
   const boxesMore = useRef();
   const [isReady, setIsReady] = useState(false);
   const [show, setShow] = useState(true);
+  const [isHide, setIsHide] = useState(true);
 
+  // For new message
   const [value, setValue] = useState("");
   const [isSending, setIsSending] = useState(false);
 
@@ -249,7 +314,7 @@ export default function Chatroom(props) {
   });
 
   useEffect(() => {
-    if (status === "success" && show) {
+    if (status === "success") {
       setIsReady(true);
       setTimeout(() => setShow(false), 1);
       setTimeout(() => setShow(true), 2);
@@ -259,18 +324,28 @@ export default function Chatroom(props) {
   useEffect(() => {
     if (window.Echo === undefined) return () => {};
     if (chatInfo.roomId === 0) return () => {};
-    handleSendBox(); // New chatroom
-    handleRead();
+    handleSendBox(); // When create a new chatroom
+    handleRead(); // Tell the other side read
+
+    // Check read by the other side
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/chatroom/getInfoByUser"), {
+        params: { user_id1: userId, user_id2: chatInfo.id },
+      })
+      .then((res) => {
+        setChatInfo((state) => ({ ...state, last_read: res.data.last_read }));
+      });
 
     window.Echo.private(`Chatroom.${chatInfo.roomId}`)
       .listen("ChatSent", (event) => {
-        const { from } = event;
         refetch(); // New message
+        const { from } = event;
         if (from !== userId) handleRead(); // Tell the other side read
       })
       .listen("ChatRead", (event) => {
         const { from, lastRead } = event;
         if (from === userId) return;
+        // Read by the other side
         setChatInfo((state) => ({
           ...state,
           last_read: lastRead,
@@ -281,7 +356,7 @@ export default function Chatroom(props) {
       window.Echo.channel(`Chatroom.${chatInfo.roomId}`)
         .stopListening("ChatSent")
         .stopListening("ChatRead");
-      refetch(); // Clear last chatroom
+      refetch(); // Clear previous chatroom
     };
   }, [chatInfo.roomId, refetch]);
 
@@ -302,37 +377,43 @@ export default function Chatroom(props) {
 
           <Divider />
 
-          <ScrollToBottom className={classes.messages}>
-            {boxes.map((page) =>
-              page.message.map((text) => (
-                <ChatBox
-                  key={text.id}
-                  chatInfo={chatInfo}
-                  message={text.message}
-                  from={text.from}
-                  time={text.created_at}
-                  // canDelete={username === i.user_name || username === author}
-                  // canEdit={username === i.user_name}
-                />
-              ))
-            )}
-            {show && (
-              <div ref={boxesMore} className={classes.end}>
-                {isFetching || isFetchingMore ? (
-                  <Loading />
-                ) : (
-                  !canFetchMore && (
-                    <Typography
-                      variant="button"
-                      className={classes.endText}
-                      gutterBottom
-                    >
-                      No message left
-                    </Typography>
-                  )
-                )}
-              </div>
-            )}
+          <ScrollToBottom
+            className={clsx(classes.messages, { [classes.hideButton]: isHide })}
+          >
+            <ScrollController
+              data={boxes}
+              name={chatInfo.name}
+              setIsHide={setIsHide}
+            >
+              {boxes.map((page) =>
+                page.message.map((text) => (
+                  <ChatBox
+                    key={text.id}
+                    chatInfo={chatInfo}
+                    message={text.message}
+                    from={text.from}
+                    time={text.created_at}
+                  />
+                ))
+              )}
+              {show && (
+                <div ref={boxesMore} className={classes.end}>
+                  {isFetching || isFetchingMore ? (
+                    <Loading />
+                  ) : (
+                    !canFetchMore && (
+                      <Typography
+                        variant="button"
+                        className={classes.endText}
+                        gutterBottom
+                      >
+                        No message left
+                      </Typography>
+                    )
+                  )}
+                </div>
+              )}
+            </ScrollController>
           </ScrollToBottom>
 
           <Divider />

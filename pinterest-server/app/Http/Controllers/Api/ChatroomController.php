@@ -42,7 +42,7 @@ class ChatroomController extends BaseController
         }
     }
 
-    public function getRoomByUser(Request $request)
+    public function getInfoByUser(Request $request)
     {
         $user_id1 = intval($request['user_id1']);
         $user_id2 = intval($request['user_id2']);
@@ -51,9 +51,9 @@ class ChatroomController extends BaseController
             ->where('user_id2', $user_id2)->get();
 
         if (count($room) > 0) {
-            return response()->json(["room_id" => $room[0]->room_id]);
+            return response()->json(["room_id" => $room[0]->room_id, "last_read" => $room[0]->last_read]);
         } else {
-            return response()->json(["room_id" => 0]);
+            return response()->json(["room_id" => 0, "last_read" => null]);
         }
     }
 

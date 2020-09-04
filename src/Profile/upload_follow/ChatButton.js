@@ -65,7 +65,7 @@ export default function ChatButton(props) {
   useEffect(() => {
     if (chatInfo.avatar_url === "") return;
     axios
-      .get(CONCAT_SERVER_URL("/api/v1/chatroom/getRoomByUser"), {
+      .get(CONCAT_SERVER_URL("/api/v1/chatroom/getInfoByUser"), {
         params: { user_id1: userId, user_id2: id },
       })
       .then((res) => {

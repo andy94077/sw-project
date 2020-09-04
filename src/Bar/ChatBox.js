@@ -56,10 +56,10 @@ const useStyles = makeStyles(() => ({
     lineHeight: "20px",
   },
   read: {
-    color: "#777",
     fontSize: "12px",
     textAlign: "right",
     display: "block",
+    marginBottom: "-5px",
   },
   time: {
     color: "#777",
@@ -68,7 +68,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function ChatBox(props) {
-  const { chatInfo, message, from, time /* , messageId, refresh */ } = props;
+  const { chatInfo, message, from, time /* , canDelete, canEdit */ } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
   // const [menu, setMenu] = useState(null);
@@ -90,10 +90,8 @@ export default function ChatBox(props) {
     return `${HH}:${MM}:${SS}`;
   };
 
-  const lastRead = getTimeFormat(chatInfo.last_read);
-  const messageTime = getTimeFormat(time);
-
-  const readOrNot = lastRead >= messageTime;
+  const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
+  const messageTime = getTimeFormat(time).slice(0, -3);
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -193,7 +191,7 @@ export default function ChatBox(props) {
         <Typography variant="button" className={classes.read}>
           {readOrNot && from === userId && "Read"}
         </Typography>
-        {messageTime.slice(0, -3)}
+        {messageTime}
       </Typography>
       {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
