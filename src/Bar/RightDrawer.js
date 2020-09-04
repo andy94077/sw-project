@@ -31,7 +31,9 @@ const useStyles = makeStyles({
     width: 150,
   },
   list: {
-    width: 250,
+    position: "relative",
+    display: "flex",
+    overflow: "auto",
     flexGrow: 1,
   },
   fullList: {
@@ -167,12 +169,12 @@ export default function RightDrawer(props) {
           </div>
         ) : null}
         <div
-          style={{ position: "relative", display: "flex", overflow: "auto" }}
+          className={classes.list}
           role="presentation"
           onClick={toggleDrawer(false)}
           onKeyDown={toggleDrawer(false)}
         >
-          <div className={classes.list}>
+          <div style={{ width: "250px" }}>
             <List>
               {menuList.map((page) => (
                 <Link
