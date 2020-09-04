@@ -55,6 +55,12 @@ const useStyles = makeStyles(() => ({
     padding: "0",
     lineHeight: "20px",
   },
+  read: {
+    fontSize: "12px",
+    textAlign: "right",
+    display: "block",
+    marginBottom: "-5px",
+  },
   time: {
     color: "#777",
     margin: "auto 2px",
@@ -62,7 +68,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function ChatBox(props) {
-  const { chatInfo, message, from, time /* , messageId, refresh */ } = props;
+  const { chatInfo, message, from, time /* , canDelete, canEdit */ } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
   // const [menu, setMenu] = useState(null);
@@ -80,9 +86,12 @@ export default function ChatBox(props) {
   const getTimeFormat = (t) => {
     // HH:MM
     const HMS = t.split(" ")[1];
-    const [HH, MM] = HMS.split(":");
-    return `${HH}:${MM}`;
+    const [HH, MM, SS] = HMS.split(":");
+    return `${HH}:${MM}:${SS}`;
   };
+
+  const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
+  const messageTime = getTimeFormat(time).slice(0, -3);
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -179,7 +188,10 @@ export default function ChatBox(props) {
         <div className={classes.content}>{message}</div>
       </Paper>
       <Typography variant="button" className={classes.time}>
-        {getTimeFormat(time)}
+        <Typography variant="button" className={classes.read}>
+          {readOrNot && from === userId && "Read"}
+        </Typography>
+        {messageTime}
       </Typography>
       {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">

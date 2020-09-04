@@ -24,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ChatSent' => [
             'App\Listeners\ChatSend',
         ],
+        'App\Events\ChatRead' => [
+            'App\Listeners\ChatIsRead',
+        ],
         'App\Events\PostChanged' => [
             'App\Listeners\PostChange',
         ],

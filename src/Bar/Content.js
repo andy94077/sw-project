@@ -142,14 +142,14 @@ export default function Content(props) {
 
   // Update
   useEffect(() => {
-    if (statusChats === "success" && type === "chats" && show) {
+    if (statusChats === "success" && type === "chats") {
       setTimeout(() => setShow(false), 1);
       setTimeout(() => setShow(true), 2);
     }
   }, [statusChats, type]);
 
   useEffect(() => {
-    if (statusNotes === "success" && type === "notes" && show) {
+    if (statusNotes === "success" && type === "notes") {
       setTimeout(() => setShow(false), 1);
       setTimeout(() => setShow(true), 2);
     }
