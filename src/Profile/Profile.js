@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
     height: "400px",
     width: "400px",
     borderRadius: "30px",
+    [theme.breakpoints.down("sm")]: {
+      width: "95%",
+    },
   },
   central: {
     display: "block",
