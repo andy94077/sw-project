@@ -19,8 +19,19 @@ import LoginForm from "../Login/LoginForm";
 import { selectUser, setData } from "../redux/userSlice";
 
 const useStyles = makeStyles({
+  profile: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 250,
+  },
+  profileRound: {
+    height: 150,
+    width: 150,
+  },
   list: {
     width: 250,
+    flexGrow: 1,
   },
   fullList: {
     width: "auto",
@@ -31,6 +42,9 @@ const useStyles = makeStyles({
   rounded: {
     height: "32px",
     borderRadius: "16px",
+  },
+  logoutLink: {
+    width: "100%",
   },
 });
 
@@ -91,13 +105,13 @@ export default function RightDrawer(props) {
       user: username !== null,
     },
     */
-    {
-      label: "Log out",
-      icon: <ExitToAppIcon />,
-      link: "/",
-      event: logOut,
-      user: username !== null,
-    },
+    // {
+    //   label: "Log out",
+    //   icon: <ExitToAppIcon />,
+    //   link: "/",
+    //   event: logOut,
+    //   user: username !== null,
+    // },
     {
       label: "Sign up",
       icon: <OpenInNewIcon />,
@@ -116,28 +130,76 @@ export default function RightDrawer(props) {
 
   return (
     <div>
-      <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="right"
+        style={{ display: "flex" }}
+        open={open}
+        onClose={toggleDrawer(false)}
+      >
+        {username !== null ? (
+          <div
+            style={{ margin: "10px 0" }}
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+          >
+            <div className={classes.profile}>
+              <img
+                alt="Avatar"
+                className={classes.profileRound}
+                src={
+                  username !== null ? (
+                    CONCAT_SERVER_URL(userAvatar)
+                  ) : (
+                    <OpenInNewIcon />
+                  )
+                }
+              />
+            </div>
+          </div>
+        ) : null}
         <div
-          className={classes.list}
+          style={{ position: "relative", display: "flex", overflow: "auto" }}
           role="presentation"
           onClick={toggleDrawer(false)}
           onKeyDown={toggleDrawer(false)}
         >
-          <List>
-            {menuList.map((page) => (
-              <Link
-                to={page.link}
-                className={page.user ? null : classes.user}
-                key={page.label}
-                onClick={page.event}
-              >
+          <div className={classes.list}>
+            <List>
+              {menuList.map((page) => (
+                <Link
+                  to={page.link}
+                  className={page.user ? null : classes.user}
+                  key={page.label}
+                  onClick={page.event}
+                >
+                  <ListItem button>
+                    <ListItemIcon>{page.icon}</ListItemIcon>
+                    <ListItemText primary={page.label} />
+                  </ListItem>
+                </Link>
+              ))}
+            </List>
+          </div>
+        </div>
+
+        <div
+          role="presentation"
+          onClick={toggleDrawer(false)}
+          onKeyDown={toggleDrawer(false)}
+        >
+          {username !== null ? (
+            <div className={classes.logoutLink}>
+              <Link to="/" key="Log out" onClick={logOut}>
                 <ListItem button>
-                  <ListItemIcon>{page.icon}</ListItemIcon>
-                  <ListItemText primary={page.label} />
+                  <ListItemIcon>
+                    <ExitToAppIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Log out" />
                 </ListItem>
               </Link>
-            ))}
-          </List>
+            </div>
+          ) : null}
         </div>
       </Drawer>
       <LoginForm

@@ -281,6 +281,7 @@ export default function ContentCard(props) {
             {newTag.select ? (
               <Button
                 variant="contained"
+                component="span"
                 color={tag === "" ? "default" : "primary"}
                 className={`${classes.central} ${classes.rounded} ${classes.text}`}
                 onClick={handleNewTagOK}
@@ -294,6 +295,7 @@ export default function ContentCard(props) {
             ) : (
               <Button
                 variant="contained"
+                component="span"
                 color="secondary"
                 className={`${classes.central} ${classes.rounded} ${classes.text}`}
                 onClick={handleUploadDesc}
