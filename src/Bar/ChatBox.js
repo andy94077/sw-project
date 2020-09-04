@@ -66,10 +66,22 @@ const useStyles = makeStyles(() => ({
     color: "#777",
     margin: "auto 2px",
   },
+  newDay: {
+    width: "100%",
+    height: "35px",
+    background: "#fff8e5",
+    padding: "5px",
+  },
 }));
 
 export default function ChatBox(props) {
-  const { chatInfo, message, from, time /* , canDelete, canEdit */ } = props;
+  const {
+    chatInfo,
+    message,
+    from,
+    time,
+    first /* , canDelete, canEdit */,
+  } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
   // const [menu, setMenu] = useState(null);
@@ -87,12 +99,12 @@ export default function ChatBox(props) {
   const getTimeFormat = (t) => {
     // HH:MM
     const HMS = t.split(" ")[1];
-    const [HH, MM, SS] = HMS.split(":");
-    return `${HH}:${MM}:${SS}`;
+    const [HH, MM] = HMS.split(":");
+    return `${HH}:${MM}`;
   };
 
   const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
-  const messageTime = getTimeFormat(time).slice(0, -3);
+  const messageTime = getTimeFormat(time);
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -171,30 +183,31 @@ export default function ChatBox(props) {
   // }
 
   return (
-    <div
-      className={clsx(classes.root, { [classes.rootByMe]: from === userId })}
-    >
-      <img
-        alt="Avatar"
-        className={classes.avatar}
-        src={CONCAT_SERVER_URL(
-          from === userId ? userAvatar : chatInfo.avatar_url
-        )}
-      />
-      <Paper
-        className={clsx(classes.message, {
-          [classes.messageByMe]: from === userId,
-        })}
+    <>
+      <div
+        className={clsx(classes.root, { [classes.rootByMe]: from === userId })}
       >
-        <div className={classes.content}>{message}</div>
-      </Paper>
-      <Typography variant="button" className={classes.time}>
-        <Typography variant="button" className={classes.read}>
-          {readOrNot && from === userId && "Read"}
+        <img
+          alt="Avatar"
+          className={classes.avatar}
+          src={CONCAT_SERVER_URL(
+            from === userId ? userAvatar : chatInfo.avatar_url
+          )}
+        />
+        <Paper
+          className={clsx(classes.message, {
+            [classes.messageByMe]: from === userId,
+          })}
+        >
+          <div className={classes.content}>{message}</div>
+        </Paper>
+        <Typography variant="button" className={classes.time}>
+          <Typography variant="button" className={classes.read}>
+            {readOrNot && from === userId && "Read"}
+          </Typography>
+          {messageTime}
         </Typography>
-        {messageTime}
-      </Typography>
-      {/* {isOption && (
+        {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
           <MoreVertIcon />
         </IconButton>
@@ -280,6 +293,8 @@ export default function ChatBox(props) {
         }
         onClose={handleDeleteDialogClose}
       /> */}
-    </div>
+      </div>
+      {first && <Paper className={classes.newDay}>{time.split(" ")[0]}</Paper>}
+    </>
   );
 }

@@ -128,15 +128,11 @@ function ScrollController(props) {
   useObserveScrollPosition(observe);
 
   useEffect(() => {
-    if (data[0].message[0] === undefined) return () => {};
-    if (position >= -40) scrollToBottom();
-    else if (data[0].message[0].from === userId) scrollToBottom();
-    else {
-      setIsNew(true);
-      const timeout = setTimeout(() => setIsNew(false), 5000);
-      return () => clearTimeout(timeout);
+    if (data[0].message[0] !== undefined) {
+      if (position >= -40) scrollToBottom();
+      else if (data[0].message[0].from === userId) scrollToBottom();
+      else setIsNew(true);
     }
-    return () => {};
   }, [data[0].message[0]]);
 
   useEffect(() => {
@@ -396,6 +392,7 @@ export default function Chatroom(props) {
                     message={text.message}
                     from={text.from}
                     time={text.created_at}
+                    first={text.first}
                   />
                 ))
               )}

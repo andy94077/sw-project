@@ -11,11 +11,33 @@ class ChatBoxController extends BaseController
     public function index(Request $request)
     {
         $room_id = intval($request['room_id']);
-        $boxes = DB::table('laravel.chat_' .  $room_id);
+        $room = DB::table('laravel.chat_' .  $room_id);
 
-        $boxes = $boxes->orderBy('created_at', 'desc')
+        $boxes = $room->orderBy('created_at', 'desc')
             ->skip(intval($request['start']))
             ->take(intval($request['number']))->get();
+
+        $boxesLen = count($boxes);
+        $last = $room->orderBy('created_at', 'desc')
+            ->skip(intval($request['start']) + $boxesLen)
+            ->first();
+        if ($last !== null) $last = substr($last->created_at, 0, 10);
+
+        $boxes = $boxes->map(function ($box, $key) use ($last, $boxesLen, $boxes) {
+            $boxTime = substr($box->created_at, 0, 10);
+            if ($key === $boxesLen - 1) {
+                if ($boxTime !== $last) {
+                    $box->first = true;
+                }
+            } else {
+                $lastBoxTime = substr($boxes[$key + 1]->created_at, 0, 10);
+                if ($boxTime !== $lastBoxTime) {
+                    $box->first = true;
+                }
+            }
+            return $box;
+        });
+
 
         if (count($boxes) > 0) {
             return response()->json([
