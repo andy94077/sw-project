@@ -26,7 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar_url', 'api_token', 'followers', 'followings', 'point'
+        'name', 'email', 'password', 'avatar_url', 'api_token', 'followers', 'followings'
     ];
 
     /**
@@ -46,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
+    public $point;
     protected static function boot()
     {
         parent::boot();
