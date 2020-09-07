@@ -22,9 +22,11 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexDirection: "row",
+    textAlign: "left",
   },
   rootByMe: {
     flexDirection: "row-reverse",
+    textAlign: "right",
   },
   message: {
     minHeight: "20px",
@@ -38,6 +40,9 @@ const useStyles = makeStyles(() => ({
   },
   messageByMe: {
     background: "#c9cfed",
+  },
+  messageUnread: {
+    background: "#fff8e5",
   },
   avatar: {
     width: "32px",
@@ -58,29 +63,42 @@ const useStyles = makeStyles(() => ({
   },
   read: {
     fontSize: "12px",
-    textAlign: "right",
     display: "block",
     marginBottom: "-5px",
   },
   time: {
+    fontSize: "14px",
     color: "#777",
     margin: "auto 2px",
   },
-  newDay: {
-    width: "100%",
-    height: "35px",
+  date: {
+    fontSize: "11px",
+    display: "block",
+  },
+  unread: {
+    margin: "5px auto",
     background: "#fff8e5",
-    padding: "5px",
+    padding: "5px 15px",
+    fontSize: "14px",
+    borderRadius: "30px",
+  },
+  newDate: {
+    margin: "5px auto",
+    background: "rgba(159, 191, 223, 0.3)",
+    padding: "5px 15px",
+    fontSize: "14px",
+    borderRadius: "30px",
   },
 }));
 
 export default function ChatBox(props) {
   const {
+    id,
     chatInfo,
     message,
     from,
     time,
-    first /* , canDelete, canEdit */,
+    firstOfDate /* , canDelete, canEdit */,
   } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
@@ -103,8 +121,48 @@ export default function ChatBox(props) {
     return `${HH}:${MM}`;
   };
 
-  const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
+  const addZero = (num) => {
+    return num < 10 ? `0${num}` : num;
+  };
+
+  const month = [
+    "Jan.",
+    "Feb.",
+    "Mar.",
+    "Apr.",
+    "May",
+    "Jun.",
+    "Jul.",
+    "Aug.",
+    "Sep.",
+    "Oct.",
+    "Nov.",
+    "Dec.",
+  ];
+
+  const getRecentTime = (t) => {
+    const date1 = new Date();
+    date1.setDate(date1.getDate());
+    const today = `${date1.getFullYear()}-${addZero(
+      date1.getMonth() + 1
+    )}-${addZero(date1.getDate())}`;
+    if (t === today) return "Today";
+
+    const date2 = new Date();
+    date2.setDate(date2.getDate() - 1);
+    const yesterday = `${date2.getFullYear()}-${addZero(
+      date2.getMonth() + 1
+    )}-${addZero(date2.getDate())}`;
+    if (t === yesterday) return "Yesterday";
+
+    const mon = month[parseInt(t.slice(5, 7), 10)];
+    return `${mon} ${t.slice(8)}`;
+  };
+
+  const readOrNot =
+    chatInfo.last_read !== undefined && chatInfo.last_read >= time;
   const messageTime = getTimeFormat(time);
+  const date = getRecentTime(time.split(" ")[0]);
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -197,15 +255,23 @@ export default function ChatBox(props) {
         <Paper
           className={clsx(classes.message, {
             [classes.messageByMe]: from === userId,
+            [classes.messageUnread]:
+              from !== userId &&
+              chatInfo.unread !== null &&
+              chatInfo.unread <= id &&
+              id <= chatInfo.newest,
           })}
         >
           <div className={classes.content}>{message}</div>
         </Paper>
-        <Typography variant="button" className={classes.time}>
+        <Typography variant="h6" className={classes.time}>
           <Typography variant="button" className={classes.read}>
             {readOrNot && from === userId && "Read"}
           </Typography>
           {messageTime}
+          <Typography className={classes.date}>
+            {date !== "Today" && date}
+          </Typography>
         </Typography>
         {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
@@ -294,7 +360,10 @@ export default function ChatBox(props) {
         onClose={handleDeleteDialogClose}
       /> */}
       </div>
-      {first && <Paper className={classes.newDay}>{time.split(" ")[0]}</Paper>}
+      {chatInfo.unread === id && (
+        <Paper className={classes.unread}>Unread messages</Paper>
+      )}
+      {firstOfDate && <Paper className={classes.newDate}>{date}</Paper>}
     </>
   );
 }

@@ -27,12 +27,12 @@ class ChatBoxController extends BaseController
             $boxTime = substr($box->created_at, 0, 10);
             if ($key === $boxesLen - 1) {
                 if ($boxTime !== $last) {
-                    $box->first = true;
+                    $box->firstOfDate = true;
                 }
             } else {
                 $lastBoxTime = substr($boxes[$key + 1]->created_at, 0, 10);
                 if ($boxTime !== $lastBoxTime) {
-                    $box->first = true;
+                    $box->firstOfDate = true;
                 }
             }
             return $box;
