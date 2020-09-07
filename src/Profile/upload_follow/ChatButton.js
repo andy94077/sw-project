@@ -46,8 +46,6 @@ export default function ChatButton(props) {
     name,
   });
 
-  const [roomId, setRoomId] = useState(-1);
-
   useEffect(() => {
     axios
       .request({
@@ -70,20 +68,29 @@ export default function ChatButton(props) {
         params: { user_id1: userId, user_id2: id },
       })
       .then((res) => {
-        setRoomId(res.data.room_id);
+        setChatInfo((state) => ({
+          ...state,
+          roomId: res.data.room_id,
+        }));
       });
   }, [chatInfo.avatar_url, id, userId]);
 
   useEffect(() => {
-    if (chatInfo.avatar_url !== "" && roomId !== -1) setIsReady(true);
-  }, [chatInfo, roomId]);
+    if (chatInfo.avatar_url !== "" && chatInfo.roomId !== -1) setIsReady(true);
+  }, [chatInfo]);
 
   const handleOpen = () => {
-    setChatInfo({
-      ...chatInfo,
-      isOpen: true,
-      roomId,
-    });
+    axios
+      .get(CONCAT_SERVER_URL("/api/v1/chatroom/getInfoByUser"), {
+        params: { user_id1: userId, user_id2: id },
+      })
+      .then((res) => {
+        setChatInfo((state) => ({
+          ...state,
+          isOpen: true,
+          roomId: res.data.room_id,
+        }));
+      });
   };
 
   const onHide = () => {

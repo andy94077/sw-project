@@ -55,12 +55,17 @@ class ChatroomController extends BaseController
             // Get the last message I have read
             $_room = Chatroom::where('user_id1', $user_id1)
                 ->where('user_id2', $user_id2)->first();
-            $unread = DB::table('laravel.chat_' .  $_room->room_id)
-                ->orderBy('created_at', 'asc')
-                ->where('created_at', '>', $_room->last_read)
-                ->where('from', $user_id2)
-                ->first();
-            if ($unread !== null) $unread = $unread->id;
+            if ($_room->last_read === null) $unread = 1;
+            else {
+                $unread = DB::table('laravel.chat_' .  $_room->room_id)
+                    ->orderBy('created_at', 'asc')
+                    ->where('created_at', '>', $_room->last_read)
+                    ->where('from', $user_id2)
+                    ->first();
+                if ($unread !== null) {
+                    $unread = $unread->id;
+                }
+            }
             $newest = DB::table('laravel.chat_' .  $_room->room_id)
                 ->orderBy('created_at', 'desc')
                 ->first()->id;
