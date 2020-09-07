@@ -41,25 +41,14 @@ class ChatroomsTableSeeder extends Seeder
             $table->string('message');
             $table->timestamps();
         });
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 75; $i++) {
             DB::table('chat_1')->insert(
                 [
                     'from' => 2 + $i % 2,
                     'to' => 3 - $i % 2,
                     'message' => "Hi " . $i . " !",
-                    'created_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string("2 day " . (76 - $i) . " minutes")),
-                    'updated_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string("2 day " . (76 - $i) . " minutes"))
-                ]
-            );
-        }
-        for ($i = 51; $i <= 75; $i++) {
-            DB::table('chat_1')->insert(
-                [
-                    'from' => 2 + $i % 2,
-                    'to' => 3 - $i % 2,
-                    'message' => "Hi " . $i . " !",
-                    'created_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string("1 day " . (76 - $i) . " minutes")),
-                    'updated_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string("1 day " . (76 - $i) . " minutes"))
+                    'created_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 25) . " day " . (76 - $i) . " minutes")),
+                    'updated_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 25) . " day " . (76 - $i) . " minutes"))
                 ]
             );
         }

@@ -37,7 +37,7 @@ const useStyles = makeStyles(() => ({
     padding: "10px",
     height: "90%",
     width: "90%",
-    display: "block",
+    display: "grid",
     margin: "auto",
   },
   avatar: {
@@ -56,7 +56,7 @@ const useStyles = makeStyles(() => ({
   },
   messages: {
     overflow: "auto",
-    height: "calc(100% - 120px)",
+    height: "100%",
     flexGrow: "1",
     display: "flex",
     "& button": {
@@ -423,7 +423,7 @@ export default function Chatroom(props) {
               id="standard-basic"
               className={classes.input}
               rowsMin={1}
-              rowsMax={3}
+              rowsMax={5}
               value={value}
               onChange={handleSetValue}
               onKeyDown={handleEnter}

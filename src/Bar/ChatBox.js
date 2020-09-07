@@ -22,9 +22,11 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexDirection: "row",
+    textAlign: "left",
   },
   rootByMe: {
     flexDirection: "row-reverse",
+    textAlign: "right",
   },
   message: {
     minHeight: "20px",
@@ -58,19 +60,24 @@ const useStyles = makeStyles(() => ({
   },
   read: {
     fontSize: "12px",
-    textAlign: "right",
     display: "block",
     marginBottom: "-5px",
   },
   time: {
+    fontSize: "14px",
     color: "#777",
     margin: "auto 2px",
   },
   newDay: {
-    width: "100%",
-    height: "35px",
-    background: "#fff8e5",
-    padding: "5px",
+    margin: "auto",
+    background: "rgba(159, 191, 223, 0.3)",
+    padding: "5px 15px",
+    fontSize: "14px",
+    borderRadius: "30px",
+  },
+  dayTime: {
+    fontSize: "11px",
+    display: "block",
   },
 }));
 
@@ -103,8 +110,47 @@ export default function ChatBox(props) {
     return `${HH}:${MM}`;
   };
 
+  const addZero = (num) => {
+    return num < 10 ? `0${num}` : num;
+  };
+
+  const month = [
+    "Jan.",
+    "Feb.",
+    "Mar.",
+    "Apr.",
+    "May",
+    "Jun.",
+    "Jul.",
+    "Aug.",
+    "Sep.",
+    "Oct.",
+    "Nov.",
+    "Dec.",
+  ];
+
+  const getRecentTime = (t) => {
+    const day1 = new Date();
+    day1.setDate(day1.getDate());
+    const today = `${day1.getFullYear()}-${addZero(
+      day1.getMonth() + 1
+    )}-${addZero(day1.getDate())}`;
+    if (t === today) return "Today";
+
+    const day2 = new Date();
+    day2.setDate(day2.getDate() - 1);
+    const yesterday = `${day2.getFullYear()}-${addZero(
+      day2.getMonth() + 1
+    )}-${addZero(day2.getDate())}`;
+    if (t === yesterday) return "Yesterday";
+
+    const mon = month[parseInt(t.slice(5, 7), 10)];
+    return `${mon} ${t.slice(8)}`;
+  };
+
   const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
   const messageTime = getTimeFormat(time);
+  const date = getRecentTime(time.split(" ")[0]);
 
   // const handleClick = (event) => {
   //   setMenu(event.currentTarget);
@@ -201,11 +247,14 @@ export default function ChatBox(props) {
         >
           <div className={classes.content}>{message}</div>
         </Paper>
-        <Typography variant="button" className={classes.time}>
+        <Typography variant="h6" className={classes.time}>
           <Typography variant="button" className={classes.read}>
             {readOrNot && from === userId && "Read"}
           </Typography>
           {messageTime}
+          <Typography className={classes.dayTime}>
+            {date !== "Today" && date}
+          </Typography>
         </Typography>
         {/* {isOption && (
         <IconButton size="small" onClick={handleClick} aria-controls="m">
@@ -294,7 +343,7 @@ export default function ChatBox(props) {
         onClose={handleDeleteDialogClose}
       /> */}
       </div>
-      {first && <Paper className={classes.newDay}>{time.split(" ")[0]}</Paper>}
+      {first && <Paper className={classes.newDay}>{date}</Paper>}
     </>
   );
 }
