@@ -76,14 +76,14 @@ const useStyles = makeStyles(() => ({
     display: "block",
   },
   unread: {
-    margin: "auto",
+    margin: "5px auto",
     background: "#fff8e5",
     padding: "5px 15px",
     fontSize: "14px",
     borderRadius: "30px",
   },
   newDate: {
-    margin: "auto",
+    margin: "5px auto",
     background: "rgba(159, 191, 223, 0.3)",
     padding: "5px 15px",
     fontSize: "14px",

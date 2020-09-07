@@ -37,7 +37,8 @@ const useStyles = makeStyles(() => ({
     padding: "10px",
     height: "90%",
     width: "90%",
-    display: "grid",
+    display: "flex",
+    flexFlow: "column",
     margin: "auto",
   },
   avatar: {
@@ -56,9 +57,7 @@ const useStyles = makeStyles(() => ({
   },
   messages: {
     overflow: "auto",
-    height: "100%",
-    flexGrow: "1",
-    display: "flex",
+    flex: "auto",
     "& button": {
       background: "url('/pictures/icon-to-down.jpg')",
       backgroundSize: "20px",
@@ -372,7 +371,7 @@ export default function Chatroom(props) {
     return (
       <div className={classes.root}>
         <div className={classes.room}>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" style={{ margin: "5px auto" }} gutterBottom>
             <Link to={`/profile/${chatInfo.name}`} onClick={onHide}>
               <img
                 alt="Avatar"
