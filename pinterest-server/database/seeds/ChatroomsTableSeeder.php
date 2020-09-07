@@ -47,8 +47,8 @@ class ChatroomsTableSeeder extends Seeder
                     'from' => 2 + $i % 2,
                     'to' => 3 - $i % 2,
                     'message' => "Hi " . $i . " !",
-                    'created_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 25) . " day " . (76 - $i) . " minutes")),
-                    'updated_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 25) . " day " . (76 - $i) . " minutes"))
+                    'created_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 20) . " day " . (76 - $i) . " minutes")),
+                    'updated_at' => date_sub(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string(floor((76 - $i) / 20) . " day " . (76 - $i) . " minutes"))
                 ]
             );
         }

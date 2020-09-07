@@ -44,8 +44,9 @@ export default function ChatButton(props) {
     id,
     avatar_url: "",
     name,
-    last_read: null,
   });
+
+  const [roomId, setRoomId] = useState(-1);
 
   useEffect(() => {
     axios
@@ -69,18 +70,19 @@ export default function ChatButton(props) {
         params: { user_id1: userId, user_id2: id },
       })
       .then((res) => {
-        setChatInfo((state) => ({ ...state, roomId: res.data.room_id }));
+        setRoomId(res.data.room_id);
       });
   }, [chatInfo.avatar_url, id, userId]);
 
   useEffect(() => {
-    if (chatInfo.avatar_url !== "" && chatInfo.roomId !== -1) setIsReady(true);
-  }, [chatInfo]);
+    if (chatInfo.avatar_url !== "" && roomId !== -1) setIsReady(true);
+  }, [chatInfo, roomId]);
 
   const handleOpen = () => {
     setChatInfo({
       ...chatInfo,
       isOpen: true,
+      roomId,
     });
   };
 

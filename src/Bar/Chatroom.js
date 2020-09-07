@@ -129,8 +129,9 @@ function ScrollController(props) {
 
   useEffect(() => {
     if (data[0].message[0] !== undefined) {
-      if (position >= -40) scrollToBottom();
-      else if (data[0].message[0].from === userId) scrollToBottom();
+      if (position >= -40) scrollToBottom({ behavior: "smooth" });
+      else if (data[0].message[0].from === userId)
+        scrollToBottom({ behavior: "smooth" });
       else setIsNew(true);
     }
   }, [data[0].message[0]]);
@@ -324,7 +325,6 @@ export default function Chatroom(props) {
     if (window.Echo === undefined) return () => {};
     if (chatInfo.roomId === 0) return () => {};
     handleSendBox(); // When create a new chatroom
-    handleRead(); // Tell the other side read
 
     // Check read by the other side
     axios
@@ -332,8 +332,16 @@ export default function Chatroom(props) {
         params: { user_id1: userId, user_id2: chatInfo.id },
       })
       .then((res) => {
-        setChatInfo((state) => ({ ...state, last_read: res.data.last_read }));
-      });
+        setChatInfo((state) => ({
+          ...state,
+          last_read: res.data.last_read,
+          unread: res.data.unread,
+          newest: res.data.newest,
+        }));
+      })
+      .finally(
+        () => handleRead() // Tell the other side read
+      );
 
     window.Echo.private(`Chatroom.${chatInfo.roomId}`)
       .listen("ChatSent", (event) => {
@@ -355,6 +363,7 @@ export default function Chatroom(props) {
       window.Echo.channel(`Chatroom.${chatInfo.roomId}`)
         .stopListening("ChatSent")
         .stopListening("ChatRead");
+      handleRead(); // Refresh read status
       refetch(); // Clear previous chatroom
     };
   }, [chatInfo.roomId, refetch]);
@@ -388,11 +397,12 @@ export default function Chatroom(props) {
                 page.message.map((text) => (
                   <ChatBox
                     key={text.id}
+                    id={text.id}
                     chatInfo={chatInfo}
                     message={text.message}
                     from={text.from}
                     time={text.created_at}
-                    first={text.first}
+                    firstOfDate={text.firstOfDate}
                   />
                 ))
               )}

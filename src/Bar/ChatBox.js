@@ -41,6 +41,9 @@ const useStyles = makeStyles(() => ({
   messageByMe: {
     background: "#c9cfed",
   },
+  messageUnread: {
+    background: "#fff8e5",
+  },
   avatar: {
     width: "32px",
     height: "32px",
@@ -68,26 +71,34 @@ const useStyles = makeStyles(() => ({
     color: "#777",
     margin: "auto 2px",
   },
-  newDay: {
+  date: {
+    fontSize: "11px",
+    display: "block",
+  },
+  unread: {
+    margin: "auto",
+    background: "#fff8e5",
+    padding: "5px 15px",
+    fontSize: "14px",
+    borderRadius: "30px",
+  },
+  newDate: {
     margin: "auto",
     background: "rgba(159, 191, 223, 0.3)",
     padding: "5px 15px",
     fontSize: "14px",
     borderRadius: "30px",
   },
-  dayTime: {
-    fontSize: "11px",
-    display: "block",
-  },
 }));
 
 export default function ChatBox(props) {
   const {
+    id,
     chatInfo,
     message,
     from,
     time,
-    first /* , canDelete, canEdit */,
+    firstOfDate /* , canDelete, canEdit */,
   } = props;
   const { userId, userAvatar } = useSelector(selectUser);
 
@@ -130,25 +141,26 @@ export default function ChatBox(props) {
   ];
 
   const getRecentTime = (t) => {
-    const day1 = new Date();
-    day1.setDate(day1.getDate());
-    const today = `${day1.getFullYear()}-${addZero(
-      day1.getMonth() + 1
-    )}-${addZero(day1.getDate())}`;
+    const date1 = new Date();
+    date1.setDate(date1.getDate());
+    const today = `${date1.getFullYear()}-${addZero(
+      date1.getMonth() + 1
+    )}-${addZero(date1.getDate())}`;
     if (t === today) return "Today";
 
-    const day2 = new Date();
-    day2.setDate(day2.getDate() - 1);
-    const yesterday = `${day2.getFullYear()}-${addZero(
-      day2.getMonth() + 1
-    )}-${addZero(day2.getDate())}`;
+    const date2 = new Date();
+    date2.setDate(date2.getDate() - 1);
+    const yesterday = `${date2.getFullYear()}-${addZero(
+      date2.getMonth() + 1
+    )}-${addZero(date2.getDate())}`;
     if (t === yesterday) return "Yesterday";
 
     const mon = month[parseInt(t.slice(5, 7), 10)];
     return `${mon} ${t.slice(8)}`;
   };
 
-  const readOrNot = chatInfo.last_read !== null && chatInfo.last_read >= time;
+  const readOrNot =
+    chatInfo.last_read !== undefined && chatInfo.last_read >= time;
   const messageTime = getTimeFormat(time);
   const date = getRecentTime(time.split(" ")[0]);
 
@@ -243,6 +255,11 @@ export default function ChatBox(props) {
         <Paper
           className={clsx(classes.message, {
             [classes.messageByMe]: from === userId,
+            [classes.messageUnread]:
+              from !== userId &&
+              chatInfo.unread !== null &&
+              chatInfo.unread <= id &&
+              id <= chatInfo.newest,
           })}
         >
           <div className={classes.content}>{message}</div>
@@ -252,7 +269,7 @@ export default function ChatBox(props) {
             {readOrNot && from === userId && "Read"}
           </Typography>
           {messageTime}
-          <Typography className={classes.dayTime}>
+          <Typography className={classes.date}>
             {date !== "Today" && date}
           </Typography>
         </Typography>
@@ -343,7 +360,10 @@ export default function ChatBox(props) {
         onClose={handleDeleteDialogClose}
       /> */}
       </div>
-      {first && <Paper className={classes.newDay}>{date}</Paper>}
+      {chatInfo.unread === id && (
+        <Paper className={classes.unread}>Unread messages</Paper>
+      )}
+      {firstOfDate && <Paper className={classes.newDate}>{date}</Paper>}
     </>
   );
 }

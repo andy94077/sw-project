@@ -47,13 +47,26 @@ class ChatroomController extends BaseController
         $user_id1 = intval($request['user_id1']);
         $user_id2 = intval($request['user_id2']);
 
-        $room = Chatroom::where('user_id1', $user_id1)
-            ->where('user_id2', $user_id2)->get();
+        // Get the time when the other side read
+        $room = Chatroom::where('user_id1', $user_id2)
+            ->where('user_id2', $user_id1)->get();
 
         if (count($room) > 0) {
-            return response()->json(["room_id" => $room[0]->room_id, "last_read" => $room[0]->last_read]);
+            // Get the last message I have read
+            $_room = Chatroom::where('user_id1', $user_id1)
+                ->where('user_id2', $user_id2)->first();
+            $unread = DB::table('laravel.chat_' .  $_room->room_id)
+                ->orderBy('created_at', 'asc')
+                ->where('created_at', '>', $_room->last_read)
+                ->where('from', $user_id2)
+                ->first();
+            if ($unread !== null) $unread = $unread->id;
+            $newest = DB::table('laravel.chat_' .  $_room->room_id)
+                ->orderBy('created_at', 'desc')
+                ->first()->id;
+            return response()->json(["room_id" => $room[0]->room_id, "last_read" => $room[0]->last_read, "unread" => $unread, "newest" => $newest]);
         } else {
-            return response()->json(["room_id" => 0, "last_read" => null]);
+            return response()->json(["room_id" => 0, "last_read" => null, "unread" => null, "newest" => null]);
         }
     }
 
@@ -121,8 +134,7 @@ class ChatroomController extends BaseController
         $user_id1 = intval($request['user_id1']);
         $user_id2 = intval($request['user_id2']);
 
-        // Tell the other side read
-        $room = Chatroom::where('user_id1', $user_id2)->where('user_id2', $user_id1)->first();
+        $room = Chatroom::where('user_id1', $user_id1)->where('user_id2', $user_id2)->first();
 
         $room->last_read = date('Y-m-d H:i:s');
         $room->save();
