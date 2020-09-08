@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
+// use App\Uploaders\ImageUploader;
 
 class ChatBoxController extends BaseController
 {
@@ -59,10 +60,15 @@ class ChatBoxController extends BaseController
         $to = intval($request['to']);
 
         DB::insert(
-            'INSERT INTO laravel.chat_' . $room_id . ' (`from`, `to`, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-            [$from, $to, $request['last_message'], date('Y-m-d H:i:s'), date('Y-m-d H:i:s')]
+            'INSERT INTO laravel.chat_' . $room_id . ' (`from`, `to`, `type`, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            [$from, $to, "text", $request['last_message'], date('Y-m-d H:i:s'), date('Y-m-d H:i:s')]
         );
 
         return response()->json(['message' => $request['last_message']]);
     }
+
+    // public function sendImage(Request $request)
+    // {
+
+    // }
 }

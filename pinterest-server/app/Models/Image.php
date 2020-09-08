@@ -6,6 +6,7 @@ use App\Libraries\DefaultImage;
 use App\Uploaders\ImageUploader;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class Image extends Model
 {
@@ -60,7 +61,7 @@ class Image extends Model
      */
     public function upload(UploadedFile $file)
     {
-        $data = \DB::select("show table status like '" . $this->table . "'");
+        $data = DB::select("show table status like '" . $this->table . "'");
         $id = $data[0]->Auto_increment;
         $this->image_name = $file->getClientOriginalName();
         return ImageUploader::upload($file, self::$directory, (string) $id);

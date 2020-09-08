@@ -81,6 +81,7 @@ class ChatroomController extends BaseController
             $table->bigIncrements('id');
             $table->unsignedBigInteger('from');
             $table->unsignedBigInteger('to');
+            $table->string('type');
             $table->string('message');
             $table->timestamps();
         });
