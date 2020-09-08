@@ -14,6 +14,9 @@ import Chatroom from "./Chatroom";
 import { CONCAT_SERVER_URL } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
+  room: {
+    outline: "none",
+  },
   rounded: {
     width: "32px",
     borderRadius: "16px",
@@ -66,7 +69,8 @@ export default function Message(props) {
   });
 
   // Toggle function (for chat)
-  const handleSetChatInfo = (roomId, id, avatarUrl, name) => () => {
+  const handleSetChatInfo = (roomId, id, avatarUrl, name) => (event) => {
+    if (event.type === "keydown" && event.key !== "Enter") return;
     if (type === "chats") {
       setChatInfo({
         isOpen: true,
@@ -97,6 +101,7 @@ export default function Message(props) {
             return (
               <div
                 key={time + value.id}
+                className={classes.room}
                 onClick={handleSetChatInfo(
                   value.room_id,
                   value.user_id2,
@@ -111,7 +116,6 @@ export default function Message(props) {
                 )}
                 tabIndex={0}
                 role="button"
-                style={{ outline: "none" }}
               >
                 <Accordion
                   defaultExpanded={background === "#fff8e5" || type === "chats"}

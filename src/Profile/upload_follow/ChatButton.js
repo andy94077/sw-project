@@ -94,11 +94,11 @@ export default function ChatButton(props) {
   };
 
   const onHide = () => {
-    setChatInfo({
-      ...chatInfo,
+    setChatInfo((state) => ({
+      ...state,
       isOpen: false,
       roomId: 0,
-    });
+    }));
   };
 
   if (isReady) {
