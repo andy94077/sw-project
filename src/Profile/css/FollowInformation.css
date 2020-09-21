@@ -1,0 +1,7 @@
+.followInformationCustomModal {
+  margin: auto;
+}
+
+.followInformationCustomModal .modal-content {
+  border-radius: 15px 15px 30px 30px;
+}

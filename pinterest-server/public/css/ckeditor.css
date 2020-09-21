@@ -1,0 +1,122 @@
+.ck div{
+    text-align: center;
+}
+.ck div img{
+    display: inline-block;
+    max-width: 100%;
+    width: auto;
+}
+.ck h1,.ck h2,.ck p,.ck ul li,.ck ol li {
+    font-family: 'Noto Sans TC','Roboto','Verdana','Microsoft JhengHei', sans-serif;
+    line-height: 130%;
+}
+.ck h1, .ck h2, .ck h3, .ck h4 {
+    text-align: center;
+}
+.ck h1 {
+    line-height: 10rem;
+}
+.ck h2 {
+    font-weight: 700;
+    color: #192453;
+    font-family: 'Noto Sans TC','Roboto','Verdana','Microsoft JhengHei', sans-serif;
+    font-size: 2.2rem;
+    line-height: 130%;
+    margin-bottom: 15px;
+}
+.ck h3 {
+    font-weight: 700;
+    color: #192453;
+    font-family: 'Noto Sans TC','Roboto','Verdana','Microsoft JhengHei', sans-serif;
+    font-size: 2rem;
+    line-height: 130%;
+    margin-bottom: 15px;
+}
+.ck h4 {
+    font-weight: 400;
+    color: #192453;
+    font-family: 'Noto Sans TC','Roboto','Verdana','Microsoft JhengHei', sans-serif;
+    font-size: 1.6rem;
+    line-height: 130%;
+    margin-bottom: 15px;
+}
+.ck .ck-content p,.ck ul li,.ck ol li {
+    line-height: 170%;
+    /* margin-bottom: 4rem; */
+    color: #0a1726;
+    font-size: 1.1rem;
+    letter-spacing: -0.1px;
+    text-align: justify;
+    text-justify: inter-word;
+}
+.ck .ck-content p{
+    word-spacing: .1rem;
+}
+.ck ul li,.ck ol li{
+    margin-bottom: 4px;
+}
+.ck .ck-content img {
+    margin-bottom: 4rem;
+}
+/* replace the original ck-content style */
+.ck-content .image {
+    margin: 0 auto !important;
+}
+
+/* product and blog 編輯器樣式 */
+.section-product-page article h2, .section-essay article h2{
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.section-product-page article h3, .section-essay article h3{
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.section-product-page article h4, .section-essay article h4{
+    font-size: 1.6rem;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.section-product-page article p, .section-essay article p{
+    line-height: 1.9rem;
+    word-spacing: .1rem;
+    margin: 0px auto 36px;
+    text-align: justify;
+}
+.section-product-page article ul, .section-essay article ul, .section-product-page article ol, .section-essay article ol{
+    list-style: disc;
+    margin-bottom: 36px;
+    padding-left: 20px;
+}
+.section-product-page article ul li, .section-essay article ul li, .section-product-page article ol li, .section-essay article ol li{
+    padding-bottom: 16px;
+    line-height: 120%;
+}
+.section-product-page article strong, .section-essay article strong{
+    font-weight: 900;
+}
+.section-product-page article i, .section-essay article i{
+    font-style: italic;
+}
+.section-product-page article a, .section-essay article a{
+    text-decoration: underline;
+}
+.section-product-page article .image, .section-essay article .image{
+    text-align: center;
+    margin-bottom: 15px;
+}
+/* The img width of blog articles and product articles */
+.section-product-page article .image img, .section-essay article .image img{
+    display: inline-block;
+    width: 900px;
+}
+/* The width of blog articles and product articles */
+.section-product-page article, .section-essay article{
+    width: 900px;
+    margin: 0 auto;
+}

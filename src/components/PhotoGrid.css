@@ -1,0 +1,37 @@
+.grid {
+  margin-top: 20px;
+  line-height: 0;
+  column-count: 6;
+  column-gap: 0px;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    column-count: 5;
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    column-count: 4;
+  }
+}
+
+@media (max-width: 800px) {
+  .grid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    column-count: 2;
+  }
+  .grid div {
+    margin: 0 3px 10px 3px;
+  }
+  .grid div div {
+    margin: 0;
+    padding: 0 6px 0px 6px;
+  }
+}

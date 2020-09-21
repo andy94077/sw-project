@@ -1,0 +1,4 @@
+@import '~/antd/dist/antd.css';
+.signup-form-input {
+  margin: 0 !important;
+}

@@ -1,0 +1,7 @@
+div.fade.in.modal {
+  display: flex !important;
+}
+
+.modal-content {
+  border-radius: 30px;
+}

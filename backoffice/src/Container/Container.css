@@ -1,0 +1,66 @@
+@import "~antd/dist/antd.css";
+.base-layout {
+  min-height: 100vh;
+}
+
+.header {
+  padding: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+
+.horizontal-menu {
+  float: right;
+}
+
+.first-menu-item {
+  margin: 0 !important;
+}
+
+.site-layout {
+  margin-top: 64px;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+.site-layout .site-sider {
+  overflow: auto;
+  height: 100%;
+  position: fixed;
+  left: 0;
+}
+
+.content {
+  background: rgb(0, 0, 0, 0.001);
+  margin-left: 200px;
+}
+
+.ant-layout-sider-collapsed+.ant-layout>.content {
+  margin-left: 80px;
+}
+
+.footer {
+  text-align: center;
+  background: rgb(0, 0, 0, 0.001);
+}
+
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px 25px 16px 16px;
+  text-align: center;
+  color: #fff;
+  line-height: 32px;
+  padding: 0 10px;
+  float: left;
+  font-size: 20px;
+}
+
+.role:hover {
+  background-color: inherit !important;
+  cursor: initial !important;
+  color: inherit !important;
+}
