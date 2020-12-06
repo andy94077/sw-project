@@ -1,6 +1,6 @@
 # sw-project
 
-A social website project inspired by `pinterest`, and `instagram`.
+A social website project inspired by `Pinterest` and `Instagram`.
 
 ## Dependencies
 
@@ -8,13 +8,15 @@ A social website project inspired by `pinterest`, and `instagram`.
 * Mysql 5.7
 * redis-server
 * PHP 7.4.8 
+* php7.4-bcmath php7.4-bz2 php7.4-intl php7.4-gd php7.4-mbstring php7.4-mysql php7.4-zip php7.4-common php7.4-xml
 * composer 1.10.9
 
 ## Install
-
+Make sure you have installed all the dependencies above.
 ```bash
 git clone https://github.com/andy94077/sw-project.git
 cd sw-project
+mysql -u root -e "create database laravel"
 ./install.sh
 ```
 
